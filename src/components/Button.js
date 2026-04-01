@@ -12,7 +12,7 @@ const Button = ({ backgroundColor, onPress, disabled, marginLeft, marginRight, t
             {
                 backgroundColor: backgroundColor ?? COLOURS.primary, width: width ?? responsiveWidth(90), alignSelf,
                 marginTop: marginTop ?? responsiveWidth(5.5), paddingVertical: paddingVertical ?? responsiveWidth(3.7),
-                borderRadius: borderRadius ?? responsiveWidth(20), marginLeft: marginLeft ?? responsiveWidth(0),
+                borderRadius: borderRadius ?? responsiveWidth(2), marginLeft: marginLeft ?? responsiveWidth(0),
                 marginRight: marginRight ?? responsiveWidth(0), borderColor: borderColor, borderWidth: borderWidth,
                 marginBottom: marginBottom, opacity: opacity
 

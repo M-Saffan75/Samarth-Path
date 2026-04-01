@@ -1,11 +1,12 @@
 import Button from '../../components/Button';
 import { COLOURS } from '../../assets/theme/Theme';
-import Title_Here from '../../components/TItle_Here';
+import UserRoutes from '../user_routes/UserRoutes';
+import Title_Here from '../../components/Title_Here';
 import { globalImages } from '../../assets/images/images_file/All_Images';
 import { StyleSheet, View, StatusBar, ImageBackground, Image } from 'react-native';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 
-const OnBoard = () => {
+const OnBoard = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <StatusBar
@@ -45,9 +46,10 @@ const OnBoard = () => {
                     marginTop={responsiveWidth(1)}
                 />
 
-                <Button label={'get started'} borderRadius={responsiveWidth(2)} alignSelf={'center'} marginTop={responsiveWidth(30)} />
+                <Button label={'get started'} borderRadius={responsiveWidth(2)} alignSelf={'center'}
+                    marginTop={responsiveWidth(30)} onPress={() => navigation.navigate(UserRoutes.Register)} />
 
-                <Button label={'sign in'} borderRadius={responsiveWidth(2)} alignSelf={'center'}
+                <Button label={'sign in'} borderRadius={responsiveWidth(2)} alignSelf={'center'} onPress={() => navigation.navigate(UserRoutes.Login)}
                     backgroundColor={COLOURS.light_green} borderColor={COLOURS.white} borderWidth={responsiveWidth(.1)} />
 
             </ImageBackground>
