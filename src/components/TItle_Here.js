@@ -11,7 +11,6 @@ const Title_Here = ({ title, fontSize, textAlign, marginTop, width, justifyConte
     return (
         <>
 
-
             <View>
                 <View style={style}>
                     <Text style={[styles.inpt_name,
@@ -36,8 +35,6 @@ const Title_Here = ({ title, fontSize, textAlign, marginTop, width, justifyConte
                     </Text>
                 </View>
             </View>
-
-            {/* </SafeAreaView> */}
         </>
     )
 }

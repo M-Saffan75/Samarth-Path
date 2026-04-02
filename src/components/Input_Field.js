@@ -24,7 +24,7 @@ const Input_Field = ({
                 <View style={[styles.inpt_area, {
                     backgroundColor: backgroundColor ?? COLOURS.grey,
                     borderWidth, borderColor,
-                    display: display, borderRadius: responsiveWidth(10) ?? borderRadius
+                    display: display, borderRadius: responsiveWidth(2) ?? borderRadius
                 }]}>
                     {first_inpt_Img ? <Image source={first_inpt_Img} style={[styles.inpt_icon, {
                         marginTop: marginTop ?? responsiveWidth(.5),
@@ -116,14 +116,14 @@ const styles = StyleSheet.create({
     },
 
     inpt_text: {
-        fontFamily: 'Inter-Medium',
+        fontFamily: 'Poppins-Medium',
         width: responsiveWidth(72),
-        top: 1,
+        top: responsiveWidth(.4),
+        textTransform: 'capitalize',
         borderRadius: responsiveWidth(2),
+        fontSize: responsiveFontSize(1.6),
         paddingVertical: responsiveWidth(2.5),
         paddingHorizontal: responsiveWidth(2),
-        fontSize: responsiveFontSize(1.7),
-        textTransform: 'capitalize',
 
     },
 

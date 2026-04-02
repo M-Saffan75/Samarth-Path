@@ -6,7 +6,7 @@ const App = () => {
   return (
     <NavigationContainer>
       <User_Navigator />
-    </NavigationContainer >
+    </NavigationContainer>
   )
 }
 

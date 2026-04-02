@@ -10,6 +10,7 @@ import Title_Here from '../../../components/Title_Here';
 import Back_Arrow from '../../../components/Back_Arrow';
 import Input_Field from '../../../components/Input_Field';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Number_Select from '../../../components/Number_Select';
 
 const Register = ({ navigation }) => {
 
@@ -29,39 +30,32 @@ const Register = ({ navigation }) => {
 
                             <Title_Here title={'create account'}
                                 color={COLOURS.black}
-                                fontSize={responsiveFontSize(2.5)}
                                 textAlign={'center'}
-                                marginBottom={responsiveWidth(2)}
                                 marginTop={responsiveWidth(10)}
+                                marginBottom={responsiveWidth(2)}
+                                fontSize={responsiveFontSize(2.5)}
                             />
 
                             <Title_Here title={'being your spiritual energy with samarth path'}
                                 color={COLOURS.black}
-                                fontSize={responsiveFontSize(1.7)}
                                 textAlign={'center'}
-                                marginBottom={responsiveWidth(8)}
                                 marginTop={responsiveWidth(1)}
+                                marginBottom={responsiveWidth(8)}
+                                fontSize={responsiveFontSize(1.7)}
                             />
 
 
-                            <Title_Here title={'username '} color={COLOURS.black} marginTop={0} />
+                            <Title_Here title={'username'} color={COLOURS.black} marginTop={0} />
                             <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}
                                 borderWidth={1}
                                 color={COLOURS.black}
                                 Placeholder={'username'}
-                                first_inpt_Img={globalImages.envelope_filled}
+                                first_inpt_Img={globalImages.user_filled}
                                 tintColor={COLOURS.grey}
                             />
                             <Title_Here title={'mobile number'} color={COLOURS.black} />
-                            <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}
-                                borderWidth={1}
-                                color={COLOURS.black}
-                                Placeholder={'+91.... xxxxxxx'}
-                                first_inpt_Img={globalImages.phone_filled}
-                                tintColor={COLOURS.grey}
-                                width={responsiveWidth(4.5)}
-                                height={responsiveWidth(4.5)}
-                            />
+                            <Number_Select />
+
 
                             <View style={styles.btn_area}>
                                 <Button label={'Send OTP'} /* onPress={handleLogin} */
@@ -71,7 +65,7 @@ const Register = ({ navigation }) => {
                             <View style={styles.dont_accnt}>
                                 <Text style={[styles.dont_text_1, { color: COLOURS.black }]}>Already have an account ?</Text>
                                 <TouchableOpacity activeOpacity={0.6}
-                                onPress={() => navigation.replace(UserRoutes.Login)}
+                                    onPress={() => navigation.replace(UserRoutes.Login)}
                                 >
                                     <Text style={[styles.dont_text_2, { color: COLOURS.primary }]}> sign In</Text>
                                 </TouchableOpacity>

@@ -9,6 +9,7 @@ import UserRoutes from '../../user_routes/UserRoutes';
 import Title_Here from '../../../components/Title_Here';
 import Back_Arrow from '../../../components/Back_Arrow';
 import Input_Field from '../../../components/Input_Field';
+import Number_Select from '../../../components/Number_Select';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Logiin = ({ navigation }) => {
@@ -43,25 +44,8 @@ const Logiin = ({ navigation }) => {
                                 marginTop={responsiveWidth(1)}
                             />
 
-{/* 
-                            <Title_Here title={'username '} color={COLOURS.black} marginTop={0} />
-                            <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}
-                                borderWidth={1}
-                                color={COLOURS.black}
-                                Placeholder={'username'}
-                                first_inpt_Img={globalImages.envelope_filled}
-                                tintColor={COLOURS.grey}
-                            /> */}
                             <Title_Here title={'mobile number'} color={COLOURS.black} />
-                            <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}
-                                borderWidth={1}
-                                color={COLOURS.black}
-                                Placeholder={'+91.... xxxxxxx'}
-                                first_inpt_Img={globalImages.phone_filled}
-                                tintColor={COLOURS.grey}
-                                width={responsiveWidth(4.5)}
-                                height={responsiveWidth(4.5)}
-                            />
+                            <Number_Select />
 
                             <View style={styles.btn_area}>
                                 <Button label={'Send OTP'} /* onPress={handleLogin} */
@@ -71,7 +55,7 @@ const Logiin = ({ navigation }) => {
                             <View style={styles.dont_accnt}>
                                 <Text style={[styles.dont_text_1, { color: COLOURS.black }]}>Don't have an account ?</Text>
                                 <TouchableOpacity activeOpacity={0.6}
-                                onPress={() => navigation.replace(UserRoutes.Register)}
+                                    onPress={() => navigation.replace(UserRoutes.Register)}
                                 >
                                     <Text style={[styles.dont_text_2, { color: COLOURS.primary }]}> sign up</Text>
                                 </TouchableOpacity>
