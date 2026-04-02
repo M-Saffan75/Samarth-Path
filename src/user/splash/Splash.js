@@ -3,7 +3,7 @@ import { COLOURS } from '../../assets/theme/Theme';
 import UserRoutes from '../user_routes/UserRoutes';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { StyleSheet, Image, View, StatusBar, Text, } from 'react-native';
+import { StyleSheet, Image, View, StatusBar} from 'react-native';
 import { globalImages } from '../../assets/images/images_file/All_Images';
 
 
@@ -13,7 +13,7 @@ const Splash = () => {
 
   useEffect(() => {
     setTimeout(() => {
-      navigation.replace(UserRoutes.Login)
+      navigation.replace(UserRoutes.PayWall)
     }, 2000);
   }, [navigation])
 

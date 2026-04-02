@@ -9,6 +9,7 @@ export const COLOURS = {
     light_grey:'#eee',    
     primary: '#E8935C',
     light_green:'#638575',
+    light_primary:'#FAF9F5',
     light_black: '#6C7278',
     transparent: 'rgba(0,0,0,0)',
     green_disbale:'rgba(52, 168, 83, 1)',

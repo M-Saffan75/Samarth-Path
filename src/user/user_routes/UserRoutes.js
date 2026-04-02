@@ -8,6 +8,12 @@ const UserRoutes = {
     Otp: 'Otp',
     OnBoard: 'OnBoard',
     Reset_Password: 'Reset_Password',
+    PayWall:'PayWall',
+
+    // Home
+
+    Home:'Home',
+
 }
 
 export default UserRoutes

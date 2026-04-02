@@ -113,8 +113,6 @@ const styles = StyleSheet.create({
 
     /*  */
 
-
-
     btn_area: {
         alignItems: 'center',
         marginTop: responsiveWidth(2),
