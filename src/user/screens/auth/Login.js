@@ -14,6 +14,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 const Logiin = ({ navigation }) => {
 
+    const handleLogin = () => {
+        navigation.navigate(UserRoutes.Otp)
+    }
+
     return (
         <>
             <StatusBar
@@ -48,7 +52,7 @@ const Logiin = ({ navigation }) => {
                             <Number_Select />
 
                             <View style={styles.btn_area}>
-                                <Button label={'Send OTP'} /* onPress={handleLogin} */
+                                <Button label={'Send OTP'} onPress={handleLogin}
                                 />
                             </View>
 

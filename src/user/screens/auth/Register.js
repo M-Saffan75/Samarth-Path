@@ -14,6 +14,10 @@ import Number_Select from '../../../components/Number_Select';
 
 const Register = ({ navigation }) => {
 
+    const handleRegister = () => {
+        navigation.navigate(UserRoutes.Otp)
+    }
+
     return (
         <>
             <StatusBar
@@ -58,7 +62,7 @@ const Register = ({ navigation }) => {
 
 
                             <View style={styles.btn_area}>
-                                <Button label={'Send OTP'} /* onPress={handleLogin} */
+                                <Button label={'Send OTP'} onPress={handleRegister}
                                 />
                             </View>
 
