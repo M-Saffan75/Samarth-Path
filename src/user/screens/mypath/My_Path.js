@@ -5,7 +5,7 @@ import Images_Here from './Images_Here';
 import Header from '../../../components/Header';
 import { COLOURS } from '../../../assets/theme/Theme';
 import Select_Text from '../../../components/Select_Text';
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { responsiveWidth } from 'react-native-responsive-dimensions';
 import { ScrollView, StatusBar, StyleSheet, View } from 'react-native';
 
