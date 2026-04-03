@@ -25,6 +25,9 @@ const UserRoutes = {
 
     User_Profile: 'User_Profile',
 
+    // Bottom_Navigation
+    Bottom_Navigation:'Bottom_Navigation',
+
 }
 
 export default UserRoutes

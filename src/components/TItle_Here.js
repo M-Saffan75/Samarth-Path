@@ -6,7 +6,7 @@ import {
 } from 'react-native-responsive-dimensions';
 import { COLOURS } from '../assets/theme/Theme';
 
-const Title_Here = ({ title, fontSize, textAlign, marginTop, width, justifyContent, letterSpacing, marginLeft, marginRight, lineHeight, borderRadius,
+const Title_Here = ({ title, fontSize, textAlign, marginTop, width, justifyContent, letterSpacing, marginLeft, marginRight, lineHeight, borderRadius, fontStyle,
     backgroundColor, alignItems, marginBottom, color, fontFamily, marginHorizontal, textTransform, alignSelf, style, paddingHorizontal, paddingVertical }) => {
     return (
         <>
@@ -17,6 +17,7 @@ const Title_Here = ({ title, fontSize, textAlign, marginTop, width, justifyConte
                     {
                         fontSize: fontSize ?? responsiveFontSize(1.9), color: color ?? COLOURS.black,
                         alignSelf,
+                        fontStyle: fontStyle ?? 'italic',
                         fontFamily: fontFamily ?? 'Poppins-Medium',
                         marginHorizontal: marginHorizontal ?? responsiveWidth(5),
                         marginBottom: marginBottom ?? responsiveWidth(1),

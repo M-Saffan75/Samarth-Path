@@ -12,6 +12,7 @@ import Register from '../screens/auth/Register';
 import PayWall from '../screens/paywall/PayWall';
 import Archives from '../screens/archives/Archives';
 import User_Profile from '../screens/profile/User_Profile';
+import Bottom_Navigation from '../bottom_tabs/Bottom_Navigation';
 
 
 const User_Navigator = () => {
@@ -31,6 +32,8 @@ const User_Navigator = () => {
                 <Stack.Screen name={UserRoutes.My_Path} component={My_Path} />
                 <Stack.Screen name={UserRoutes.Splash_Here} component={Splash} />
                 <Stack.Screen name={UserRoutes.User_Profile} component={User_Profile} />
+                <Stack.Screen name={UserRoutes.Bottom_Navigation} component={Bottom_Navigation} />
+                
             </Stack.Navigator>
         </>
     );

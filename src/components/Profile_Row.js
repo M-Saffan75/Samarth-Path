@@ -6,10 +6,10 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions'
 
 const Profile_Row = ({ bordernone, paddingBottom, label, source,
-    tintColor, backgroundColor, color }) => {
+    tintColor, backgroundColor, color, navigation, onPress }) => {
     return (
         <>
-            <TouchableOpacity activeOpacity={0.8}>
+            <TouchableOpacity activeOpacity={0.8} onPress={onPress}>
                 <View style={{
                     marginBottom: responsiveWidth(3),
                     // paddingTop: responsiveWidth(1),

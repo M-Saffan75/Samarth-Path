@@ -3,7 +3,7 @@ import Home from '../screens/home/Home';
 import { Fonts } from '../../assets/fonts/Fonts';
 import UserRoutes from '../user_routes/UserRoutes';
 import { COLOURS } from '../../assets/theme/Theme';
-import Archives from '../screens/archieves/Archives';
+import Archives from '../screens/archives/Archives';
 import My_Path from '../../user/screens/mypath/My_Path';
 import User_Profile from '../screens/profile/User_Profile';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -61,10 +61,10 @@ const Bottom_Navigation = () => {
               alignItems: 'center', paddingTop: responsiveWidth(3),
               width: width / 5, top: responsiveWidth(2),
             }}>
-              <Image source={focused ? globalImages.archive : globalImages.archive_light} style={{
+              <Image source={focused ? globalImages.archive_icon : globalImages.archive_light} style={{
                 height: responsiveWidth(5.5), width: responsiveWidth(5.5),
               }} tintColor={focused ? COLOURS.primary : COLOURS.grey} />
-              <Text style={{ color: focused ? COLOURS.primary : COLOURS.grey, fontFamily: focused ? Fonts.Medium : Fonts.Regular, fontSize: responsiveFontSize(1.7) }}>Order</Text>
+              <Text style={{ color: focused ? COLOURS.primary : COLOURS.grey, fontFamily: focused ? Fonts.Medium : Fonts.Regular, fontSize: responsiveFontSize(1.7) }}>Archives</Text>
             </View>
           ),
         }} />
@@ -78,7 +78,7 @@ const Bottom_Navigation = () => {
               <Image source={focused ? globalImages.access_icon : globalImages.access_light} style={{
                 height: responsiveWidth(5.5), width: responsiveWidth(5.5),
               }} tintColor={focused ? COLOURS.primary : COLOURS.grey} />
-              <Text style={{ color: focused ? COLOURS.primary : COLOURS.grey, fontFamily: focused ? Fonts.Medium : Fonts.Regular, fontSize: responsiveFontSize(1.7) }}>Order</Text>
+              <Text style={{ color: focused ? COLOURS.primary : COLOURS.grey, fontFamily: focused ? Fonts.Medium : Fonts.Regular, fontSize: responsiveFontSize(1.7) }}>My Path</Text>
             </View>
           ),
         }} />

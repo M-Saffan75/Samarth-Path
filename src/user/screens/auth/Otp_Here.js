@@ -22,7 +22,7 @@ const Otp_Here = ({ navigation }) => {
     const et6 = useRef();
 
     const click = () => {
-        navigation.navigate(UserRoutes.Reset_Password)
+        navigation.navigate(UserRoutes.Bottom_Navigation)
         console.log('sssss')
         console.log({
             et1: et1.current,
@@ -124,7 +124,7 @@ const Otp_Here = ({ navigation }) => {
                             </View>
 
                             <View>
-                                <Outline_Text text={'resend OTP'} width={responsiveWidth(22)} />
+                                <Outline_Text text={'resend OTP'} width={responsiveWidth(22)} onPress={() => navigation.goBack()} />
                             </View>
 
                         </View>

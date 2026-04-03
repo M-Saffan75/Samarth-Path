@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from '../../../components/Header';
 import { Fonts } from '../../../assets/fonts/Fonts';
+import UserRoutes from '../../user_routes/UserRoutes';
 import { COLOURS } from '../../../assets/theme/Theme';
 import Title_Here from '../../../components/Title_Here';
 import Profile_Row from '../../../components/Profile_Row';
@@ -9,7 +10,7 @@ import { globalImages } from '../../../assets/images/images_file/All_Images';
 import { Image, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 
-const User_Profile = () => {
+const User_Profile = ({ navigation }) => {
     return (
         <>
             <StatusBar
@@ -112,9 +113,12 @@ const User_Profile = () => {
 
                         <View style={[styles.box_profile_new, { backgroundColor: COLOURS.light_primary }]}>
                             <Profile_Row label={'sign out'} bordernone={false} paddingBottom={responsiveWidth(.1)}
-                                source={globalImages.signpost_icon} tintColor={COLOURS.red}
-                                backgroundColor={COLOURS.light_red} color={COLOURS.red} />
+                                source={globalImages.logout_icon} tintColor={COLOURS.red}
+                                backgroundColor={COLOURS.light_red} color={COLOURS.red}
+                                onPress={() => navigation.replace(UserRoutes.OnBoard)} />
                         </View>
+
+                        <View style={{ marginBottom: responsiveWidth(15) }} />
 
                     </ScrollView>
 

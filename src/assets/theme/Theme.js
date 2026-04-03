@@ -8,7 +8,7 @@ export const COLOURS = {
     yellow:'#d7e601',
     light_grey:'#eee',    
     primary: '#E8935C',
-    light_red:'#FDF3F2',
+    light_red:'#f7e9e8',
     light_green:'#638575',
     light_primary:'#FAF9F5',
     light_black: '#6C7278',
