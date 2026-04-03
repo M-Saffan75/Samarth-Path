@@ -17,8 +17,9 @@ const Subscription_Offer = ({ detail, source }) => {
                 </View>
                 <Text style={{
                     fontFamily: Fonts.Medium, textTransform: 'capitalize', fontSize: responsiveFontSize(1.7),
-                    color: COLOURS.black, top: responsiveWidth(.4), paddingHorizontal: responsiveWidth(3), letterSpacing:responsiveWidth(.1)
-                }}>{detail}</Text>
+                    color: COLOURS.black, top: responsiveWidth(.4), paddingHorizontal: responsiveWidth(3), letterSpacing: responsiveWidth(.1)
+                }}>{detail}
+                </Text>
             </View>
 
         </>

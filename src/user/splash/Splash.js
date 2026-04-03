@@ -13,7 +13,7 @@ const Splash = () => {
 
   useEffect(() => {
     setTimeout(() => {
-      navigation.replace(UserRoutes.PayWall)
+      navigation.replace(UserRoutes.User_Profile)
     }, 2000);
   }, [navigation])
 

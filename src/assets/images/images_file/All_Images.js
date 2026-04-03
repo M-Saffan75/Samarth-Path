@@ -6,6 +6,7 @@ const icon_new = require('../all_images/icon_new.png')
 const archive_icon = require('../all_images/archive.png')
 const signpost_icon = require('../all_images/signpost.png')
 const calender_icon = require('../all_images/calendar.png')
+const profile = require('../all_images/profile.jpg')
 const access_icon = require('../all_images/access-control.png')
 
 const user_filled = require('../../icons/Filled/user.png')
@@ -17,5 +18,5 @@ export const globalImages = {
     app_logo, image_1, bg_here, icon_new,
     user_filled, envelope_filled, phone_filled,
     back_arrow, archive_icon, calender_icon, signpost_icon,
-    access_icon,
+    access_icon,profile,
 }

@@ -14,6 +14,10 @@ const UserRoutes = {
 
     Home:'Home',
 
+    // profiles
+
+    User_Profile:'User_Profile',
+
 }
 
 export default UserRoutes
