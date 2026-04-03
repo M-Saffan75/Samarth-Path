@@ -22,7 +22,7 @@ const Otp_Here = ({ navigation }) => {
     const et6 = useRef();
 
     const click = () => {
-        navigation.navigate(UserRoutes.PayWall)
+        navigation.replace(UserRoutes.PayWall)
         console.log('sssss')
         console.log({
             et1: et1.current,

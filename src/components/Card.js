@@ -69,11 +69,10 @@ const Card = ({ schedule, text, title, phase, description, source }) => {
 
                     <View style={{
                         marginHorizontal: responsiveWidth(4), marginTop: responsiveWidth(2.5),
-                        flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'
+                        flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start'
                     }}>
                         <Reaction source={globalImages.heart} count={22} />
                         <Reaction source={globalImages.comment} count={12} />
-                        <Reaction source={globalImages.archive_light} count={13} />
                         <Reaction source={globalImages.save_icon} count={2} />
                     </View>
 
