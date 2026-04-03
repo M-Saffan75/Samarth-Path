@@ -9,6 +9,7 @@ import Login from '../screens/auth/Login';
 import Otp_Here from '../screens/auth/Otp_Here';
 import Register from '../screens/auth/Register';
 import PayWall from '../screens/paywall/PayWall';
+import Main_Home from '../screens/home/Main_Home';
 import User_Profile from '../screens/profile/User_Profile';
 
 
@@ -25,6 +26,7 @@ const User_Navigator = () => {
                 <Stack.Screen name={UserRoutes.OnBoard} component={OnBoard} />
                 <Stack.Screen name={UserRoutes.PayWall} component={PayWall} />
                 <Stack.Screen name={UserRoutes.Register} component={Register} />
+                <Stack.Screen name={UserRoutes.Main_Home} component={Main_Home} />
                 <Stack.Screen name={UserRoutes.Splash_Here} component={Splash} />
                 <Stack.Screen name={UserRoutes.User_Profile} component={User_Profile} />
             </Stack.Navigator>

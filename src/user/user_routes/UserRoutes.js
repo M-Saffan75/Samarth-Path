@@ -13,6 +13,7 @@ const UserRoutes = {
     // Home
 
     Home:'Home',
+    Main_Home:'Main_Home',
 
     // profiles
 
