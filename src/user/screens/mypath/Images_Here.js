@@ -11,7 +11,7 @@ const Images_Here = () => {
       <View>
 
         <View style={styles.bg_img}>
-          <Image source={globalImages.icon_new} style={styles.logo_img} />
+          <Image source={globalImages.app_logo} style={styles.logo_img} tintColor={COLOURS.primary}/>
         </View>
         <Title_Here title={'no saved images'} textAlign={'center'} />
         <Title_Here title={'save spiritual Images to see them later...'} fontSize={responsiveFontSize(1.7)}

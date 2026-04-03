@@ -5,23 +5,23 @@ import { Image, StyleSheet, Text, View } from 'react-native'
 import { globalImages } from '../../../assets/images/images_file/All_Images'
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions'
 
-const Videos_Here = () => {
+const Text_Here = () => {
   return (
     <>
       <View>
 
         <View style={styles.bg_img}>
-          <Image source={globalImages.icon_new} style={styles.logo_img} />
+          <Image source={globalImages.app_logo} style={styles.logo_img} tintColor={COLOURS.primary}/>
         </View>
-        <Title_Here title={'no saved videos'} textAlign={'center'} />
-        <Title_Here title={'save spiritual videos to read them later...'} fontSize={responsiveFontSize(1.7)}
+        <Title_Here title={'no saved text'} textAlign={'center'} />
+        <Title_Here title={'save spiritual text to read them later...'} fontSize={responsiveFontSize(1.7)}
           textAlign={'center'} color={COLOURS.light_black} marginTop={responsiveWidth(1)} />
       </View>
     </>
   )
 }
 
-export default Videos_Here
+export default Text_Here
 
 const styles = StyleSheet.create({
   

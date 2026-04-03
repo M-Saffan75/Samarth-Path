@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
+import Text_Here from './Text_Here';
+import Videos_Here from './Videos_Here';
+import Images_Here from './Images_Here';
 import Header from '../../../components/Header';
-import Text_Here from '../../screens/home/Text_Here';
-import Videos_Here from '../../screens/home/Videos_Here';
-import Images_Here from '../../screens/home/Images_Here';
 import { COLOURS } from '../../../assets/theme/Theme';
 import Select_Text from '../../../components/Select_Text';
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { responsiveWidth } from 'react-native-responsive-dimensions';
 import { ScrollView, StatusBar, StyleSheet, View } from 'react-native';
 
-const Main_Home = () => {
+const My_Path = () => {
 
     const [activeTab, setActiveTab] = useState('Text');
 
@@ -66,7 +66,7 @@ const Main_Home = () => {
     )
 }
 
-export default Main_Home
+export default My_Path
 
 const styles = StyleSheet.create({
     row_select: {

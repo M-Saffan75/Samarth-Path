@@ -8,16 +8,22 @@ const UserRoutes = {
     Otp: 'Otp',
     OnBoard: 'OnBoard',
     Reset_Password: 'Reset_Password',
-    PayWall:'PayWall',
+    PayWall: 'PayWall',
 
     // Home
 
-    Home:'Home',
-    Main_Home:'Main_Home',
+    Home: 'Home',
+    Main_Home: 'Main_Home',
+
+    // Archieve
+    Archives: 'Archives',
+
+    // My_Path
+    My_Path: 'My_Path',
 
     // profiles
 
-    User_Profile:'User_Profile',
+    User_Profile: 'User_Profile',
 
 }
 
