@@ -24,7 +24,7 @@ const Splash = () => {
 
   useEffect(() => {
     setTimeout(() => {
-      navigation.replace(UserRoutes.Bottom_Navigation)
+      navigation.replace(UserRoutes.OnBoard)
     }, 3000);
   }, [navigation])
 

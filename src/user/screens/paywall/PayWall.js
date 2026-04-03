@@ -14,7 +14,7 @@ import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dim
 const PayWall = ({ navigation }) => {
 
     const handleSubscription = () => {
-        navigation.navigate(UserRoutes.Home)
+        navigation.navigate(UserRoutes.Bottom_Navigation)
     }
 
     return (
@@ -28,7 +28,7 @@ const PayWall = ({ navigation }) => {
                 <View style={[styles.container, { backgroundColor: COLOURS.white }]}>
 
                     <View style={styles.logo_bg}>
-                        <App_Logo source={globalImages.icon_new} resizeMode={'cover'} height={responsiveWidth(12)} width={responsiveWidth(12)} />
+                        <App_Logo source={globalImages.app_logo} resizeMode={'cover'} height={responsiveWidth(12)} width={responsiveWidth(12)} tintColor={COLOURS.primary}/>
                     </View>
 
                     {/*  */}

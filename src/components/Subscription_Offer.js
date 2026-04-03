@@ -13,7 +13,7 @@ const Subscription_Offer = ({ detail, source }) => {
                     backgroundColor: COLOURS.light_grey, borderRadius: responsiveWidth(2),
                     height: responsiveWidth(10), width: responsiveWidth(10), alignItems: 'center', justifyContent: 'center'
                 }}>
-                    <Image source={source} style={{ height: responsiveWidth(4), width: responsiveWidth(4) }} tintColor={COLOURS.green} />
+                    <Image source={source} style={{ height: responsiveWidth(4), width: responsiveWidth(4) }} tintColor={COLOURS.light_green} />
                 </View>
                 <Text style={{
                     fontFamily: Fonts.Medium, textTransform: 'capitalize', fontSize: responsiveFontSize(1.7),

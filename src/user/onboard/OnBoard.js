@@ -22,7 +22,7 @@ const OnBoard = ({ navigation }) => {
 
                 <Image source={globalImages.image_1} style={styles.top_img} resizeMode='contain' />
 
-                <Image source={globalImages.icon_new} style={styles.icon_new_img} resizeMode='contain' />
+                <Image source={globalImages.app_logo} style={styles.icon_new_img} resizeMode='contain' />
 
                 {/* Samarth path */}
 

@@ -14,7 +14,11 @@ const getFlag = (code) => {
 };
 
 const Number_Select = ({ value, onChangeText, onChangeFormatted }) => {
-    const [selected, setSelected] = useState(countries[0]);
+    
+    const [selected, setSelected] = useState(
+        countries.find(c => c.code === 'IN') || countries[0]  // India default
+    );
+
     const [modalVisible, setModalVisible] = useState(false);
     const [search, setSearch] = useState('');
 
