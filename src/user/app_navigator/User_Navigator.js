@@ -3,7 +3,7 @@ import UserRoutes from '../user_routes/UserRoutes';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import Splash from '../splash/Splash';
-import Home from '../screens/mypath/Home';
+import Home from '../screens/home/Home';
 import OnBoard from '../onboard/OnBoard';
 import Login from '../screens/auth/Login';
 import My_Path from '../screens/mypath/My_Path';

@@ -24,7 +24,7 @@ const Splash = () => {
 
   useEffect(() => {
     setTimeout(() => {
-      navigation.replace(UserRoutes.My_Path)
+      navigation.replace(UserRoutes.Home)
     }, 3000);
   }, [navigation])
 

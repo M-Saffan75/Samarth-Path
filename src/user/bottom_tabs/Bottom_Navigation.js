@@ -1,12 +1,13 @@
 import React from 'react';
-import Main_Home from '../screens/home/My_Path';
+import Home from '../screens/home/Home';
+import { Fonts } from '../../assets/fonts/Fonts';
 import UserRoutes from '../user_routes/UserRoutes';
 import { COLOURS } from '../../assets/theme/Theme';
 import Archives from '../screens/archieves/Archives';
+import My_Path from '../../user/screens/mypath/My_Path';
 import User_Profile from '../screens/profile/User_Profile';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { globalImages } from '../../assets/images/images_file/All_Images';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StyleSheet, Text, View, Image, Dimensions, Easing } from 'react-native';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 
@@ -14,10 +15,9 @@ const { height, width } = Dimensions.get('window')
 
 const Bottom_Navigation = () => {
 
-  const Stack = createNativeStackNavigator();
   const Tab = createBottomTabNavigator();
 
-  
+
   return (
     <>
       <Tab.Navigator
@@ -42,7 +42,7 @@ const Bottom_Navigation = () => {
           }
         }}>
 
-        <Tab.Screen name={UserRoutes.Main_Home} component={Main_Home} options={{
+        <Tab.Screen name={UserRoutes.Home} component={Home} options={{
           tabBarIcon: ({ focused }) => (
             < View style={{
               alignItems: 'center', paddingTop: responsiveWidth(3),
@@ -51,7 +51,7 @@ const Bottom_Navigation = () => {
               <Image source={focused ? globalImages.home_filled : globalImages.home_icon} style={{
                 height: responsiveWidth(5.5), width: responsiveWidth(5.5),
               }} tintColor={focused ? COLOURS.primary : COLOURS.grey} />
-              <Text style={{ color: focused ? COLOURS.primary : COLOURS.grey, fontFamily: focused ? 'Poppins-Medium' : 'Poppins-Regular', fontSize: responsiveFontSize(1.7) }}>Home</Text>
+              <Text style={{ color: focused ? COLOURS.primary : COLOURS.grey, fontFamily: focused ? Fonts.Medium : Fonts.Regular, fontSize: responsiveFontSize(1.7) }}>Home</Text>
             </View>
           ),
         }} />
@@ -61,10 +61,24 @@ const Bottom_Navigation = () => {
               alignItems: 'center', paddingTop: responsiveWidth(3),
               width: width / 5, top: responsiveWidth(2),
             }}>
-              <Image source={focused ? globalImages.order_filled : globalImages.order_icon} style={{
+              <Image source={focused ? globalImages.archive : globalImages.archive_light} style={{
                 height: responsiveWidth(5.5), width: responsiveWidth(5.5),
               }} tintColor={focused ? COLOURS.primary : COLOURS.grey} />
-              <Text style={{ color: focused ? COLOURS.primary : COLOURS.grey, fontFamily: focused ? 'Poppins-Medium' : 'Poppins-Regular', fontSize: responsiveFontSize(1.7) }}>Order</Text>
+              <Text style={{ color: focused ? COLOURS.primary : COLOURS.grey, fontFamily: focused ? Fonts.Medium : Fonts.Regular, fontSize: responsiveFontSize(1.7) }}>Order</Text>
+            </View>
+          ),
+        }} />
+
+        <Tab.Screen name={UserRoutes.My_Path} component={My_Path} options={{
+          tabBarIcon: ({ focused }) => (
+            < View style={{
+              alignItems: 'center', paddingTop: responsiveWidth(3),
+              width: width / 5, top: responsiveWidth(2),
+            }}>
+              <Image source={focused ? globalImages.access_icon : globalImages.access_light} style={{
+                height: responsiveWidth(5.5), width: responsiveWidth(5.5),
+              }} tintColor={focused ? COLOURS.primary : COLOURS.grey} />
+              <Text style={{ color: focused ? COLOURS.primary : COLOURS.grey, fontFamily: focused ? Fonts.Medium : Fonts.Regular, fontSize: responsiveFontSize(1.7) }}>Order</Text>
             </View>
           ),
         }} />
@@ -75,10 +89,10 @@ const Bottom_Navigation = () => {
               alignItems: 'center', paddingTop: responsiveWidth(3),
               width: width / 5, top: responsiveWidth(2),
             }}>
-              <Image source={focused ? globalImages.user_filled : globalImages.user_icon} style={{
+              <Image source={focused ? globalImages.user_filled : globalImages.user_light} style={{
                 height: responsiveWidth(5.5), width: responsiveWidth(5.5),
               }} tintColor={focused ? COLOURS.primary : COLOURS.grey} />
-              <Text style={{ color: focused ? COLOURS.primary : COLOURS.grey, fontFamily: focused ? 'Poppins-Medium' : 'Poppins-Regular', fontSize: responsiveFontSize(1.7) }}>Profile</Text>
+              <Text style={{ color: focused ? COLOURS.primary : COLOURS.grey, fontFamily: focused ? Fonts.Medium : Fonts.Regular, fontSize: responsiveFontSize(1.7) }}>Profile</Text>
             </View>
           ),
         }} />

@@ -15,9 +15,17 @@ const phone_filled = require('../../icons/Filled/phone.png')
 const back_arrow = require('../../icons/Bold/chevron-left.png')
 const envelope_filled = require('../../icons/Filled/envelope.png')
 
+const home_icon = require('../../icons/Bold/home.png')
+const home_filled = require('../../icons/Filled/home.png')
+const archive_light = require('../all_images/archive_light.png')
+const access_light = require('../all_images/access-control-light.png')
+const user_light = require('../../icons/Bold/user.png')
+
+
 export const globalImages = {
     app_logo, image_1, bg_here, icon_new,
     user_filled, envelope_filled, phone_filled,
     back_arrow, archive_icon, calender_icon, signpost_icon,
-    access_icon,profile,about_icon
+    access_icon, profile, about_icon, home_icon, home_filled,
+    archive_light, access_light, user_light
 }
