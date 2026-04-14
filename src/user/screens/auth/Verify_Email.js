@@ -72,8 +72,8 @@ const Verify_Email = ({ navigation, route }) => {
             });
         } catch (error) {
             console.log('error.code', error.code)
-            if (error.code === 410) { // OTP expired => modal open
-                setModalEmail(email); // email already 
+            if (error.code === 410) { 
+                setModalEmail(email); 
                 setModalVisible(true);
             } else {
                 showError(error.message || 'Invalid OTP. Try again!');
@@ -95,7 +95,7 @@ const Verify_Email = ({ navigation, route }) => {
             const data = await resendOtp({ email: modalEmail });
             showSuccess(data?.message || 'OTP sent successfully');
             setModalVisible(false);
-            setOtp(['', '', '', '', '', '']); // ✅ old OTP clear
+            setOtp(['', '', '', '', '', '']); 
         } catch (error) {
             if (error.code === 429) {
                 setModalVisible(false);
