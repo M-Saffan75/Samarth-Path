@@ -73,7 +73,7 @@ const Logiin = ({ navigation }) => {
                         setRateLimitMessage('please wait 1 minute before requesting another OTP');
                         setRateLimitModal(true);
                     } else {
-                        showError(resendError.message || 'Something went wrong. Try again!');
+                        console.log(resendError.message || 'Something went wrong. Try again!');
                     }
                 } finally {
                     setLoading(false);

@@ -90,7 +90,6 @@ const Register = ({ navigation }) => {
         try {
             setLoading(true);
             const data = await registerUser({ name, phone, email, password });
-            console.log('data:', data.data.email);
             navigation.reset({
                 index: 0,
                 routes: [{
@@ -118,7 +117,7 @@ const Register = ({ navigation }) => {
                         setRateLimitModal(true);
                         console.log('429 error:', resendError.message);
                     } else {
-                        showError(resendError.message || 'Something went wrong. Try again!');
+                        console.log(resendError.message || 'Something went wrong. Try again!');
                     }
                 } finally {
                     setLoading(false);

@@ -16,6 +16,7 @@ import { useLoader } from '../../../loading/LoaderContext';
 import { resendOtp, verifyOtp } from './auth_backend/Auth_Backend';
 import { showError, showSuccess } from '../../../helper/Helper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Wait_Modal from '../../../components/Wait_Modal';
 
 
 const Verify_Email = ({ navigation, route }) => {
@@ -25,8 +26,15 @@ const Verify_Email = ({ navigation, route }) => {
     const [modalEmail, setModalEmail] = useState('');
     const [modalLoading, setModalLoading] = useState(false);
 
+
+    const [rateLimitModal, setRateLimitModal] = useState(false);
+    const [rateLimitMessage, setRateLimitMessage] = useState('');
+
     const { email } = route.params;
-    console.log(email)
+    useEffect(() => {
+        setModalEmail(email);
+    }, [email]);
+
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
 
     const et1 = useRef();
@@ -88,12 +96,15 @@ const Verify_Email = ({ navigation, route }) => {
             showSuccess(data?.message || 'OTP sent successfully');
             setModalVisible(false);
             setOtp(['', '', '', '', '', '']); // ✅ old OTP clear
-            navigation.reset({
-                index: 0,
-                routes: [{ name: UserRoutes.Bottom_Navigation }],
-            });
         } catch (error) {
-            showError(error.message || 'Something went wrong. Try again!');
+            if (error.code === 429) {
+                setModalVisible(false);
+                setRateLimitMessage('please wait 1 minute before requesting another OTP');
+                setRateLimitModal(true);
+            } else {
+                console.log(error.message || 'Something went wrong. Try again!');
+            }
+            console.log(error.message || 'Something went wrong. Try again!');
         } finally {
             setLoading(false);
             setModalLoading(false);
@@ -206,6 +217,11 @@ const Verify_Email = ({ navigation, route }) => {
                             setModalEmail={setModalEmail}
                             handleModalSubmit={handleModalSubmit}
                             loading={modalLoading}
+                        />
+                        <Wait_Modal
+                            visible={rateLimitModal}
+                            message={rateLimitMessage}
+                            onClose={() => setRateLimitModal(false)}
                         />
                     </ImageBackground>
                 </View >
