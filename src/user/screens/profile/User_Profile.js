@@ -10,7 +10,23 @@ import { globalImages } from '../../../assets/images/images_file/All_Images';
 import { Image, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { showError } from '../../../helper/Helper';
+
 const User_Profile = ({ navigation }) => {
+
+    const handleLogout = async () => {
+        try {
+            await AsyncStorage.removeItem('token');
+            navigation.reset({
+                index: 0,
+                routes: [{ name: UserRoutes.OnBoard }],
+            });
+        } catch (error) {
+            showError('Something went wrong. Try again!');
+        }
+    };
+
     return (
         <>
             <StatusBar
@@ -115,7 +131,7 @@ const User_Profile = ({ navigation }) => {
                             <Profile_Row label={'sign out'} bordernone={false} paddingBottom={responsiveWidth(.1)}
                                 source={globalImages.logout_icon} tintColor={COLOURS.red}
                                 backgroundColor={COLOURS.light_red} color={COLOURS.red}
-                                onPress={() => navigation.replace(UserRoutes.OnBoard)} />
+                                onPress={handleLogout} />
                         </View>
 
                         <View style={{ marginBottom: responsiveWidth(15) }} />

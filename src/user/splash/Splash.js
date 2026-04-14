@@ -7,12 +7,35 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { responsiveFontSize } from 'react-native-responsive-dimensions';
 import { globalImages } from '../../assets/images/images_file/All_Images';
 import { StyleSheet, Image, View, StatusBar, Animated } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const Splash = () => {
 
-  const navigation = useNavigation()
+  const navigation = useNavigation();
   const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  const checkToken = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      if (token) {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: UserRoutes.Bottom_Navigation }],
+        });
+      } else {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: UserRoutes.OnBoard }],
+        });
+      }
+    } catch (error) {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: UserRoutes.OnBoard }],
+      });
+    }
+  };
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -23,11 +46,11 @@ const Splash = () => {
   }, []);
 
   useEffect(() => {
-    setTimeout(() => {
-      navigation.replace(UserRoutes.OnBoard)
+    const timeout = setTimeout(() => {
+      checkToken(); // ✅ 3 second baad check karo
     }, 3000);
-  }, [navigation])
-
+    return () => clearTimeout(timeout); // ✅ cleanup
+  }, []);
 
 
   return (
@@ -41,7 +64,7 @@ const Splash = () => {
               fontSize={responsiveFontSize(2.5)} textAlign={'center'} />
           </Animated.View>
         </View>
-      </SafeAreaView >
+      </SafeAreaView>
     </>
   )
 }

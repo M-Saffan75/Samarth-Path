@@ -33,6 +33,10 @@ const comment_filled = require('../../icons/Filled/comments.png')
 const save_icon = require('../../icons/Bold/bookmark.png')
 const save_filled = require('../../icons/Filled/bookmark.png')
 
+const eye_slash = require('../../icons/Bold/eye-slash.png')
+const eye = require('../../icons/Bold/eye.png')
+const pswd_key = require('../../images/all_images/key.png')
+
 export const globalImages = {
     app_logo, image_1, bg_here, icon_new,
     user_filled, envelope_filled, phone_filled,
@@ -40,5 +44,6 @@ export const globalImages = {
     access_icon, profile, about_icon, home_icon, home_filled,
     archive_light, access_light, user_light, logout_icon,
     spiritual_1, spiritual_2, heart_filled, heart, comment_filled, comment,
-    save_icon,save_filled,spiritual_3,spiritual_4,spiritual_5
+    save_icon, save_filled, spiritual_3, spiritual_4, spiritual_5, eye_slash,
+    eye, pswd_key,
 }

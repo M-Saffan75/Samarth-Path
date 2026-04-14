@@ -1,5 +1,5 @@
-import React from 'react'
-import { NavigationContainer } from '@react-navigation/native'
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
 import User_Navigator from './src/user/app_navigator/User_Navigator';
 
 const App = () => {

@@ -14,7 +14,7 @@ const getFlag = (code) => {
 };
 
 const Number_Select = ({ value, onChangeText, onChangeFormatted }) => {
-    
+
     const [selected, setSelected] = useState(
         countries.find(c => c.code === 'IN') || countries[0]  // India default
     );
@@ -70,7 +70,7 @@ const Number_Select = ({ value, onChangeText, onChangeFormatted }) => {
             </View>
 
             {/* Country Picker Modal */}
-            <Modal visible={modalVisible} animationType='slide' transparent>
+            <Modal visible={modalVisible} animationType='fade' transparent>
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalBox}>
 
@@ -134,11 +134,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: responsiveWidth(1),
-        top:responsiveWidth(.4),
+        top: responsiveWidth(.4),
         paddingHorizontal: responsiveWidth(3),
     },
     flagText: {
-        top:responsiveWidth(-.4),
+        top: responsiveWidth(-.4),
         fontSize: responsiveFontSize(2.5),
     },
     dialText: {
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Poppins-Medium',
     },
     arrow: {
-        top:responsiveWidth(-.5),
+        top: responsiveWidth(-.5),
         color: COLOURS.black,
         fontSize: responsiveFontSize(1.5),
     },
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     },
     input: {
         flex: 1,
-        top:responsiveWidth(.5),
+        top: responsiveWidth(.5),
         color: COLOURS.black,
         fontFamily: 'Poppins-Medium',
         fontSize: responsiveFontSize(1.8),

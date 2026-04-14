@@ -13,12 +13,12 @@ import Outline_Text from '../../../components/Outline_Text';
 import Modal_Verify from '../../../components/Modal_Verify';
 
 import { useLoader } from '../../../loading/LoaderContext';
+import { resendOtp, verifyOtp } from './auth_backend/Auth_Backend';
 import { showError, showSuccess } from '../../../helper/Helper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { forgotPassword, resendOtp, verifyOtp, verifyResetOtp } from './auth_backend/Auth_Backend';
 
 
-const Otp_Here = ({ navigation, route }) => {
+const Verify_Email = ({ navigation, route }) => {
 
     const { setLoading } = useLoader();
     const [modalVisible, setModalVisible] = useState(false);
@@ -26,11 +26,7 @@ const Otp_Here = ({ navigation, route }) => {
     const [modalLoading, setModalLoading] = useState(false);
 
     const { email } = route.params;
-    
-    useEffect(() => {
-        setModalEmail(email);
-    }, [email]);
-
+    console.log(email)
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
 
     const et1 = useRef();
@@ -58,17 +54,18 @@ const Otp_Here = ({ navigation, route }) => {
         try {
             setLoading(true);
             const otpString = otp.join('');
-            setModalEmail(email)
-            const data = await verifyResetOtp({ email, otp: otpString });
+            const data = await verifyOtp({ email, otp: otpString });
             showSuccess(data?.message || 'OTP verified!');
+            await AsyncStorage.setItem('token', data?.data?.token);
+            console.log('verify_token', data?.data?.token)
             navigation.reset({
                 index: 0,
-                routes: [{ name: UserRoutes.Reset_Password, params: { email } }],
+                routes: [{ name: UserRoutes.Bottom_Navigation }],
             });
         } catch (error) {
             console.log('error.code', error.code)
-            if (error.code === 410) {
-                setModalEmail(email);
+            if (error.code === 410) { // OTP expired => modal open
+                setModalEmail(email); // email already 
                 setModalVisible(true);
             } else {
                 showError(error.message || 'Invalid OTP. Try again!');
@@ -80,7 +77,6 @@ const Otp_Here = ({ navigation, route }) => {
 
 
     const handleModalSubmit = async () => {
-        setModalEmail(email)
         if (!modalEmail) {
             showError('Please enter your email');
             return;
@@ -88,11 +84,14 @@ const Otp_Here = ({ navigation, route }) => {
         try {
             setLoading(true);
             setModalLoading(true);
-            const data = await forgotPassword({ email: modalEmail });
-            showSuccess(data?.message || 'OTP Resent!');
+            const data = await resendOtp({ email: modalEmail });
+            showSuccess(data?.message || 'OTP sent successfully');
             setModalVisible(false);
-            setOtp(['', '', '', '', '', '']);
-
+            setOtp(['', '', '', '', '', '']); // ✅ old OTP clear
+            navigation.reset({
+                index: 0,
+                routes: [{ name: UserRoutes.Bottom_Navigation }],
+            });
         } catch (error) {
             showError(error.message || 'Something went wrong. Try again!');
         } finally {
@@ -190,7 +189,8 @@ const Otp_Here = ({ navigation, route }) => {
                             </View>
 
                             <View style={styles.btn_area}>
-                                <Button label={'Submitsss'} onPress={handleSubmit}
+                                <Button label={'Submit'} onPress={handleSubmit}
+                                // onPress={() => navigation.navigate(routeName.Bottom_Nav)}
                                 />
                             </View>
 
@@ -214,7 +214,7 @@ const Otp_Here = ({ navigation, route }) => {
     )
 }
 
-export default Otp_Here
+export default Verify_Email
 
 
 const styles = StyleSheet.create({
