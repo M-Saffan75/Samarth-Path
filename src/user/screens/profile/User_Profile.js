@@ -110,8 +110,9 @@ const User_Profile = ({ navigation }) => {
 
                         <View style={[styles.box_profile_new, { backgroundColor: COLOURS.light_primary }]}>
                             <Profile_Row label={'notifications'} source={globalImages.calender_icon} />
-                            <Profile_Row label={'about samarth path'} bordernone={false} paddingBottom={responsiveWidth(.1)}
-                                source={globalImages.about_icon} />
+                            <Profile_Row label={'about samarth path'} source={globalImages.about_icon} />
+                            <Profile_Row label={'change password'} bordernone={false} paddingBottom={responsiveWidth(.1)}
+                                source={globalImages.lock_icon} onPress={() => navigation.navigate(UserRoutes.Change_Password)} />
                         </View>
 
                         {/*  */}

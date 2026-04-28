@@ -18,6 +18,7 @@ import Verify_Email from '../screens/auth/Verify_Email';
 import User_Profile from '../screens/profile/User_Profile';
 import Reset_Password from '../screens/auth/Reset_Password';
 import { LoaderProvider } from '../../loading/LoaderContext';
+import Change_Password from '../screens/auth/Change_Password';
 import Forgot_Password from '../screens/auth/Forgot_Password';
 import Bottom_Navigation from '../bottom_tabs/Bottom_Navigation';
 
@@ -40,6 +41,7 @@ const User_Navigator = () => {
                     <Stack.Screen name={UserRoutes.My_Path} component={My_Path} />
                     <Stack.Screen name={UserRoutes.Forgot_Password} component={Forgot_Password} />
                     <Stack.Screen name={UserRoutes.Reset_Password} component={Reset_Password} />
+                    <Stack.Screen name={UserRoutes.Change_Password} component={Change_Password} />
                     <Stack.Screen name={UserRoutes.Splash_Here} component={Splash} />
                     <Stack.Screen name={UserRoutes.User_Profile} component={User_Profile} />
                     <Stack.Screen name={UserRoutes.Bottom_Navigation} component={Bottom_Navigation} />

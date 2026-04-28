@@ -90,26 +90,18 @@ const Register = ({ navigation }) => {
         try {
             setLoading(true);
             const data = await registerUser({ name, phone, email, password });
-            navigation.reset({
-                index: 0,
-                routes: [{
-                    name: UserRoutes.Verify_Email,
-                    params: { email: data?.data?.email },
-                }],
+            navigation.replace(UserRoutes.Verify_Email, {
+                phone: data?.data?.phone,
             });
             showSuccess(data?.message || 'Registration successful');
         } catch (error) {
-            if (error.code === 409) {
+            if (error.code === 408) {
                 try {
                     setLoading(true);
-                    const resendData = await resendOtp({ email });
+                    const resendData = await resendOtp({ phone });
                     showSuccess(resendData?.message || 'OTP sent successfully');
-                    navigation.reset({
-                        index: 0,
-                        routes: [{
-                            name: UserRoutes.Verify_Email,
-                            params: { email },
-                        }],
+                    navigation.replace(UserRoutes.Verify_Email, {
+                        phone: data?.data?.phone,
                     });
                 } catch (resendError) {
                     if (resendError.code === 429) {
@@ -167,7 +159,7 @@ const Register = ({ navigation }) => {
                                 <Number_Select value={phone} onChangeText={setPhone} />
 
 
-                                <Title_Here title={'name'} color={COLOURS.black} marginTop={0} />
+                                <Title_Here title={'name'} color={COLOURS.black} marginTop={responsiveWidth(2)} />
                                 <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}
                                     borderWidth={1}
                                     color={COLOURS.black}

@@ -23,17 +23,17 @@ const Verify_Email = ({ navigation, route }) => {
 
     const { setLoading } = useLoader();
     const [modalVisible, setModalVisible] = useState(false);
-    const [modalEmail, setModalEmail] = useState('');
+    const [modalPhone, setModalPhone] = useState('');
     const [modalLoading, setModalLoading] = useState(false);
 
 
     const [rateLimitModal, setRateLimitModal] = useState(false);
     const [rateLimitMessage, setRateLimitMessage] = useState('');
 
-    const { email } = route.params;
+    const { phone } = route.params;
     useEffect(() => {
-        setModalEmail(email);
-    }, [email]);
+        setModalPhone(phone);
+    }, [phone]);
 
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
 
@@ -62,7 +62,7 @@ const Verify_Email = ({ navigation, route }) => {
         try {
             setLoading(true);
             const otpString = otp.join('');
-            const data = await verifyOtp({ email, otp: otpString });
+            const data = await verifyOtp({ phone, otp: otpString });
             showSuccess(data?.message || 'OTP verified!');
             await AsyncStorage.setItem('token', data?.data?.token);
             console.log('verify_token', data?.data?.token)
@@ -73,7 +73,7 @@ const Verify_Email = ({ navigation, route }) => {
         } catch (error) {
             console.log('error.code', error.code)
             if (error.code === 410) { 
-                setModalEmail(email); 
+                setModalPhone(phone); 
                 setModalVisible(true);
             } else {
                 showError(error.message || 'Invalid OTP. Try again!');
@@ -85,14 +85,14 @@ const Verify_Email = ({ navigation, route }) => {
 
 
     const handleModalSubmit = async () => {
-        if (!modalEmail) {
-            showError('Please enter your email');
+        if (!modalPhone) {
+            showError('Please enter your phone');
             return;
         }
         try {
             setLoading(true);
             setModalLoading(true);
-            const data = await resendOtp({ email: modalEmail });
+            const data = await resendOtp({ phone: modalPhone });
             showSuccess(data?.message || 'OTP sent successfully');
             setModalVisible(false);
             setOtp(['', '', '', '', '', '']); 
@@ -134,7 +134,7 @@ const Verify_Email = ({ navigation, route }) => {
                                 fontSize={responsiveFontSize(2.5)}
                             />
 
-                            <Title_Here title={'enter 6 digit code sent to your email...'}
+                            <Title_Here title={'enter 6 digit code sent to your phone...'}
                                 color={COLOURS.black}
                                 textAlign={'center'}
                                 marginTop={responsiveWidth(1)}
@@ -213,8 +213,8 @@ const Verify_Email = ({ navigation, route }) => {
                         <Modal_Verify
                             modalVisible={modalVisible}
                             setModalVisible={setModalVisible}
-                            modalEmail={modalEmail}
-                            setModalEmail={setModalEmail}
+                            modalEmail={modalPhone}
+                            setModalEmail={setModalPhone}
                             handleModalSubmit={handleModalSubmit}
                             loading={modalLoading}
                         />

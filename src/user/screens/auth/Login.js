@@ -25,15 +25,14 @@ const Logiin = ({ navigation }) => {
     const { setLoading } = useLoader();
 
     const [phone, setPhone] = useState('');
-    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [rateLimitModal, setRateLimitModal] = useState(false);
     const [rateLimitMessage, setRateLimitMessage] = useState('');
 
     const handleLogin = () => {
         // Name
-        if (!email.trim()) {
-            showError('Email is required');
+        if (!phone.trim()) {
+            showError('Phone Number is required');
             return;
         }
         // Password
@@ -47,7 +46,7 @@ const Logiin = ({ navigation }) => {
     const handleApiCall = async () => {
         try {
             setLoading(true);
-            const data = await loginUser({ email, password });
+            const data = await loginUser({ phone, password });
             console.log('logindata:', data);
             await AsyncStorage.setItem('token', data?.data?.token);
             showSuccess(data?.message || 'Login successful');
@@ -59,13 +58,13 @@ const Logiin = ({ navigation }) => {
             if (error.code === 403) {
                 try {
                     setLoading(true);
-                    const resendData = await resendOtp({ email });
+                    const resendData = await resendOtp({ phone });
                     showSuccess(resendData?.message || 'OTP sent successfully');
                     navigation.reset({
                         index: 0,
                         routes: [{
                             name: UserRoutes.Verify_Email,
-                            params: { email },
+                            params: { phone },
                         }],
                     });
                 } catch (resendError) {
@@ -80,6 +79,7 @@ const Logiin = ({ navigation }) => {
                 }
             } else {
                 showError(error.message || 'Something went wrong. Try again!');
+                setLoading(flattenStyle)
             }
         } finally {
             setLoading(false);
@@ -117,19 +117,8 @@ const Logiin = ({ navigation }) => {
                                 marginTop={responsiveWidth(1)}
                             />
 
-                            {/* <Title_Here title={'mobile number'} color={COLOURS.black} />
-                            <Number_Select value={phone} onChangeText={setPhone} /> */}
-                            <Title_Here title={'email'} color={COLOURS.black} marginTop={0} />
-                            <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}
-                                borderWidth={1}
-                                color={COLOURS.black}
-                                Placeholder={'Your email'}
-                                first_inpt_Img={globalImages.envelope_filled}
-                                tintColor={COLOURS.grey}
-                                value={email}
-                                onChangeText={setEmail}
-                            />
-
+                            <Title_Here title={'mobile number'} color={COLOURS.black} />
+                            <Number_Select value={phone} onChangeText={setPhone} />
 
                             <Title_Here title={'password'} color={COLOURS.black} marginTop={0} />
                             <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}

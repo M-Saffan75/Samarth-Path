@@ -8,33 +8,23 @@ import Button from '../../../components/Button';
 import UserRoutes from '../../user_routes/UserRoutes';
 import Title_Here from '../../../components/Title_Here';
 import Back_Arrow from '../../../components/Back_Arrow';
-import Input_Field from '../../../components/Input_Field';
 import Number_Select from '../../../components/Number_Select';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import Wait_Modal from '../../../components/Wait_Modal';
 import { useLoader } from '../../../loading/LoaderContext';
+import { forgotPassword } from './auth_backend/Auth_Backend';
 import { showError, showSuccess } from '../../../helper/Helper';
-import { forgotPassword, loginUser, resendOtp } from './auth_backend/Auth_Backend';
 
 const Forgot_Password = ({ navigation }) => {
 
 
     const { setLoading } = useLoader();
-    const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
 
-    const validateEmail = (email) => {
-        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return regex.test(email);
-    };
 
     const handleForgotPassword = () => {
-        if (!email.trim()) {
-            showError('Email is required');
-            return;
-        }
-        if (!validateEmail(email)) {
-            showError('Please enter a valid email address');
+        if (!phone.trim()) {
+            showError('Phone is required');
             return;
         }
         handleApiCall();
@@ -43,10 +33,10 @@ const Forgot_Password = ({ navigation }) => {
     const handleApiCall = async () => {
         try {
             setLoading(true);
-            const data = await forgotPassword({ email });
+            const data = await forgotPassword({ phone });
             showSuccess(data?.message || 'OTP sent successfully!');
             setLoading(false)
-            navigation.navigate(UserRoutes.Otp_Here, { email });
+            navigation.navigate(UserRoutes.Otp_Here, { phone });
         } catch (error) {
             showError(error.message || 'Something went wrong. Try again!');
         } finally {
@@ -68,7 +58,7 @@ const Forgot_Password = ({ navigation }) => {
                         <View style={[styles.login_area]}>
                             <Back_Arrow label={'forgot password'} />
 
-                            <Title_Here title={'Enter your email to reset your password'}
+                            <Title_Here title={'Enter your phone to reset your password'}
                                 color={COLOURS.black}
                                 fontSize={responsiveFontSize(1.7)}
                                 textAlign={'center'}
@@ -76,18 +66,8 @@ const Forgot_Password = ({ navigation }) => {
                                 marginTop={responsiveWidth(5)}
                             />
 
-                            {/* <Title_Here title={'mobile number'} color={COLOURS.black} />
-                            <Number_Select value={phone} onChangeText={setPhone} /> */}
-                            <Title_Here title={'email'} color={COLOURS.black} marginTop={responsiveWidth(10)} />
-                            <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}
-                                borderWidth={1}
-                                color={COLOURS.black}
-                                Placeholder={'Your email'}
-                                first_inpt_Img={globalImages.envelope_filled}
-                                tintColor={COLOURS.grey}
-                                value={email}
-                                onChangeText={setEmail}
-                            />
+                            <Title_Here title={'mobile number'} color={COLOURS.black} marginBottom={responsiveWidth(4)}/>
+                            <Number_Select value={phone} onChangeText={setPhone} />
 
                             <View style={styles.btn_area}>
                                 <Button label={'send otp'} onPress={handleForgotPassword}

@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BASE_URL } from '../../../../api_url/BASE_URL';
 import { USER_API_URL } from '../../../user_api_url/USER_API_URL';
 
@@ -11,9 +12,9 @@ export const registerUser = async ({ name, phone, email, password }) => {
     });
 
     const data = await response.json();
-
+    console.log('data',data)
     if (!response.ok) {
-        const error = new Error(data.message || 'Registration failed'); // ✅ pehle banao
+        const error = new Error(data.message || 'Registration failed'); 
         error.code = data.code; // ✅ phir code set karo
         throw error; // ✅ phir throw karo
     }
@@ -22,34 +23,34 @@ export const registerUser = async ({ name, phone, email, password }) => {
 };
 
 
-export const resendOtp = async ({ email }) => {
+export const resendOtp = async ({ phone }) => {
 
     const response = await fetch(`${BASE_URL}${USER_API_URL.RESEND_OTP}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ phone }),
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-        const error = new Error(data.message || 'Resend OTP failed'); // ✅ pehle banao
+        const error = new Error(data.message || 'Resend OTP failed'); 
         error.code = data.code;
         throw error; }
 
     return data;
 };
 
-export const verifyOtp = async ({ email, otp }) => {
+export const verifyOtp = async ({ phone, otp }) => {
 
-    const response = await fetch(`${BASE_URL}${USER_API_URL.VERIFY_EMAIL}`, {
+    const response = await fetch(`${BASE_URL}${USER_API_URL.VERIFY_PHONE}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, otp }),
+        body: JSON.stringify({ phone, otp }),
     });
 
     const data = await response.json();
@@ -68,17 +69,17 @@ export const verifyOtp = async ({ email, otp }) => {
 };
 
 
-export const loginUser = async ({ email, password }) => {
+export const loginUser = async ({ phone, password }) => {
     const response = await fetch(`${BASE_URL}${USER_API_URL.LOGIN}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ phone, password }),
     });
-
+    
+    console.log( phone, password)
     const data = await response.json();
-
     if (response.status === 403) {
         const error = new Error(data.message);
         error.code = 403;
@@ -94,14 +95,14 @@ export const loginUser = async ({ email, password }) => {
 
 // forogot/reset process
 
-export const forgotPassword = async ({ email }) => {
+export const forgotPassword = async ({ phone }) => {
 
     const response = await fetch(`${BASE_URL}${USER_API_URL.FORGOT_PASSWORD}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ phone }),
     });
 
     const data = await response.json();
@@ -115,15 +116,14 @@ export const forgotPassword = async ({ email }) => {
 };
 
 
-export const verifyResetOtp = async ({ email, otp }) => {
-    console.log(`${BASE_URL}${USER_API_URL.RESET_OTP}`);
+export const verifyResetOtp = async ({ phone, otp }) => {
 
     const response = await fetch(`${BASE_URL}${USER_API_URL.RESET_OTP}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, otp }),
+        body: JSON.stringify({ phone, otp }),
     });
 
     const data = await response.json();
@@ -138,13 +138,36 @@ export const verifyResetOtp = async ({ email, otp }) => {
 };
 
 
-export const resetPassword = async ({ email, newPassword }) => {
+export const resetPassword = async ({ phone, newPassword }) => {
     const response = await fetch(`${BASE_URL}${USER_API_URL.NEW_PASSWORD}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, newPassword }),
+        body: JSON.stringify({ phone, newPassword }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        console.log(data.message);
+        throw new Error(data.message || 'Reset password failed');
+    }
+
+    return data;
+};
+
+
+
+export const changedpassword = async ({ currentPassword, newPassword }) => {
+    const token = await AsyncStorage.getItem('token');
+    const response = await fetch(`${BASE_URL}${USER_API_URL.CHANGE_PASSWORD}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ currentPassword, newPassword }),
     });
 
     const data = await response.json();

@@ -20,11 +20,17 @@ const home_filled = require('../../icons/Filled/home.png')
 const archive_light = require('../all_images/archive_light.png')
 const access_light = require('../all_images/access-control-light.png')
 const user_light = require('../../icons/Bold/user.png')
+
 const spiritual_1 = require('../all_images/spiritual_1.jpg')
 const spiritual_2 = require('../all_images/spiritual_2.jpg')
 const spiritual_3 = require('../all_images/spiritual_3.jpg')
 const spiritual_4 = require('../all_images/spiritual_4.jpg')
 const spiritual_5 = require('../all_images/spiritual_5.jpg')
+const spiritual_6 = require('../all_images/spiritual_6.jpg')
+const spiritual_7 = require('../all_images/spiritual_7.jpg')
+const spiritual_8 = require('../all_images/spiritual_8.jpg')
+const spiritual_9 = require('../all_images/spiritual_9.jpg')
+const spiritual_10 = require('../all_images/spiritual_10.jpg')
 
 const heart = require('../../icons/Bold/heart.png')
 const heart_filled = require('../../icons/Filled/heart.png')
@@ -37,6 +43,13 @@ const eye_slash = require('../../icons/Bold/eye-slash.png')
 const eye = require('../../icons/Bold/eye.png')
 const pswd_key = require('../../images/all_images/key.png')
 
+const pause = require('../../icons/Extra/pause_btn.png')
+const play = require('../../icons/Extra/play-btn.png')
+const volume = require('../../icons/Extra/volume-up.png')
+const mute = require('../../icons/Extra/mute.png')
+const lock_icon = require('../../icons/Filled/lock.png')
+
+
 export const globalImages = {
     app_logo, image_1, bg_here, icon_new,
     user_filled, envelope_filled, phone_filled,
@@ -45,5 +58,10 @@ export const globalImages = {
     archive_light, access_light, user_light, logout_icon,
     spiritual_1, spiritual_2, heart_filled, heart, comment_filled, comment,
     save_icon, save_filled, spiritual_3, spiritual_4, spiritual_5, eye_slash,
-    eye, pswd_key,
+    eye, pswd_key, pause, play, volume, mute,lock_icon,
+    spiritual_6,
+    spiritual_7,
+    spiritual_8,
+    spiritual_9,
+    spiritual_10,
 }

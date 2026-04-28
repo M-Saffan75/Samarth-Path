@@ -1,14 +1,15 @@
 import React from 'react';
+import VideoPlayer from './VideoPlayer';
 import Reaction from '../components/Reaction';
 import { COLOURS } from '../assets/theme/Theme';
 import { globalImages } from '../assets/images/images_file/All_Images'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 
-const Card = ({ schedule, text, title, phase, description, source }) => {
+const Card = ({ item, activeVideoId, setActiveVideoId, onPress }) => {
     return (
         <>
-            <TouchableOpacity activeOpacity={10} style={{
+            <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={{
                 backgroundColor: COLOURS.light_primary, paddingHorizontal: responsiveWidth(2), paddingTop: responsiveWidth(4),
                 paddingVertical: responsiveWidth(1), borderRadius: responsiveWidth(4), marginHorizontal: responsiveWidth(4),
                 marginTop: responsiveWidth(3), paddingBottom: responsiveWidth(4),
@@ -22,49 +23,61 @@ const Card = ({ schedule, text, title, phase, description, source }) => {
                             paddingLeft: responsiveWidth(1),
                             textTransform: 'uppercase', fontFamily: 'Poppins-Medium',
                             top: responsiveWidth(.5), color: COLOURS.primary
-                        }}>{schedule}</Text>
-
+                        }}>{item.schedule}</Text>
                     </View>
+
                     <View>
                         <Text style={{
                             paddingLeft: responsiveWidth(1),
                             textTransform: 'uppercase', fontFamily: 'Poppins-Medium',
                             top: responsiveWidth(.5), color: COLOURS.grey
-                        }}>{text}</Text>
+                        }}>{item.type}</Text>
                     </View>
 
                 </View>
 
                 <View>
-                    <Image source={source} style={{
-                        height: responsiveWidth(50), width: responsiveWidth(83),
-                        borderRadius: responsiveWidth(4), marginTop: responsiveWidth(5), alignSelf: 'center'
-                    }} />
 
-                    <Text numberOfLines={1}
-                        ellipsizeMode='tail' style={{
+                    {/* ---- Image ya Video ---- */}
+                    {item?.type === 'video' ? (
+                        <VideoPlayer
+                            uri={item.video}
+                            videoId={item.id}
+                            activeVideoId={activeVideoId}
+                            setActiveVideoId={setActiveVideoId}
+                            style={{
+                                width: responsiveWidth(83),
+                                height: responsiveWidth(50),
+                                borderRadius: responsiveWidth(4),
+                                marginTop: responsiveWidth(5),
+                                alignSelf: 'center',
+                                overflow: 'hidden',
+                            }}
+                        />
+                    ) : (
+                        <Image source={item.image} style={{
+                            height: responsiveWidth(50), width: responsiveWidth(83),
+                            borderRadius: responsiveWidth(4), marginTop: responsiveWidth(5), alignSelf: 'center'
+                        }} />
+                    )}
+
+                    <Text numberOfLines={1} ellipsizeMode='tail' style={{
                         paddingLeft: responsiveWidth(4), marginTop: responsiveWidth(3),
                         textTransform: 'capitalize', fontFamily: 'Poppins-Medium',
                         top: responsiveWidth(.5), color: COLOURS.black, fontSize: responsiveFontSize(2)
-                    }}>{title}</Text>
+                    }}>{item.title}</Text>
 
-
-                    <Text
-                        numberOfLines={5}
-                        ellipsizeMode='tail'
-                        style={{
-                            paddingLeft: responsiveWidth(4), marginTop: responsiveWidth(2),
-                            textTransform: 'capitalize', fontFamily: 'Poppins-Medium',
-                            top: responsiveWidth(.5), color: COLOURS.grey, fontSize: responsiveFontSize(1.7)
-                        }}
-                    >
-                        {description}
+                    <Text numberOfLines={5} ellipsizeMode='tail' style={{
+                        paddingLeft: responsiveWidth(4), marginTop: responsiveWidth(2),
+                        textTransform: 'capitalize', fontFamily: 'Poppins-Medium',
+                        top: responsiveWidth(.5), color: COLOURS.grey, fontSize: responsiveFontSize(1.7)
+                    }}>
+                        {item.description}
                     </Text>
 
                     <View style={{
                         width: '91%', height: responsiveWidth(.2), backgroundColor: COLOURS.grey,
                         marginTop: responsiveWidth(3), alignSelf: 'center'
-
                     }} />
 
                     <View style={{
@@ -84,5 +97,3 @@ const Card = ({ schedule, text, title, phase, description, source }) => {
 }
 
 export default Card
-
-const styles = StyleSheet.create({})

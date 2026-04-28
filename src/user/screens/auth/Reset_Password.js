@@ -20,7 +20,7 @@ const Reset_Password = ({ navigation, route }) => {
 
 
     const { setLoading } = useLoader();
-    const { email } = route.params;
+    const { phone } = route.params;
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -57,8 +57,8 @@ const Reset_Password = ({ navigation, route }) => {
     const handleApiCall = async () => {
         try {
             setLoading(true);
-            const data = await resetPassword({ email, newPassword: password });
-            showSuccess(data?.message || 'OTP sent successfully!');
+            const data = await resetPassword({ phone, newPassword: password });
+            showSuccess(data?.message || 'reset password successfully!');
             setLoading(false)
             navigation.reset({
                 index: 0,

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Card_info from '../../../data/Data'
 import Card from '../../../components/Card'
 import Header from '../../../components/Header'
@@ -6,10 +6,22 @@ import { COLOURS } from '../../../assets/theme/Theme'
 import Title_Here from '../../../components/Title_Here'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { globalImages } from '../../../assets/images/images_file/All_Images'
-import { FlatList, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native'
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions'
+import { AppState, FlatList, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native'
 
 const Home = () => {
+
+  const [activeVideoId, setActiveVideoId] = useState(null)
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state !== 'active') {
+        setActiveVideoId(null)
+      }
+    })
+    return () => subscription.remove()
+  }, [])
+
   return (
     <>
       <StatusBar
@@ -40,11 +52,11 @@ const Home = () => {
                 contentContainerStyle={{ paddingBottom: responsiveWidth(5) }}
                 renderItem={({ item }) => (
                   <Card
-                    schedule={item.schedule}
-                    title={item.title}
-                    source={item.image}
-                    text={item.text}
-                    description={item.description}
+                    item={item}
+                    activeVideoId={activeVideoId}
+                    setActiveVideoId={setActiveVideoId}
+                    onScrollBeginDrag={() => setActiveVideoId(null)} 
+                  // onPress={() => navigation.navigate(UserRoutes.Detail, { item })}
                   />
                 )}
               />

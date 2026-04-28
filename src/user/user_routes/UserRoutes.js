@@ -11,6 +11,7 @@ const UserRoutes = {
     Verify_Email: 'Verify_Email',
     Reset_Password: 'Reset_Password',
     Forgot_Password: 'Forgot_Password',
+    Change_Password:'Change_Password',
 
     // PayWall
     PayWall: 'PayWall',

@@ -3,7 +3,7 @@ import { COLOURS } from '../../../assets/theme/Theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { globalImages } from '../../../assets/images/images_file/All_Images';
 import { StatusBar, TextInput, View, StyleSheet, ImageBackground } from 'react-native';
-import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions';
+import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 
 import Button from '../../../components/Button';
 import UserRoutes from '../../user_routes/UserRoutes';
@@ -14,7 +14,6 @@ import Modal_Verify from '../../../components/Modal_Verify';
 
 import { useLoader } from '../../../loading/LoaderContext';
 import { showError, showSuccess } from '../../../helper/Helper';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { forgotPassword, resendOtp, verifyOtp, verifyResetOtp } from './auth_backend/Auth_Backend';
 
 
@@ -22,14 +21,14 @@ const Otp_Here = ({ navigation, route }) => {
 
     const { setLoading } = useLoader();
     const [modalVisible, setModalVisible] = useState(false);
-    const [modalEmail, setModalEmail] = useState('');
+    const [modalPhone, setModalPhone] = useState('');
     const [modalLoading, setModalLoading] = useState(false);
 
-    const { email } = route.params;
+    const { phone } = route.params;
     
     useEffect(() => {
-        setModalEmail(email);
-    }, [email]);
+        setModalPhone(phone);
+    }, [phone]);
 
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
 
@@ -58,17 +57,17 @@ const Otp_Here = ({ navigation, route }) => {
         try {
             setLoading(true);
             const otpString = otp.join('');
-            setModalEmail(email)
-            const data = await verifyResetOtp({ email, otp: otpString });
+            setModalPhone(phone)
+            const data = await verifyResetOtp({ phone, otp: otpString });
             showSuccess(data?.message || 'OTP verified!');
             navigation.reset({
                 index: 0,
-                routes: [{ name: UserRoutes.Reset_Password, params: { email } }],
+                routes: [{ name: UserRoutes.Reset_Password, params: { phone } }],
             });
         } catch (error) {
             console.log('error.code', error.code)
             if (error.code === 410) {
-                setModalEmail(email);
+                setModalPhone(phone);
                 setModalVisible(true);
             } else {
                 showError(error.message || 'Invalid OTP. Try again!');
@@ -80,15 +79,15 @@ const Otp_Here = ({ navigation, route }) => {
 
 
     const handleModalSubmit = async () => {
-        setModalEmail(email)
-        if (!modalEmail) {
-            showError('Please enter your email');
+        setModalPhone(phone)
+        if (!modalPhone) {
+            showError('Please enter your phone');
             return;
         }
         try {
             setLoading(true);
             setModalLoading(true);
-            const data = await forgotPassword({ email: modalEmail });
+            const data = await forgotPassword({ phone: modalPhone });
             showSuccess(data?.message || 'OTP Resent!');
             setModalVisible(false);
             setOtp(['', '', '', '', '', '']);
@@ -124,7 +123,7 @@ const Otp_Here = ({ navigation, route }) => {
                                 fontSize={responsiveFontSize(2.5)}
                             />
 
-                            <Title_Here title={'enter 6 digit code sent to your email...'}
+                            <Title_Here title={'enter 6 digit code sent to your phone...'}
                                 color={COLOURS.black}
                                 textAlign={'center'}
                                 marginTop={responsiveWidth(1)}
@@ -202,8 +201,8 @@ const Otp_Here = ({ navigation, route }) => {
                         <Modal_Verify
                             modalVisible={modalVisible}
                             setModalVisible={setModalVisible}
-                            modalEmail={modalEmail}
-                            setModalEmail={setModalEmail}
+                            modalEmail={modalPhone}
+                            setModalEmail={setModalPhone}
                             handleModalSubmit={handleModalSubmit}
                             loading={modalLoading}
                         />
