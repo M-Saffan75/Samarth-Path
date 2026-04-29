@@ -1,11 +1,11 @@
 // components/VideoPlayer.js
-import React, { useRef, useState, useEffect } from 'react'
-import { View, TouchableOpacity, StyleSheet, Text, Image } from 'react-native'
 import Video from 'react-native-video'
-import Slider from '@react-native-community/slider'
 import { COLOURS } from '../assets/theme/Theme'
-import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions'
+import Slider from '@react-native-community/slider'
+import React, { useRef, useState, useEffect } from 'react'
 import { globalImages } from '../assets/images/images_file/All_Images';
+import { View, TouchableOpacity, StyleSheet, Text, Image } from 'react-native'
+import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions'
 
 const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60)
@@ -45,6 +45,13 @@ const VideoPlayer = ({ uri, videoId, activeVideoId, setActiveVideoId, style }) =
             if (hideTimeout.current) clearTimeout(hideTimeout.current)
         }
     }, [paused])
+
+    useEffect(() => {
+        return () => {
+            if (hideTimeout.current) clearTimeout(hideTimeout.current)
+            if (videoRef.current) videoRef.current = null
+        }
+    }, [])
 
     const togglePlay = () => {
         if (paused) {
@@ -97,6 +104,10 @@ const VideoPlayer = ({ uri, videoId, activeVideoId, setActiveVideoId, style }) =
                 onEnd={onEnd}
                 playInBackground={false}
                 playWhenInactive={false}
+                ignoreSilentSwitch="obey"
+                maxBitRate={2000000}
+                progressUpdateInterval={500} 
+                reportBandwidth={false}
             />
 
             {/* ✅ Touch anywhere on video to show/hide controls */}

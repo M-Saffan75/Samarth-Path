@@ -12,9 +12,9 @@ export const registerUser = async ({ name, phone, email, password }) => {
     });
 
     const data = await response.json();
-    console.log('data',data)
+    console.log('data', data)
     if (!response.ok) {
-        const error = new Error(data.message || 'Registration failed'); 
+        const error = new Error(data.message || 'Registration failed');
         error.code = data.code; // ✅ phir code set karo
         throw error; // ✅ phir throw karo
     }
@@ -36,9 +36,10 @@ export const resendOtp = async ({ phone }) => {
     const data = await response.json();
 
     if (!response.ok) {
-        const error = new Error(data.message || 'Resend OTP failed'); 
+        const error = new Error(data.message || 'Resend OTP failed');
         error.code = data.code;
-        throw error; }
+        throw error;
+    }
 
     return data;
 };
@@ -77,8 +78,8 @@ export const loginUser = async ({ phone, password }) => {
         },
         body: JSON.stringify({ phone, password }),
     });
-    
-    console.log( phone, password)
+
+    console.log(phone, password)
     const data = await response.json();
     if (response.status === 403) {
         const error = new Error(data.message);
@@ -180,3 +181,16 @@ export const changedpassword = async ({ currentPassword, newPassword }) => {
     return data;
 };
 
+
+export const getUserMe = async (token) => {
+    const response = await fetch(`${BASE_URL}${USER_API_URL.ME}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message);
+    return data.data;
+};

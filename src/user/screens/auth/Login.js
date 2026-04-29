@@ -15,15 +15,18 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Wait_Modal from '../../../components/Wait_Modal';
 import { useLoader } from '../../../loading/LoaderContext';
 import { showError, showSuccess } from '../../../helper/Helper';
-import { loginUser, resendOtp } from './auth_backend/Auth_Backend';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getUserMe, loginUser, resendOtp } from './auth_backend/Auth_Backend';
 
-const Logiin = ({ navigation }) => {
+
+import { useUser } from './user_context/UserContext';
+
+const Login = ({ navigation }) => {
 
 
 
     const { setLoading } = useLoader();
-
+    const { updateUser } = useUser();
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
     const [rateLimitModal, setRateLimitModal] = useState(false);
@@ -48,6 +51,8 @@ const Logiin = ({ navigation }) => {
             setLoading(true);
             const data = await loginUser({ phone, password });
             console.log('logindata:', data);
+            const user = await getUserMe(data?.data?.token)
+            updateUser(user)
             await AsyncStorage.setItem('token', data?.data?.token);
             showSuccess(data?.message || 'Login successful');
             navigation.reset({
@@ -93,7 +98,7 @@ const Logiin = ({ navigation }) => {
                 barStyle={'dark-content'}
                 backgroundColor={COLOURS.white}
             />
-            <SafeAreaView>
+            <SafeAreaView style={{ flex: 1 }}>
                 <View style={[styles.container, { backgroundColor: COLOURS.white }]}>
 
                     <ImageBackground source={globalImages.bg_auth} style={styles.login_img} resizeMode='cover'>
@@ -167,7 +172,7 @@ const Logiin = ({ navigation }) => {
     )
 }
 
-export default Logiin
+export default Login
 
 
 const styles = StyleSheet.create({

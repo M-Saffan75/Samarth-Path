@@ -1,11 +1,11 @@
 import React from 'react';
+import User_Main from './src/user/app_navigator/User_Main';
 import { NavigationContainer } from '@react-navigation/native';
-import User_Navigator from './src/user/app_navigator/User_Navigator';
 
 const App = () => {
   return (
     <NavigationContainer>
-      <User_Navigator />
+      <User_Main />
     </NavigationContainer>
   )
 }

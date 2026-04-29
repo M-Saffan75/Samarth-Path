@@ -12,16 +12,21 @@ import Back_Arrow from '../../../components/Back_Arrow';
 import Outline_Text from '../../../components/Outline_Text';
 import Modal_Verify from '../../../components/Modal_Verify';
 
+import Wait_Modal from '../../../components/Wait_Modal';
 import { useLoader } from '../../../loading/LoaderContext';
-import { resendOtp, verifyOtp } from './auth_backend/Auth_Backend';
 import { showError, showSuccess } from '../../../helper/Helper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Wait_Modal from '../../../components/Wait_Modal';
+import { resendOtp, verifyOtp, getUserMe, } from './auth_backend/Auth_Backend';
+
+
+import { useUser } from './user_context/UserContext';
 
 
 const Verify_Email = ({ navigation, route }) => {
 
     const { setLoading } = useLoader();
+    const { updateUser } = useUser();
+
     const [modalVisible, setModalVisible] = useState(false);
     const [modalPhone, setModalPhone] = useState('');
     const [modalLoading, setModalLoading] = useState(false);
@@ -63,17 +68,18 @@ const Verify_Email = ({ navigation, route }) => {
             setLoading(true);
             const otpString = otp.join('');
             const data = await verifyOtp({ phone, otp: otpString });
-            showSuccess(data?.message || 'OTP verified!');
+            const user = await getUserMe(data?.data?.token)
+            updateUser(user)
             await AsyncStorage.setItem('token', data?.data?.token);
-            console.log('verify_token', data?.data?.token)
+            showSuccess(data?.message || 'OTP verified!');
             navigation.reset({
                 index: 0,
                 routes: [{ name: UserRoutes.Bottom_Navigation }],
             });
         } catch (error) {
             console.log('error.code', error.code)
-            if (error.code === 410) { 
-                setModalPhone(phone); 
+            if (error.code === 410) {
+                setModalPhone(phone);
                 setModalVisible(true);
             } else {
                 showError(error.message || 'Invalid OTP. Try again!');
@@ -95,7 +101,7 @@ const Verify_Email = ({ navigation, route }) => {
             const data = await resendOtp({ phone: modalPhone });
             showSuccess(data?.message || 'OTP sent successfully');
             setModalVisible(false);
-            setOtp(['', '', '', '', '', '']); 
+            setOtp(['', '', '', '', '', '']);
         } catch (error) {
             if (error.code === 429) {
                 setModalVisible(false);

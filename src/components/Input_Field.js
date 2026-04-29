@@ -9,7 +9,7 @@ import { globalImages } from '../assets/images/images_file/All_Images';
 
 const Input_Field = ({
     Placeholder, Second_inpt_Img, first_inpt_Img, textAlignVertical, display, borderWidth, borderColor, height, width, color,
-    secureTextEntry, tintColor, onChangeText, keyboardType, maxLength, third_inpt_Img, left, backgroundColor, marginTop,
+    secureTextEntry, tintColor, onChangeText, keyboardType, maxLength, third_inpt_Img, left, backgroundColor, marginTop,Input_marginTop,
     numberOfLines, pointerEvents, defaultValue, textTransform, editable, multiline, onValueChange, borderRadius, onPress }) => {
 
     const [isPasswordVisible, setPasswordVisible] = useState(secureTextEntry);
@@ -23,7 +23,7 @@ const Input_Field = ({
             <View style={styles.align_body}>
                 <View style={[styles.inpt_area, {
                     backgroundColor: backgroundColor ?? COLOURS.grey,
-                    borderWidth, borderColor,
+                    borderWidth, borderColor,marginTop:Input_marginTop,
                     display: display, borderRadius: responsiveWidth(2) ?? borderRadius
                 }]}>
                     {first_inpt_Img ? <Image source={first_inpt_Img} style={[styles.inpt_icon, {

@@ -11,7 +11,7 @@ const UserRoutes = {
     Verify_Email: 'Verify_Email',
     Reset_Password: 'Reset_Password',
     Forgot_Password: 'Forgot_Password',
-    Change_Password:'Change_Password',
+    Change_Password: 'Change_Password',
 
     // PayWall
     PayWall: 'PayWall',
@@ -20,18 +20,32 @@ const UserRoutes = {
     Home: 'Home',
     Main_Home: 'Main_Home',
 
+    // Edit_Profile
+    Edit_Profile: 'Edit_Profile',
+    User_Profile: 'User_Profile',
+
     // Archieve
     Archives: 'Archives',
 
     // My_Path
     My_Path: 'My_Path',
 
-    // profiles
-    User_Profile: 'User_Profile',
+    // Network
+    Network: 'Network',
+
+    // User_Notification
+    User_Notification:'User_Notification',
+
+    // AboutSamarthPath
+    AboutSamarthPath: 'AboutSamarthPath',
 
     // Bottom_Navigation
     Bottom_Navigation: 'Bottom_Navigation',
+    User_Auth_Navigation: 'User_Auth_Navigation',
+    User_Profile_Navigation: 'User_Profile_Navigation',
 
+    // User_Main
+    User_Main: 'User_Main'
 }
 
 export default UserRoutes

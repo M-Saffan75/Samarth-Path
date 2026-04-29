@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react'
-import Card_info from '../../../data/Data'
-import Card from '../../../components/Card'
-import Header from '../../../components/Header'
-import { COLOURS } from '../../../assets/theme/Theme'
-import Title_Here from '../../../components/Title_Here'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { globalImages } from '../../../assets/images/images_file/All_Images'
-import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions'
-import { AppState, FlatList, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native'
+import React, { useEffect, useState } from 'react';
+import Card_info from '../../../data/Data';
+import Card from '../../../components/Card';
+import Header from '../../../components/Header';
+import { COLOURS } from '../../../assets/theme/Theme';
+import Title_Here from '../../../components/Title_Here';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { AppState, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
+
+import { FlashList } from '@shopify/flash-list';
 
 const Home = () => {
 
@@ -45,18 +46,19 @@ const Home = () => {
           <View style={styles.card_area}>
             {Card_info.length > 0 ? (
 
-              <FlatList
+              <FlashList
                 data={Card_info}
                 keyExtractor={(item) => item.id.toString()}
                 showsVerticalScrollIndicator={false}
+                estimatedItemSize={responsiveWidth(100)}
+                onScrollBeginDrag={() => setActiveVideoId(null)}
+                removeClippedSubviews={true}
                 contentContainerStyle={{ paddingBottom: responsiveWidth(5) }}
                 renderItem={({ item }) => (
                   <Card
                     item={item}
                     activeVideoId={activeVideoId}
                     setActiveVideoId={setActiveVideoId}
-                    onScrollBeginDrag={() => setActiveVideoId(null)} 
-                  // onPress={() => navigation.navigate(UserRoutes.Detail, { item })}
                   />
                 )}
               />

@@ -14,6 +14,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLoader } from '../../../loading/LoaderContext';
 import { changedpassword } from './auth_backend/Auth_Backend';
 import { showError, showSuccess } from '../../../helper/Helper';
+import { FadeIn } from '../../../components/FadeIn';
+import { FadeUp } from '../../../components/FadeUp';
 
 const Change_Password = ({ navigation }) => {
 
@@ -97,57 +99,65 @@ const Change_Password = ({ navigation }) => {
                                 marginTop={responsiveWidth(10)}
                             />
 
-                            <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}
-                                borderWidth={1}
-                                color={COLOURS.black}
-                                Placeholder={'Your Current Password'}
-                                first_inpt_Img={globalImages.pswd_key}
-                                Second_inpt_Img={globalImages.eye}
-                                tintColor={COLOURS.grey}
-                                width={responsiveWidth(4.5)}
-                                height={responsiveWidth(4.5)}
-                                value={currentPassword}
-                                onChangeText={setCurrentPassword}
-                            />
-
-                            <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}
-                                borderWidth={1}
-                                color={COLOURS.black}
-                                Placeholder={'New Password'}
-                                first_inpt_Img={globalImages.pswd_key}
-                                Second_inpt_Img={globalImages.eye}
-                                tintColor={COLOURS.grey}
-                                width={responsiveWidth(4.5)}
-                                height={responsiveWidth(4.5)}
-                                value={password}
-                                onChangeText={setPassword}
-                            />
-
-                            <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}
-                                borderWidth={1}
-                                color={COLOURS.black}
-                                Placeholder={'Confirm Password'}
-                                first_inpt_Img={globalImages.pswd_key}
-                                Second_inpt_Img={globalImages.eye}
-                                tintColor={COLOURS.grey}
-                                width={responsiveWidth(4.5)}
-                                height={responsiveWidth(4.5)}
-                                value={confirmPassword}
-                                onChangeText={setConfirmPassword}
-                            />
-
-                            <View style={styles.btn_area}>
-                                <Button label={'confirm'} onPress={handleReset}
+                            <FadeIn delay={150}>
+                                <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}
+                                    borderWidth={1}
+                                    color={COLOURS.black}
+                                    Placeholder={'Your Current Password'}
+                                    first_inpt_Img={globalImages.pswd_key}
+                                    Second_inpt_Img={globalImages.eye}
+                                    tintColor={COLOURS.grey}
+                                    width={responsiveWidth(4.5)}
+                                    height={responsiveWidth(4.5)}
+                                    value={currentPassword}
+                                    onChangeText={setCurrentPassword}
                                 />
-                            </View>
+                            </FadeIn>
+                            <FadeIn delay={250}>
+                                <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}
+                                    borderWidth={1}
+                                    color={COLOURS.black}
+                                    Placeholder={'New Password'}
+                                    first_inpt_Img={globalImages.pswd_key}
+                                    Second_inpt_Img={globalImages.eye}
+                                    tintColor={COLOURS.grey}
+                                    width={responsiveWidth(4.5)}
+                                    height={responsiveWidth(4.5)}
+                                    value={password}
+                                    onChangeText={setPassword}
+                                />
+
+                            </FadeIn>
+
+                            <FadeIn delay={350}>
+                                <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}
+                                    borderWidth={1}
+                                    color={COLOURS.black}
+                                    Placeholder={'Confirm Password'}
+                                    first_inpt_Img={globalImages.pswd_key}
+                                    Second_inpt_Img={globalImages.eye}
+                                    tintColor={COLOURS.grey}
+                                    width={responsiveWidth(4.5)}
+                                    height={responsiveWidth(4.5)}
+                                    value={confirmPassword}
+                                    onChangeText={setConfirmPassword}
+                                />
+                            </FadeIn>
+
+                            <FadeUp>
+                                <View style={styles.btn_area}>
+                                    <Button label={'Confirm & Update'} onPress={handleReset}
+                                    />
+                                </View>
+                            </FadeUp>
 
 
                         </View>
 
                     </ImageBackground>
 
-                </View>
-            </SafeAreaView>
+                </View >
+            </SafeAreaView >
         </>
     )
 }
