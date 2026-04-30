@@ -33,11 +33,17 @@ const UserRoutes = {
     // Network
     Network: 'Network',
 
+    // Suspended
+    Suspended: 'Suspended',
+
     // User_Notification
-    User_Notification:'User_Notification',
+    User_Notification: 'User_Notification',
 
     // AboutSamarthPath
     AboutSamarthPath: 'AboutSamarthPath',
+
+    // WeeklyWinners
+    Weekly_Winners:'Weekly_Winners',
 
     // Bottom_Navigation
     Bottom_Navigation: 'Bottom_Navigation',

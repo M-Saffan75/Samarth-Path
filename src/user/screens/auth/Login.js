@@ -50,9 +50,8 @@ const Login = ({ navigation }) => {
         try {
             setLoading(true);
             const data = await loginUser({ phone, password });
-            console.log('logindata:', data);
-            const user = await getUserMe(data?.data?.token)
-            updateUser(user)
+            const user = await getUserMe(data?.data?.token);
+            updateUser(user);
             await AsyncStorage.setItem('token', data?.data?.token);
             showSuccess(data?.message || 'Login successful');
             navigation.reset({
@@ -60,31 +59,57 @@ const Login = ({ navigation }) => {
                 routes: [{ name: UserRoutes.Bottom_Navigation }],
             });
         } catch (error) {
-            if (error.code === 403) {
-                try {
-                    setLoading(true);
-                    const resendData = await resendOtp({ phone });
-                    showSuccess(resendData?.message || 'OTP sent successfully');
-                    navigation.reset({
-                        index: 0,
-                        routes: [{
-                            name: UserRoutes.Verify_Email,
-                            params: { phone },
-                        }],
-                    });
-                } catch (resendError) {
-                    if (resendError.code === 429) {
-                        setRateLimitMessage('please wait 1 minute before requesting another OTP');
-                        setRateLimitModal(true);
-                    } else {
-                        console.log(resendError.message || 'Something went wrong. Try again!');
-                    }
-                } finally {
-                    setLoading(false);
-                }
+            console.log('LOGIN ERROR:', error);
+            setLoading(false);
+
+            if (error.code === 403 && error.message?.includes('verify your phone')) {
+                await handleUnverifiedUser();
+                return;
+            }
+
+            if (error.code === 403 && (
+                error.message?.includes('suspended') ||
+                error.message?.includes('blocked')
+            )) {
+                navigation.navigate(UserRoutes.Suspended);
+                return;
+            }
+
+            if (error.code === 403 && (
+                error.message?.includes('Trial period expired') ||
+                error.message?.includes('Subscription expired')
+            )) {
+                navigation.navigate(UserRoutes.PayWall);
+                return;
+            }
+
+            showError(error.message || 'Something went wrong. Try again!');
+
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // ✅ Resend OTP ka alag clean function
+    const handleUnverifiedUser = async () => {
+        try {
+            setLoading(true);
+            await resendOtp({ phone });
+            showSuccess('OTP sent successfully');
+            navigation.reset({
+                index: 0,
+                routes: [{
+                    name: UserRoutes.Verify_Email,
+                    params: { phone },
+                }],
+            });
+        } catch (resendError) {
+            console.log('RESEND OTP ERROR:', resendError);
+            if (resendError.code === 429) {
+                setRateLimitMessage('Please wait 1 minute before requesting another OTP');
+                setRateLimitModal(true);
             } else {
-                showError(error.message || 'Something went wrong. Try again!');
-                setLoading(flattenStyle)
+                showError(resendError.message || 'Failed to send OTP');
             }
         } finally {
             setLoading(false);
@@ -122,10 +147,10 @@ const Login = ({ navigation }) => {
                                 marginTop={responsiveWidth(1)}
                             />
 
-                            <Title_Here title={'mobile number'} color={COLOURS.black} />
+                            <Title_Here title={'mobile number'} color={COLOURS.black} marginBottom={responsiveWidth(3)}/>
                             <Number_Select value={phone} onChangeText={setPhone} />
 
-                            <Title_Here title={'password'} color={COLOURS.black} marginTop={0} />
+                            <Title_Here title={'password'} color={COLOURS.black} marginTop={responsiveWidth(4)} marginBottom={responsiveWidth(2)} />
                             <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}
                                 borderWidth={1}
                                 color={COLOURS.black}

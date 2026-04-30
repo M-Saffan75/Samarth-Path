@@ -15,7 +15,7 @@ import { LoaderProvider } from '../../loading/LoaderContext';
 import Bottom_Navigation from '../bottom_tabs/Bottom_Navigation';
 import User_Notification from '../notification/User_Notification';
 
-
+import Suspended from '../screens/suspended/Suspended';
 import User_Profile from '../screens/profile/User_Profile';
 import Edit_Profile from '../screens/profile/Edit_Profile';
 import { UserProvider } from '../screens/auth/user_context/UserContext';
@@ -30,6 +30,7 @@ import Reset_Password from '../screens/auth/Reset_Password';
 import Forgot_Password from '../screens/auth/Forgot_Password';
 import Change_Password from '../screens/auth/Change_Password';
 import AboutSamarthPath from '../screens/about_app/AboutSamarthPath';
+import Weekly_Winners from '../screens/weekly_winners/Weekly_Winners';
 
 const User_Navigator = () => {
 
@@ -54,17 +55,24 @@ const User_Navigator = () => {
 
                         {/* Network */}
                         <Stack.Screen name={UserRoutes.Network} component={Network} />
+                        <Stack.Screen name={UserRoutes.Suspended} component={Suspended} />
                         {/* Network */}
 
                         {/* Notification */}
                         <Stack.Screen name={UserRoutes.User_Notification} component={User_Notification} />
                         {/* Notification */}
+                  
+                        {/* weekly Winners */}
+                        <Stack.Screen name={UserRoutes.Weekly_Winners} component={Weekly_Winners} />
+                        {/* weekly Winners */}
 
                         {/* user auth */}
+
                         <Stack.Screen name={UserRoutes.Login} component={Login} />
                         <Stack.Screen name={UserRoutes.OnBoard} component={OnBoard} />
                         <Stack.Screen name={UserRoutes.Register} component={Register} />
                         <Stack.Screen name={UserRoutes.Otp_Here} component={Otp_Here} />
+
                         <Stack.Screen name={UserRoutes.Verify_Email} component={Verify_Email} />
                         <Stack.Screen name={UserRoutes.Reset_Password} component={Reset_Password} />
                         <Stack.Screen name={UserRoutes.Forgot_Password} component={Forgot_Password} />

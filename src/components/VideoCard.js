@@ -1,12 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import VideoPlayer from './VideoPlayer';
-import Reaction from '../components/Reaction';
+import Reaction from './Reaction';
+import { Fonts } from '../assets/fonts/Fonts';
 import { COLOURS } from '../assets/theme/Theme';
+import CommentSheet from '../components/CommentSheet';
 import { globalImages } from '../assets/images/images_file/All_Images'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 
-const Card = ({ item, activeVideoId, setActiveVideoId, onPress }) => {
+
+const VideoCard = ({ item, activeVideoId, setActiveVideoId, onPress }) => {
+
+    const [showComments, setShowComments] = useState(false);
+
+    if (!item?.video) {
+        return (
+            <View style={styles.fallback}>
+                <Text style={styles.fallback_text}>🎬 Video Coming Soon...</Text>
+            </View>
+        );
+    }
+
     return (
         <>
             <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={{
@@ -85,15 +99,39 @@ const Card = ({ item, activeVideoId, setActiveVideoId, onPress }) => {
                         flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start'
                     }}>
                         <Reaction source={globalImages.heart} count={22} />
-                        <Reaction source={globalImages.comment} count={12} />
+                        <Reaction source={globalImages.comment} count={12} onPress={() => setShowComments(true)} />
                         <Reaction source={globalImages.save_icon} count={2} />
                     </View>
 
                 </View>
+
+                {/* Comment Sheet */}
+                <CommentSheet
+                    isOpen={showComments}
+                    onClose={() => setShowComments(false)}
+                    postId={item?.id}
+                />
 
             </TouchableOpacity>
         </>
     )
 }
 
-export default Card
+export default VideoCard
+
+const styles = StyleSheet.create({
+    fallback: {
+        backgroundColor: COLOURS.light_primary,
+        marginHorizontal: responsiveWidth(4),
+        marginTop: responsiveWidth(3),
+        borderRadius: responsiveWidth(4),
+        paddingVertical: responsiveWidth(8),
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    fallback_text: {
+        fontFamily: Fonts.Medium,
+        fontSize: responsiveFontSize(1.8),
+        color: COLOURS.grey,
+    },
+});

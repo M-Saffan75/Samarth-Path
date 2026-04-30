@@ -1,16 +1,19 @@
-import React, { useEffect, useState } from 'react';
 import Card_info from '../../../data/Data';
-import Card from '../../../components/Card';
 import Header from '../../../components/Header';
+import React, { useEffect, useState } from 'react';
 import { COLOURS } from '../../../assets/theme/Theme';
 import Title_Here from '../../../components/Title_Here';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppState, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 
-import { FlashList } from '@shopify/flash-list';
 
-const Home = () => {
+import { FlashList } from '@shopify/flash-list';
+import VideoCard from '../../../components/VideoCard';
+import ImageCard from '../../../components/ImageCard';
+import QuizCard from '../../../components/QuizCard';
+
+const Home = ({navigation}) => {
 
   const [activeVideoId, setActiveVideoId] = useState(null)
 
@@ -54,13 +57,15 @@ const Home = () => {
                 onScrollBeginDrag={() => setActiveVideoId(null)}
                 removeClippedSubviews={true}
                 contentContainerStyle={{ paddingBottom: responsiveWidth(5) }}
-                renderItem={({ item }) => (
-                  <Card
-                    item={item}
+                // renderItem update karo:
+                renderItem={({ item }) => {
+                  if (item.type === 'video') return <VideoCard item={item}
                     activeVideoId={activeVideoId}
-                    setActiveVideoId={setActiveVideoId}
-                  />
-                )}
+                    setActiveVideoId={setActiveVideoId} />;
+                  if (item.type === 'image') return <ImageCard item={item} />;
+                  if (item.type === 'quiz') return <QuizCard item={item} navigation={navigation} />;
+                  return null;
+                }}
               />
 
             ) : (
@@ -68,11 +73,13 @@ const Home = () => {
               // If Data now show 
               <View style={styles.empty}>
                 <Text style={styles.empty_icon}>𝌮</Text>
-                <Text style={styles.empty_text}>No content available for today</Text>
+                <Text style={styles.empty_text}>No content available for today until you buy our premiuim subscription!</Text>
               </View>
 
             )}
           </View>
+
+
 
           <View style={{ marginBottom: responsiveWidth(12) }} />
 

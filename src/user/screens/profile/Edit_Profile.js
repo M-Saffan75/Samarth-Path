@@ -115,6 +115,7 @@ const Edit_Profile = () => {
                             color={COLOURS.black}
                             maxLength={35}
                             Placeholder={'Your email'}
+                            editable={false}
                             defaultValue={userData?.email}
                             first_inpt_Img={globalImages.envelope_filled}
                             tintColor={COLOURS.grey}
@@ -131,6 +132,7 @@ const Edit_Profile = () => {
                             keyboardType={'numeric'}
                             Placeholder={'Your Phone'}
                             maxLength={12}
+                            editable={false}
                             defaultValue={userData?.phone}
                             first_inpt_Img={globalImages.phone_filled}
                             tintColor={COLOURS.grey}

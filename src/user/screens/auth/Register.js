@@ -195,7 +195,7 @@ const Register = ({ navigation }) => {
                                     onChangeText={setPassword}
                                 />
 
-                                <Title_Here title={'password'} color={COLOURS.black} marginTop={0} />
+                                <Title_Here title={'confirm password'} color={COLOURS.black} marginTop={0} />
                                 <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}
                                     borderWidth={1}
                                     color={COLOURS.black}

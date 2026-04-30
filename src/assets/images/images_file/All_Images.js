@@ -49,6 +49,9 @@ const volume = require('../../icons/Extra/volume-up.png')
 const mute = require('../../icons/Extra/mute.png')
 const lock_icon = require('../../icons/Filled/lock.png')
 const edit_pencil = require('../all_images/edit_text.png')
+const select = require('../all_images/select.png')
+const unselect = require('../all_images/unselect.png')
+const check_icon = require('../all_images/check.png')
 
 export const globalImages = {
     app_logo, image_1, bg_here, icon_new,
@@ -59,7 +62,7 @@ export const globalImages = {
     spiritual_1, spiritual_2, heart_filled, heart, comment_filled, comment,
     save_icon, save_filled, spiritual_3, spiritual_4, spiritual_5, eye_slash,
     eye, pswd_key, pause, play, volume, mute, lock_icon,
-    spiritual_6, edit_pencil,
+    spiritual_6, edit_pencil,unselect,select,check_icon,
     spiritual_7,
     spiritual_8,
     spiritual_9,

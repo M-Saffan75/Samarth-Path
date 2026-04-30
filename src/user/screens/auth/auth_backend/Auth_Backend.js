@@ -79,16 +79,13 @@ export const loginUser = async ({ phone, password }) => {
         body: JSON.stringify({ phone, password }),
     });
 
-    console.log(phone, password)
     const data = await response.json();
-    if (response.status === 403) {
-        const error = new Error(data.message);
-        error.code = 403;
-        throw error;
-    }
 
     if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
+        const error = new Error(data.message || 'Login failed');
+        error.code = response.status;  
+        error.status = response.status;    
+        throw error;
     }
 
     return data;
