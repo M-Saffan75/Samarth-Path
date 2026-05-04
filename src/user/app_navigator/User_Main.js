@@ -5,27 +5,21 @@ import NetInfo from '@react-native-community/netinfo';
 import Network from '../../internet/Network';
 
 const User_Main = () => {
-
-    const [isConnected, setIsConnected] = useState(true)
+    const [isConnected, setIsConnected] = useState(true);
 
     useEffect(() => {
         const unsubscribe = NetInfo.addEventListener(state => {
-            setIsConnected(state.isConnected ?? true)
-        })
-        return () => unsubscribe()
-    }, [])
+            setIsConnected(state.isConnected ?? true);
+        });
+        return () => unsubscribe();
+    }, []);
 
     return (
         <View style={{ flex: 1 }}>
-            <User_Navigator />
-            {!isConnected && (
-                <View style={StyleSheet.absoluteFill}>
-                    <Network />
-                </View>
-            )}
+            <User_Navigator isConnected={isConnected} />
         </View>
-    )
-}
+    );
+};
 
 export default User_Main
 

@@ -1,12 +1,15 @@
 import React from 'react'
 import { Fonts } from '../assets/fonts/Fonts';
-import { COLOURS } from '../assets/theme/Theme';
 import { globalImages } from '../assets/images/images_file/All_Images';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions'
+import { useTheme } from '../assets/themecontext/ThemeContext';
 
 const Profile_Row = ({ bordernone, paddingBottom, label, source,
     tintColor, backgroundColor, color, navigation, onPress }) => {
+        
+        const { theme: COLOURS } = useTheme();
+        
     return (
         <>
             <TouchableOpacity activeOpacity={0.8} onPress={onPress}>

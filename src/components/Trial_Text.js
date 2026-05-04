@@ -1,14 +1,15 @@
 import React from 'react'
-import { COLOURS } from '../assets/theme/Theme';
 import { Fonts } from '../assets/fonts/Fonts';
 import { StyleSheet, Text, View } from 'react-native';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
+import { useTheme } from '../assets/themecontext/ThemeContext';
 
 
 import { useUser } from '../user/screens/auth/user_context/UserContext';
 
 const Trial_Text = ({ backgroundColor, width, alignSelf }) => {
 
+    const { theme: COLOURS } = useTheme();
     const { userData } = useUser();
 
     return (

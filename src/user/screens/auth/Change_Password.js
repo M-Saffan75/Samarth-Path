@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { COLOURS } from '../../../assets/theme/Theme';
+import { useTheme } from '../../../assets/themecontext/ThemeContext';
 import { globalImages } from '../../../assets/images/images_file/All_Images';
 import { ImageBackground, StyleSheet, Text, View, StatusBar, } from 'react-native';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
@@ -19,7 +20,7 @@ import { FadeUp } from '../../../components/FadeUp';
 
 const Change_Password = ({ navigation }) => {
 
-
+    const { theme: COLOURS, isDark } = useTheme();
     const { setLoading } = useLoader();
     const [currentPassword, setCurrentPassword] = useState('');
     const [password, setPassword] = useState('');
@@ -80,11 +81,11 @@ const Change_Password = ({ navigation }) => {
     return (
         <>
             <StatusBar
-                barStyle={'dark-content'}
+                barStyle={isDark ? 'light-content' : 'dark-content'}
                 backgroundColor={COLOURS.white}
             />
-            <SafeAreaView>
-                <View style={[styles.container, { backgroundColor: COLOURS.white }]}>
+            <SafeAreaView style={{ flex: 1, backgroundColor: COLOURS.light_primary }}>
+                <View style={[styles.container, { backgroundColor: COLOURS.light_primary }]}>
 
                     <ImageBackground source={globalImages.bg_auth} style={styles.login_img} resizeMode='cover'>
 

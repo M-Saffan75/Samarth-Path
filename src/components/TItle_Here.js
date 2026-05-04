@@ -4,10 +4,13 @@ import {
     responsiveWidth,
     responsiveFontSize
 } from 'react-native-responsive-dimensions';
-import { COLOURS } from '../assets/theme/Theme';
+import { useTheme } from '../assets/themecontext/ThemeContext';
 
 const Title_Here = ({ title, fontSize, textAlign, marginTop, width, justifyContent, letterSpacing, marginLeft, marginRight, lineHeight, borderRadius, fontStyle,
     backgroundColor, alignItems, marginBottom, color, fontFamily, marginHorizontal, textTransform, alignSelf, style, paddingHorizontal, paddingVertical }) => {
+
+    const { theme: COLOURS } = useTheme();
+
     return (
         <>
 

@@ -1,34 +1,35 @@
 import React, { useState } from 'react';
 import Header from '../../../components/Header';
 import { Calendar } from 'react-native-calendars';
-import { COLOURS } from '../../../assets/theme/Theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, StatusBar } from 'react-native';
+import { useTheme } from '../../../assets/themecontext/ThemeContext';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 
 const Archives = () => {
 
-const today = new Date().toISOString().split('T')[0];
-const [selectedDate, setSelectedDate] = useState(today);
+    const { theme: COLOURS, isDark } = useTheme();
+    const today = new Date().toISOString().split('T')[0];
+    const [selectedDate, setSelectedDate] = useState(today);
 
-const formatDisplayDate = (dateStr) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', {
-        weekday: 'long',
-        month: 'long',
-        day: 'numeric',
-    });
-};
+    const formatDisplayDate = (dateStr) => {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('en-US', {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric',
+        });
+    };
 
-const handleDateSelect = (day) => {
-    setSelectedDate(day.dateString);
-    console.log('Selected Date:', day.dateString); // 2026-04-03 format — API 
-};
+    const handleDateSelect = (day) => {
+        setSelectedDate(day.dateString);
+        console.log('Selected Date:', day.dateString); // 2026-04-03 format — API 
+    };
 
     return (
         <>
             <StatusBar
-                barStyle={'dark-content'}
+                barStyle={isDark ? 'light-content' : 'dark-content'}
                 backgroundColor={COLOURS.light_primary}
             />
             <SafeAreaView style={{ flex: 1, backgroundColor: COLOURS.light_primary }}>
@@ -38,7 +39,7 @@ const handleDateSelect = (day) => {
                     <Header title={'archives'} />
 
                     {/* Calendar */}
-                    <View style={styles.calendar_box}>
+                    <View style={[styles.calendar_box, { backgroundColor: COLOURS.white, }]}>
                         <Calendar
                             current={today}
                             onDayPress={handleDateSelect}
@@ -74,14 +75,14 @@ const handleDateSelect = (day) => {
                     </View>
 
                     {/* Selected Date */}
-                    <Text style={styles.selected_date}>
+                    <Text style={[styles.selected_date,{color: COLOURS.black,}]}>
                         {formatDisplayDate(selectedDate)}
                     </Text>
 
                     {/* No Content */}
                     <View style={styles.empty_area}>
-                        <Text style={styles.empty_icon}>𝌮</Text>
-                        <Text style={[styles.empty_text, { color: COLOURS.light_black }]}>No content available for this date</Text>
+                        <Text style={[styles.empty_icon,{color: COLOURS.primary,}]}>𝌮</Text>
+                        <Text style={[styles.empty_text, { color: COLOURS.primary, }]}>No content available for this date</Text>
                     </View>
 
                 </View>
@@ -102,7 +103,7 @@ const styles = StyleSheet.create({
         marginTop: responsiveWidth(4),
         borderRadius: responsiveWidth(5),
         overflow: 'hidden',
-        backgroundColor: COLOURS.white,
+
         elevation: 2,
         shadowColor: '#000',
         shadowOpacity: 0.06,
@@ -112,7 +113,6 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontFamily: 'Poppins-Bold',
         fontSize: responsiveFontSize(2),
-        color: COLOURS.black,
         marginTop: responsiveWidth(6),
     },
     empty_area: {
@@ -121,13 +121,11 @@ const styles = StyleSheet.create({
     },
     empty_icon: {
         fontSize: responsiveFontSize(5),
-        color: COLOURS.light_grey,
         marginBottom: responsiveWidth(3),
     },
     empty_text: {
         fontFamily: 'Poppins-Medium',
-        fontSize: responsiveFontSize(1.8),
-        color: COLOURS.light_grey,
+        fontSize: responsiveFontSize(1.8),  
         textAlign: 'center',
     },
 });

@@ -7,10 +7,6 @@ import { StyleSheet, Text, View, StatusBar, Image } from 'react-native';
 const App_Logo = ({ alignItems, width, borderRadius, backgroundColor, height, source, marginTop, resizeMode, tintColor }) => {
   return (
     <>
-      <StatusBar
-        barStyle={'dark-content'}
-        backgroundColor={COLOURS.white}
-      />
 
       <View style={[styles.container, { backgroundColor: backgroundColor }]}>
 

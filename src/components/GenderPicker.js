@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Modal, StyleSheet } from 'react-native';
 import { COLOURS } from '../assets/theme/Theme';
+import { useTheme } from '../assets/themecontext/ThemeContext';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 
 const OPTIONS = ['Male', 'Female', 'Others'];
@@ -12,20 +13,22 @@ const ICONS = {
 };
 
 export const GenderPicker = ({ value, onChange }) => {
+
+    const { theme: COLOURS, isDark } = useTheme();
     const [show, setShow] = useState(false);
 
     return (
         <View>
             <TouchableOpacity
-                style={[styles.input, value && styles.inputFilled]}
+                style={[[styles.input, { backgroundColor: COLOURS.light_primary, }], value && styles.inputFilled]}
                 onPress={() => setShow(true)}
                 activeOpacity={0.8}
             >
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(2) }}>
                     {value && (
-                        <Text style={styles.selectedIcon}>{ICONS[value]}</Text>
+                        <Text style={[styles.selectedIcon, { color: COLOURS.grey, }]}>{ICONS[value]}</Text>
                     )}
-                    <Text style={value ? styles.valueText : styles.placeholder}>
+                    <Text style={value ? [styles.valueText, { color: COLOURS.black, }] : styles.placeholder}>
                         {value || 'Gender'}
                     </Text>
                 </View>
@@ -38,16 +41,16 @@ export const GenderPicker = ({ value, onChange }) => {
                     activeOpacity={1}
                     onPress={() => setShow(false)}
                 >
-                    <View style={styles.modal}>
+                    <View style={[styles.modal, { backgroundColor: COLOURS.white, }]}>
 
                         {/* Handle bar */}
-                        <View style={styles.handle} />
+                        <View style={[styles.handle, { backgroundColor: COLOURS.light_grey, }]} />
 
                         {/* Header */}
-                        <View style={styles.modalHeader}>
-                            <Text style={styles.modalTitle}>Select Gender</Text>
-                            <TouchableOpacity onPress={() => setShow(false)} style={styles.closeWrapper}>
-                                <Text style={styles.closeBtn}>✕</Text>
+                        <View style={[styles.modalHeader, { borderBottomColor: COLOURS.light_grey, }]}>
+                            <Text style={[styles.modalTitle, { color: COLOURS.black, }]}>Select Gender</Text>
+                            <TouchableOpacity onPress={() => setShow(false)} style={[styles.closeWrapper, { backgroundColor: COLOURS.light_grey, }]}>
+                                <Text style={[styles.closeBtn, { color: COLOURS.grey, }]}>✕</Text>
                             </TouchableOpacity>
                         </View>
 
@@ -59,7 +62,7 @@ export const GenderPicker = ({ value, onChange }) => {
                                     style={[
                                         styles.option,
                                         value === option && styles.optionSelected,
-                                        index !== OPTIONS.length - 1 && styles.optionBorder,
+                                        index !== OPTIONS.length - 1 && [styles.optionBorder, { borderBottomColor: COLOURS.light_grey, }],
                                     ]}
                                     onPress={() => {
                                         onChange(option);
@@ -68,20 +71,20 @@ export const GenderPicker = ({ value, onChange }) => {
                                     activeOpacity={0.7}
                                 >
                                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(3) }}>
-                                        <View style={[styles.iconCircle, value === option && styles.iconCircleSelected]}>
+                                        <View style={[[styles.iconCircle, { backgroundColor: COLOURS.light_grey, }], value === option && styles.iconCircleSelected]}>
                                             <Text style={[styles.optionIcon, value === option && styles.optionIconSelected]}>
                                                 {ICONS[option]}
                                             </Text>
                                         </View>
-                                        <Text style={[styles.optionText, value === option && styles.optionTextSelected]}>
+                                        <Text style={[[styles.optionText, { color: COLOURS.black, }], value === option && [styles.optionTextSelected, { color: COLOURS.primary, }]]}>
                                             {option}
                                         </Text>
                                     </View>
 
                                     {/* Checkmark */}
                                     {value === option && (
-                                        <View style={styles.checkCircle}>
-                                            <Text style={styles.checkmark}>✓</Text>
+                                        <View style={[styles.checkCircle, { backgroundColor: COLOURS.primary, }]}>
+                                            <Text style={[styles.checkmark, { color: COLOURS.white, }]}>✓</Text>
                                         </View>
                                     )}
                                 </TouchableOpacity>
@@ -104,7 +107,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         borderRadius: responsiveWidth(2),
         paddingVertical: responsiveWidth(2.5),
-        backgroundColor: COLOURS.light_primary,
         paddingHorizontal: responsiveWidth(4),
         borderWidth: 1.5,
         borderColor: 'transparent',
@@ -119,14 +121,13 @@ const styles = StyleSheet.create({
         fontFamily: 'Poppins-Regular',
     },
     valueText: {
-        color: COLOURS.black,
-        top:responsiveWidth(.5),
+        top: responsiveWidth(.5),
         fontSize: responsiveFontSize(1.8),
         fontFamily: 'Poppins-Medium',
     },
     selectedIcon: {
         fontSize: responsiveFontSize(2),
-        color: COLOURS.grey,
+
     },
     arrow: {
         color: '#AAAAAA',
@@ -140,7 +141,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
     },
     modal: {
-        backgroundColor: COLOURS.white,
+
         borderTopLeftRadius: responsiveWidth(6),
         borderTopRightRadius: responsiveWidth(6),
         paddingBottom: responsiveWidth(8),
@@ -149,7 +150,7 @@ const styles = StyleSheet.create({
     handle: {
         width: responsiveWidth(10),
         height: responsiveWidth(1),
-        backgroundColor: COLOURS.light_grey,
+
         borderRadius: responsiveWidth(2),
         alignSelf: 'center',
         marginTop: responsiveWidth(3),
@@ -161,16 +162,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: responsiveWidth(3),
         borderBottomWidth: 1,
-        borderBottomColor: COLOURS.light_grey,
         marginBottom: responsiveWidth(2),
     },
     modalTitle: {
         fontSize: responsiveFontSize(2),
         fontFamily: 'Poppins-SemiBold',
-        color: COLOURS.black,
+
     },
     closeWrapper: {
-        backgroundColor: COLOURS.light_grey,
         borderRadius: responsiveWidth(5),
         height: responsiveWidth(7),
         width: responsiveWidth(7),
@@ -179,7 +178,6 @@ const styles = StyleSheet.create({
     },
     closeBtn: {
         fontSize: responsiveFontSize(1.6),
-        color: COLOURS.grey,
         fontFamily: 'Poppins-Medium',
     },
 
@@ -197,7 +195,6 @@ const styles = StyleSheet.create({
     },
     optionBorder: {
         borderBottomWidth: 1,
-        borderBottomColor: COLOURS.light_grey,
     },
     optionSelected: {
         backgroundColor: '#FFF5EE',
@@ -206,7 +203,6 @@ const styles = StyleSheet.create({
         height: responsiveWidth(9),
         width: responsiveWidth(9),
         borderRadius: responsiveWidth(5),
-        backgroundColor: COLOURS.light_grey,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -223,22 +219,20 @@ const styles = StyleSheet.create({
     optionText: {
         fontSize: responsiveFontSize(1.9),
         fontFamily: 'Poppins-Regular',
-        color: COLOURS.black,
+
     },
     optionTextSelected: {
-        color: COLOURS.primary,
         fontFamily: 'Poppins-Bold',
     },
     checkCircle: {
         height: responsiveWidth(6),
         width: responsiveWidth(6),
         borderRadius: responsiveWidth(3),
-        backgroundColor: COLOURS.primary,
+
         alignItems: 'center',
         justifyContent: 'center',
     },
     checkmark: {
-        color: COLOURS.white,
         fontSize: responsiveFontSize(1.4),
         fontFamily: 'Poppins-Bold',
     },

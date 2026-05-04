@@ -1,28 +1,37 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import VideoPlayer from './VideoPlayer';
 import Reaction from './Reaction';
+import { FadeUp } from './FadeUp';
 import { Fonts } from '../assets/fonts/Fonts';
-import { COLOURS } from '../assets/theme/Theme';
 import CommentSheet from '../components/CommentSheet';
+import { useTheme } from '../assets/themecontext/ThemeContext';
 import { globalImages } from '../assets/images/images_file/All_Images'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 
 
-const VideoCard = ({ item, activeVideoId, setActiveVideoId, onPress }) => {
 
+const VideoCard = ({ item, activeVideoId, setActiveVideoId, onPress, onUnbookmark }) => {
+
+    const { theme: COLOURS, isDark } = useTheme();
     const [showComments, setShowComments] = useState(false);
+    const [commentsCount, setCommentsCount] = useState(item?.commentsCount);
+
+    useEffect(() => {
+        setCommentsCount(item?.commentsCount);
+    }, [item?.commentsCount]); // ← item change hone pe update
 
     if (!item?.video) {
         return (
-            <View style={styles.fallback}>
-                <Text style={styles.fallback_text}>🎬 Video Coming Soon...</Text>
+            <View style={[styles.fallback, { backgroundColor: COLOURS.light_primary, }]}>
+                <Text style={[styles.fallback_text, { color: COLOURS.grey, }]}>🎬 Video Coming Soon...</Text>
             </View>
         );
     }
 
+
     return (
-        <>
+        <FadeUp>
             <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={{
                 backgroundColor: COLOURS.light_primary, paddingHorizontal: responsiveWidth(2), paddingTop: responsiveWidth(4),
                 paddingVertical: responsiveWidth(1), borderRadius: responsiveWidth(4), marginHorizontal: responsiveWidth(4),
@@ -53,29 +62,23 @@ const VideoCard = ({ item, activeVideoId, setActiveVideoId, onPress }) => {
                 <View>
 
                     {/* ---- Image ya Video ---- */}
-                    {item?.type === 'video' ? (
-                        <VideoPlayer
-                            uri={item.video}
-                            videoId={item.id}
-                            activeVideoId={activeVideoId}
-                            setActiveVideoId={setActiveVideoId}
-                            style={{
-                                width: responsiveWidth(83),
-                                height: responsiveWidth(50),
-                                borderRadius: responsiveWidth(4),
-                                marginTop: responsiveWidth(5),
-                                alignSelf: 'center',
-                                overflow: 'hidden',
-                            }}
-                        />
-                    ) : (
-                        <Image source={item.image} style={{
-                            height: responsiveWidth(50), width: responsiveWidth(83),
-                            borderRadius: responsiveWidth(4), marginTop: responsiveWidth(5), alignSelf: 'center'
-                        }} />
-                    )}
+                    <VideoPlayer
+                        uri={item.video}
+                        videoId={item.id}
+                        activeVideoId={activeVideoId}
+                        setActiveVideoId={setActiveVideoId}
+                        style={{
+                            width: responsiveWidth(83),
+                            height: responsiveWidth(50),
+                            borderRadius: responsiveWidth(4),
+                            marginTop: responsiveWidth(5),
+                            alignSelf: 'center',
+                            overflow: 'hidden',
+                        }}
+                    />
 
-                    <Text numberOfLines={1} ellipsizeMode='tail' style={{
+
+                    < Text numberOfLines={1} ellipsizeMode='tail' style={{
                         paddingLeft: responsiveWidth(4), marginTop: responsiveWidth(3),
                         textTransform: 'capitalize', fontFamily: 'Poppins-Medium',
                         top: responsiveWidth(.5), color: COLOURS.black, fontSize: responsiveFontSize(2)
@@ -98,9 +101,20 @@ const VideoCard = ({ item, activeVideoId, setActiveVideoId, onPress }) => {
                         marginHorizontal: responsiveWidth(4), marginTop: responsiveWidth(2.5),
                         flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start'
                     }}>
-                        <Reaction source={globalImages.heart} count={22} />
-                        <Reaction source={globalImages.comment} count={12} onPress={() => setShowComments(true)} />
-                        <Reaction source={globalImages.save_icon} count={2} />
+                        <Reaction
+                            isHeart
+                            contentId={item.id}
+                            isLiked={item.isLiked}  // ← yeh sahi hai?
+                            count={item.likesCount}
+                        />
+                        <Reaction source={globalImages.comment} count={commentsCount} onPress={() => setShowComments(true)} />
+
+                        <Reaction
+                            isBookmark
+                            contentId={item.id}
+                            initialBookmarked={item.isArchived}
+                            onUnbookmark={() => onUnbookmark?.(item.id)}
+                        />
                     </View>
 
                 </View>
@@ -110,10 +124,12 @@ const VideoCard = ({ item, activeVideoId, setActiveVideoId, onPress }) => {
                     isOpen={showComments}
                     onClose={() => setShowComments(false)}
                     postId={item?.id}
+                    onCommentAdded={() => setCommentsCount(prev => prev + 1)}
+                    onCommentDeleted={() => setCommentsCount(prev => prev - 1)}
                 />
 
             </TouchableOpacity>
-        </>
+        </FadeUp>
     )
 }
 
@@ -121,7 +137,7 @@ export default VideoCard
 
 const styles = StyleSheet.create({
     fallback: {
-        backgroundColor: COLOURS.light_primary,
+
         marginHorizontal: responsiveWidth(4),
         marginTop: responsiveWidth(3),
         borderRadius: responsiveWidth(4),
@@ -132,6 +148,5 @@ const styles = StyleSheet.create({
     fallback_text: {
         fontFamily: Fonts.Medium,
         fontSize: responsiveFontSize(1.8),
-        color: COLOURS.grey,
     },
 });

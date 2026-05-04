@@ -10,6 +10,8 @@ import Title_Here from '../../../components/Title_Here';
 import Back_Arrow from '../../../components/Back_Arrow';
 import Number_Select from '../../../components/Number_Select';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '../../../assets/themecontext/ThemeContext';
+
 
 import { useLoader } from '../../../loading/LoaderContext';
 import { forgotPassword } from './auth_backend/Auth_Backend';
@@ -17,7 +19,7 @@ import { showError, showSuccess } from '../../../helper/Helper';
 
 const Forgot_Password = ({ navigation }) => {
 
-
+    const { theme: COLOURS, isDark } = useTheme();
     const { setLoading } = useLoader();
     const [phone, setPhone] = useState('');
 
@@ -47,10 +49,10 @@ const Forgot_Password = ({ navigation }) => {
     return (
         <>
             <StatusBar
-                barStyle={'dark-content'}
-                backgroundColor={COLOURS.white}
+                barStyle={isDark ? 'light-content' : 'dark-content'}
+                backgroundColor={COLOURS.light_primary}
             />
-            <SafeAreaView>
+            <SafeAreaView style={{ flex: 1, backgroundColor: COLOURS.white }}>
                 <View style={[styles.container, { backgroundColor: COLOURS.white }]}>
 
                     <ImageBackground source={globalImages.bg_auth} style={styles.login_img} resizeMode='cover'>
@@ -66,7 +68,7 @@ const Forgot_Password = ({ navigation }) => {
                                 marginTop={responsiveWidth(5)}
                             />
 
-                            <Title_Here title={'mobile number'} color={COLOURS.black} marginBottom={responsiveWidth(4)}/>
+                            <Title_Here title={'mobile number'} color={COLOURS.black} marginBottom={responsiveWidth(4)} />
                             <Number_Select value={phone} onChangeText={setPhone} />
 
                             <View style={styles.btn_area}>
@@ -110,13 +112,13 @@ const styles = StyleSheet.create({
     /*  */
 
     dont_text_2: {
-        fontFamily: 'Inter-Bold',
+        fontFamily: 'Poppins-Bold',
         fontSize: responsiveFontSize(1.7),
         textTransform: 'capitalize',
     },
 
     dont_text_1: {
-        fontFamily: 'Inter-Medium',
+        fontFamily: 'Poppins-Medium',
         fontSize: responsiveFontSize(1.7),
     },
 
@@ -125,7 +127,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
 
-        marginTop: responsiveWidth(10)
+        marginTop: responsiveWidth(15)
     },
 
     /*  */

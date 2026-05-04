@@ -1,5 +1,6 @@
 import React from 'react'
 import { COLOURS } from '../assets/theme/Theme'
+import { useTheme } from '../assets/themecontext/ThemeContext';
 import { Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 
 const Modal_Verify = ({
@@ -10,6 +11,8 @@ const Modal_Verify = ({
     handleModalSubmit,
     loading
 }) => {
+    const { theme: COLOURS, isDark } = useTheme();
+
     return (
         <Modal
             visible={modalVisible}
@@ -18,25 +21,25 @@ const Modal_Verify = ({
             onRequestClose={() => setModalVisible(false)}
         >
             <View style={styles.modalOverlay}>
-                <View style={styles.modalBox}>
+                <View style={[styles.modalBox, { backgroundColor: COLOURS.white, }]}>
 
-                    <Text style={styles.modalTitle}>Already Registered</Text>
+                    <Text style={[styles.modalTitle, { color: COLOURS.black }]}>Already Registered</Text>
                     <Text style={styles.modalSubtitle}>
-                        Your account is registered but not verified yet. Enter your email to get OTP.
+                        Your account is registered but not verified yet. confirm your number to get OTP.
                     </Text>
 
                     <TextInput
-                        style={styles.modalInput}
-                        placeholder="Enter your email"
-                        placeholderTextColor="#999"
-                        value={modalEmail}
-                        onChangeText={setModalEmail}
-                        keyboardType="email-address"
-                        autoCapitalize="none"
+                        style={[styles.modalInput, { color: COLOURS.black }]}
+                    placeholder="Enter your email"
+                    placeholderTextColor="#999"
+                    value={modalEmail}
+                    onChangeText={setModalEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
                     />
 
                     <TouchableOpacity
-                        style={[styles.modalBtn, loading && { opacity: 0.7 }]}
+                        style={[[styles.modalBtn, { backgroundColor: COLOURS.primary, }], loading && { opacity: 0.7 }]}
                         onPress={handleModalSubmit}
                         disabled={loading}
                     >
@@ -66,7 +69,7 @@ const styles = StyleSheet.create({
     },
     modalBox: {
         width: '85%',
-        backgroundColor: '#fff',
+
         borderRadius: 16,
         padding: 24,
         alignItems: 'center',
@@ -74,7 +77,6 @@ const styles = StyleSheet.create({
     modalTitle: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#333',
         marginBottom: 8,
     },
     modalSubtitle: {
@@ -91,12 +93,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: 14,
         paddingVertical: 10,
         fontSize: 14,
-        color: '#333',
         marginBottom: 16,
     },
     modalBtn: {
         width: '100%',
-        backgroundColor:COLOURS.primary,
+
         borderRadius: 10,
         paddingVertical: 12,
         alignItems: 'center',

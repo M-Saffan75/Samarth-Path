@@ -34,6 +34,7 @@ const spiritual_10 = require('../all_images/spiritual_10.jpg')
 
 const heart = require('../../icons/Bold/heart.png')
 const heart_filled = require('../../icons/Filled/heart.png')
+const trash = require('../../icons/Filled/trash.png')
 const comment = require('../../icons/Bold/comments.png')
 const comment_filled = require('../../icons/Filled/comments.png')
 const save_icon = require('../../icons/Bold/bookmark.png')
@@ -52,6 +53,12 @@ const edit_pencil = require('../all_images/edit_text.png')
 const select = require('../all_images/select.png')
 const unselect = require('../all_images/unselect.png')
 const check_icon = require('../all_images/check.png')
+const theme_icon = require('../all_images/theme.png')
+
+const check_icon_json = require('../../images/all_images/check-icon.json')
+const cross_icon = require('../../images/all_images/cross.json')
+const like_json = require('../../images/all_images/like-heart.json')
+const send_icon = require('../../icons/Filled/send.png')
 
 export const globalImages = {
     app_logo, image_1, bg_here, icon_new,
@@ -61,9 +68,9 @@ export const globalImages = {
     archive_light, access_light, user_light, logout_icon,
     spiritual_1, spiritual_2, heart_filled, heart, comment_filled, comment,
     save_icon, save_filled, spiritual_3, spiritual_4, spiritual_5, eye_slash,
-    eye, pswd_key, pause, play, volume, mute, lock_icon,
-    spiritual_6, edit_pencil,unselect,select,check_icon,
-    spiritual_7,
+    eye, pswd_key, pause, play, volume, mute, lock_icon, cross_icon,
+    spiritual_6, edit_pencil, unselect, select, check_icon, check_icon_json,
+    spiritual_7, like_json,trash,send_icon,theme_icon,
     spiritual_8,
     spiritual_9,
     spiritual_10,

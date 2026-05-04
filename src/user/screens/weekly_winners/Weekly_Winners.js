@@ -9,13 +9,14 @@ import {
     ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
-import { COLOURS } from '../../../assets/theme/Theme';
 import { Fonts } from '../../../assets/fonts/Fonts';
-import Back_Arrow from '../../../components/Back_Arrow';
-import { FadeDown } from '../../../components/FadeDown';
 import { FadeUp } from '../../../components/FadeUp';
 import { FadeIn } from '../../../components/FadeIn';
+import { COLOURS } from '../../../assets/theme/Theme';
+import Back_Arrow from '../../../components/Back_Arrow';
+import { FadeDown } from '../../../components/FadeDown';
+import { useTheme } from '../../../assets/themecontext/ThemeContext';
+import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 
 
 const weeklyScore = {
@@ -67,11 +68,12 @@ const getMedalEmoji = (rank) => {
 // ─── Sub Components ────────────────────────────────────────────────────────
 
 const ScoreBar = ({ score, total, rank, rankLabel }) => {
+    const { theme: COLOURS, isDark } = useTheme();
     const dots = Array.from({ length: total }, (_, i) => i < score);
 
     return (
         <FadeDown>
-            <View style={styles.scoreBar}>
+            <View style={[styles.scoreBar, { backgroundColor: COLOURS.primary, }]}>
                 <View>
                     <Text style={styles.scoreBarLabel}>Your score this week</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: responsiveWidth(1) }}>
@@ -82,7 +84,7 @@ const ScoreBar = ({ score, total, rank, rankLabel }) => {
                         {dots.map((filled, i) => (
                             <View
                                 key={i}
-                                style={[styles.dot, filled ? styles.dotFilled : styles.dotEmpty]}
+                                style={[styles.dot, filled ? [styles.dotFilled, { backgroundColor: COLOURS.white, }] : styles.dotEmpty]}
                             />
                         ))}
                     </View>
@@ -99,9 +101,9 @@ const ScoreBar = ({ score, total, rank, rankLabel }) => {
 
 // const PrizeCard = ({ prize }) => (
 //     <View style={styles.card}>
-//         <View style={styles.cardHeader}>
+//         <View style={[styles.cardHeader,{backgroundColor: COLOURS.light_primary,}]}>
 //             <View style={styles.prizeBadge}>
-//                 <Text style={styles.prizeBadgeText}>Prize of the Week</Text>
+//                 <Text style={[styles.prizeBadgeText,{color: COLOURS.primary,}]}>Prize of the Week</Text>
 //             </View>
 //         </View>
 //         <View style={styles.prizeBody}>
@@ -109,19 +111,20 @@ const ScoreBar = ({ score, total, rank, rankLabel }) => {
 //             {prize.image ? (
 //                 <Image source={prize.image} style={styles.prizeImage} resizeMode="cover" />
 //             ) : (
-//                 <View style={styles.prizeImagePlaceholder}>
+//                 <View style={[styles.prizeImagePlaceholder,{ borderColor: COLOURS.light_grey,}]}>
 //                     <Text style={{ fontSize: responsiveFontSize(3.5) }}>🎁</Text>
 //                 </View>
 //             )}
 //             <View style={{ flex: 1 }}>
-//                 <Text style={styles.prizeTitle}>{prize.title}</Text>
-//                 <Text style={styles.prizeDesc}>{prize.description}</Text>
+//                 <Text style={[styles.prizeTitle,{color: COLOURS.black,}]}>{prize.title}</Text>
+//                 <Text style={[styles.prizeDesc,{color: COLOURS.grey,}]}>{prize.description}</Text>
 //             </View>
 //         </View>
 //     </View>
 // );
 
 const WinnerRow = ({ item, index }) => {
+    const { theme: COLOURS, isDark } = useTheme();
     const rank = index + 1;
     const medal = getMedalEmoji(rank);
     const color = avatarColors[index % avatarColors.length];
@@ -134,7 +137,7 @@ const WinnerRow = ({ item, index }) => {
                     {medal ? (
                         <Text style={styles.medalEmoji}>{medal}</Text>
                     ) : (
-                        <Text style={styles.rankText}>{rank}</Text>
+                        <Text style={[styles.rankText, { color: COLOURS.grey, }]}>{rank}</Text>
                     )}
                 </View>
 
@@ -145,12 +148,12 @@ const WinnerRow = ({ item, index }) => {
 
                 {/* Name + sub */}
                 <View style={{ flex: 1 }}>
-                    <Text style={styles.winnerName}>{item.name}</Text>
-                    <Text style={styles.winnerSub}>{item.score} correct answers</Text>
+                    <Text style={[styles.winnerName, { color: COLOURS.black, }]}>{item.name}</Text>
+                    <Text style={[styles.winnerSub, { color: COLOURS.grey, }]}>{item.score} correct answers</Text>
                 </View>
 
                 {/* Score */}
-                <Text style={styles.winnerScore}>{item.score}/{item.total}</Text>
+                <Text style={[styles.winnerScore, { color: COLOURS.primary, }]}>{item.score}/{item.total}</Text>
             </View>
         </FadeUp>
     );
@@ -159,8 +162,11 @@ const WinnerRow = ({ item, index }) => {
 // ─── Main Screen ───────────────────────────────────────────────────────────
 
 const Weekly_Winners = () => {
+
+    const { theme: COLOURS, isDark } = useTheme();
+
     return (
-        <SafeAreaView style={styles.safeArea}>
+        <SafeAreaView style={[styles.safeArea, { backgroundColor: COLOURS.light_primary, }]}>
             <Back_Arrow label={'weekly winners'} />
 
             {/* Score Bar */}
@@ -181,11 +187,11 @@ const Weekly_Winners = () => {
 
                 {/* Leaderboard */}
                 <FadeIn delay={500}>
-                    <View style={[styles.card, { marginTop: responsiveWidth(3) }]}>
-                        <View style={styles.cardHeader}>
-                            <Text style={styles.leaderboardTitle}>Leaderboard</Text>
-                            <View style={styles.weekTag}>
-                                <Text style={styles.weekTagText}>Week 18, 2026</Text>
+                    <View style={[styles.card, { marginTop: responsiveWidth(3), borderColor: COLOURS.grey, }]}>
+                        <View style={[styles.cardHeader, { borderBottomColor: COLOURS.light_grey, }]}>
+                            <Text style={[styles.leaderboardTitle, { color: COLOURS.black, }]}>Leaderboard</Text>
+                            <View style={[styles.weekTag, { borderColor: COLOURS.grey, backgroundColor: COLOURS.light_primary, }]}>
+                                <Text style={[styles.weekTagText, { color: COLOURS.grey, }]}>Week 18, 2026</Text>
                             </View>
                         </View>
 
@@ -208,17 +214,15 @@ const styles = StyleSheet.create({
 
     safeArea: {
         flex: 1,
-        backgroundColor: COLOURS.light_primary,
     },
 
-    // Header
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: responsiveWidth(4),
         paddingVertical: responsiveWidth(3),
-        backgroundColor: COLOURS.light_primary,
+
         borderBottomWidth: 0.5,
         borderBottomColor: COLOURS.light_grey,
     },
@@ -229,20 +233,10 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
         letterSpacing: 0.5,
     },
-    backBtn: {
-        width: responsiveWidth(8),
-        height: responsiveWidth(8),
-        borderRadius: responsiveWidth(4),
-        backgroundColor: COLOURS.white,
-        borderWidth: 0.5,
-        borderColor: COLOURS.light_grey,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
 
     // Score Bar
     scoreBar: {
-        backgroundColor: COLOURS.primary,
+
         marginHorizontal: responsiveWidth(4),
         marginTop: responsiveWidth(4),
         borderRadius: responsiveWidth(4),
@@ -285,7 +279,7 @@ const styles = StyleSheet.create({
         borderRadius: responsiveWidth(1),
     },
     dotFilled: {
-        backgroundColor: COLOURS.white,
+
     },
     dotEmpty: {
         backgroundColor: 'rgba(255,255,255,0.3)',
@@ -293,12 +287,12 @@ const styles = StyleSheet.create({
 
     // Card
     card: {
-        backgroundColor: COLOURS.light_primary,
+
         marginHorizontal: responsiveWidth(4),
         marginTop: responsiveWidth(3),
         borderRadius: responsiveWidth(4),
         borderWidth: 0.5,
-        borderColor: COLOURS.light_grey,
+
         overflow: 'hidden',
     },
     cardHeader: {
@@ -308,7 +302,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: responsiveWidth(4),
         paddingVertical: responsiveWidth(3),
         borderBottomWidth: 0.5,
-        borderBottomColor: COLOURS.light_grey,
+
     },
 
     // Prize
@@ -320,7 +314,6 @@ const styles = StyleSheet.create({
     },
     prizeBadgeText: {
         fontSize: responsiveFontSize(1.3),
-        color: COLOURS.primary,
         fontFamily: Fonts.Medium,
     },
     prizeBody: {
@@ -342,19 +335,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 0.5,
-        borderColor: COLOURS.light_grey,
+
         flexShrink: 0,
     },
     prizeTitle: {
         fontSize: responsiveFontSize(1.7),
         fontFamily: Fonts.Medium,
-        color: COLOURS.black,
+
         marginBottom: responsiveWidth(1),
     },
     prizeDesc: {
         fontSize: responsiveFontSize(1.4),
         fontFamily: Fonts.Regular,
-        color: COLOURS.grey,
         lineHeight: responsiveWidth(4.5),
     },
 
@@ -362,19 +354,17 @@ const styles = StyleSheet.create({
     leaderboardTitle: {
         fontSize: responsiveFontSize(1.7),
         fontFamily: Fonts.Medium,
-        color: COLOURS.black,
+
     },
     weekTag: {
-        backgroundColor: COLOURS.light_primary,
         borderRadius: responsiveWidth(1.5),
         paddingHorizontal: responsiveWidth(2.5),
         paddingVertical: responsiveWidth(0.8),
         borderWidth: 0.5,
-        borderColor: COLOURS.light_grey,
+
     },
     weekTagText: {
         fontSize: responsiveFontSize(1.3),
-        color: COLOURS.grey,
         fontFamily: Fonts.Regular,
     },
 
@@ -385,7 +375,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: responsiveWidth(4),
         paddingVertical: responsiveWidth(2.5),
         borderBottomWidth: 0.5,
-        borderBottomColor: '#FAF9F5',
+        borderBottomColor: '#dcdad0',
         gap: responsiveWidth(3),
     },
     rankBox: {
@@ -398,7 +388,7 @@ const styles = StyleSheet.create({
     rankText: {
         fontSize: responsiveFontSize(1.6),
         fontFamily: Fonts.Medium,
-        color: COLOURS.grey,
+
     },
     avatar: {
         width: responsiveWidth(9),
@@ -415,18 +405,18 @@ const styles = StyleSheet.create({
     winnerName: {
         fontSize: responsiveFontSize(1.6),
         fontFamily: Fonts.Medium,
-        color: COLOURS.black,
+
     },
     winnerSub: {
         fontSize: responsiveFontSize(1.3),
         fontFamily: Fonts.Regular,
-        color: COLOURS.grey,
+
         marginTop: responsiveWidth(0.5),
     },
     winnerScore: {
         fontSize: responsiveFontSize(1.6),
         fontFamily: Fonts.Medium,
-        color: COLOURS.primary,
+
         flexShrink: 0,
     },
 });

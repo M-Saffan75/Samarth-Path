@@ -4,27 +4,21 @@ import {
     TouchableOpacity, KeyboardAvoidingView,
     Platform, StyleSheet, Animated, PanResponder,
     Dimensions, Modal, TouchableWithoutFeedback,
+    ActivityIndicator,
+    Keyboard,
 } from 'react-native';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
+import { globalImages } from '../assets/images/images_file/All_Images';
 import { COLOURS } from '../assets/theme/Theme';
 import { Fonts } from '../assets/fonts/Fonts';
-import { globalImages } from '../assets/images/images_file/All_Images';
-import { FadeDown } from './FadeDown';
 import { FadeUp } from './FadeUp';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { deleteComment, fetchComments, postComment } from '../user/screens/home/homebackend/HomeBackend';
+import { useUser } from '../user/screens/auth/user_context/UserContext';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
-const SHEET_HEIGHT = SCREEN_HEIGHT * 0.75;
-
-// ─── Mock Comments ─────────────────────────────────────────────────────────
-const mockComments = [
-    { id: 1, user: 'Rahul Kumar', initials: 'RK', time: '2h ago', text: 'Bahut accha content hai! Roz padhta hoon.' },
-    { id: 2, user: 'Priya Sharma', initials: 'PS', time: '3h ago', text: 'Yeh quiz aaj bahut tough tha but loved it!' },
-    { id: 3, user: 'Meera Verma', initials: 'MV', time: '5h ago', text: 'Samarth Path ne meri zindagi badal di.' },
-    { id: 4, user: 'Vikram Rao', initials: 'VR', time: '6h ago', text: 'Amazing wisdom today. Keep it up!' },
-    { id: 5, user: 'Anita Nair', initials: 'AN', time: '8h ago', text: 'Roz ka quiz mera favorite part hai.' },
-    { id: 6, user: 'Karan Mehta', initials: 'KM', time: '9h ago', text: 'Best app for daily motivation!' },
-    { id: 7, user: 'Divya Patel', initials: 'DP', time: '10h ago', text: 'Har roz kuch naya seekhne ko milta.' },
-];
+const SHEET_HEIGHT = SCREEN_HEIGHT * 0.80;
+const MAX_SHEET_TOP = SCREEN_HEIGHT * 0.15;
 
 const avatarColors = [
     { bg: '#FFF3EB', text: '#E8935C' },
@@ -34,36 +28,113 @@ const avatarColors = [
     { bg: '#EEEDFE', text: '#534AB7' },
 ];
 
-// ─── Comment Row ───────────────────────────────────────────────────────────
-const CommentRow = ({ item, index }) => {
-    const color = avatarColors[index % avatarColors.length];
-    return (
-        <FadeUp>
-            <View style={styles.commentRow}>
-                <View style={[styles.avatar, { backgroundColor: color.bg }]}>
-                    <Text style={[styles.avatarText, { color: color.text }]}>{item.initials}</Text>
-                </View>
-                <View style={styles.commentContent}>
-                    <View style={styles.commentBubble}>
-                        <Text style={styles.commentUser}>{item.user}</Text>
-                        <Text style={styles.commentText}>{item.text}</Text>
-                    </View>
-                    <Text style={styles.commentTime}>{item.time}</Text>
-                </View>
-            </View>
-        </FadeUp>
-    );
+// Name se 2 initials nikalo
+const getInitials = (name = '') => {
+    const words = name.trim().split(' ');
+    if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
+    return name.slice(0, 2).toUpperCase();
 };
 
+// ─── Comment Row ───────────────────────────────────────────────────────────
+
+const CommentRow = ({ item, index, currentUserId, onDelete }) => {
+    const color = avatarColors[index % avatarColors.length];
+    const isOwner = item.userId?._id === currentUserId;
+    const isTemp = item._id?.startsWith('temp_');
+    const content = (
+        <View style={styles.commentRow}>
+            {/* Avatar */}
+            <View style={[styles.avatar, { backgroundColor: color.bg }]}>
+                <Text style={[styles.avatarText, { color: color.text }]}>
+                    {getInitials(item.userId?.name || item.user || 'U')}
+                </Text>
+            </View>
+
+            {/* Content */}
+            <View style={styles.commentContent}>
+                <View style={styles.commentBubble}>
+                    <Text style={styles.commentUser}>
+                        {item.userId?.name || item.user || 'User'}
+                    </Text>
+                    <Text style={styles.commentText}>{item.text}</Text>
+                </View>
+                <Text style={styles.commentTime}>{item.time || item.createdAt || ''}</Text>
+            </View>
+
+            {/* Delete — sirf apne comment pe */}
+            {isOwner && (
+                <TouchableOpacity
+                    onPress={() => onDelete(item._id || item.id)}
+                    activeOpacity={0.7}
+                    style={{
+                        top: responsiveWidth(4), backgroundColor: COLOURS.primary,
+                        height: responsiveWidth(7),
+                        width: responsiveWidth(7),
+                        borderRadius: responsiveWidth(100),
+                        justifyContent: 'center', alignItems: 'center'
+                    }}
+                >
+                    <Image
+                        source={globalImages.trash}
+                        style={{ width: responsiveWidth(4), height: responsiveWidth(4) }}
+                        tintColor={COLOURS.white}
+                    />
+                </TouchableOpacity>
+            )}
+        </View>
+    );
+    return isTemp ? <FadeUp>{content}</FadeUp> : content;
+};
+
+
 // ─── Main Component ────────────────────────────────────────────────────────
-const CommentSheet = ({ isOpen, onClose, postId }) => {
+const CommentSheet = ({ isOpen, onClose, postId, onCommentAdded, onCommentDeleted }) => {
+
+    const { userData } = useUser();
     const [comment, setComment] = useState('');
-    const [comments, setComments] = useState(mockComments);
+    const [comments, setComments] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [posting, setPosting] = useState(false);
+    const [currentUserId, setCurrentUserId] = useState(null);
 
     const translateY = useRef(new Animated.Value(SHEET_HEIGHT)).current;
-    const listScrollOffset = useRef(0); // list kitni scroll hui hai
+    const listScrollOffset = useRef(0);
 
-    // ─── Open / Close Animation ──────────────────────────────
+    const [userIdLoaded, setUserIdLoaded] = useState(false);
+    const inputRef = useRef(null);
+
+    const [currentUserName, setCurrentUserName] = useState('');
+    const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+    useEffect(() => {
+        const show = Keyboard.addListener('keyboardDidShow', (e) => {
+            setKeyboardHeight(e.endCoordinates.height);
+        });
+        const hide = Keyboard.addListener('keyboardDidHide', () => {
+            setKeyboardHeight(0);
+        });
+        return () => {
+            show.remove();
+            hide.remove();
+        };
+    }, []);
+
+
+    useEffect(() => {
+        const getUser = async () => {
+            const token = await AsyncStorage.getItem('token');
+            if (token) {
+                const payload = token.split('.')[1];
+                const decoded = JSON.parse(atob(payload));
+                setCurrentUserId(decoded._id || decoded.id || decoded.userId);
+                setCurrentUserName(decoded.name || decoded.userName || '');
+            }
+            setUserIdLoaded(true);
+        };
+        getUser();
+    }, []);
+
+    // Sheet open/close animation
     useEffect(() => {
         if (isOpen) {
             Animated.spring(translateY, {
@@ -71,6 +142,7 @@ const CommentSheet = ({ isOpen, onClose, postId }) => {
                 useNativeDriver: true,
                 bounciness: 4,
             }).start();
+            loadComments();
         } else {
             Animated.timing(translateY, {
                 toValue: SHEET_HEIGHT,
@@ -80,54 +152,93 @@ const CommentSheet = ({ isOpen, onClose, postId }) => {
         }
     }, [isOpen]);
 
-    // ─── PanResponder — Sirf Handle bar pe drag ──────────────
+    // Comments fetch
+    const loadComments = async () => {
+        if (!postId) return;
+        setLoading(true);
+        try {
+            const res = await fetchComments(postId);
+            if (res.success) {
+                setComments(res.data || []);
+            }
+        } catch (e) {
+            console.log('Fetch comments error:', e);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Post comment
+
+    const handlePostComment = async () => {
+        if (!comment.trim() || posting) return;
+        const text = comment.trim();
+        setComment(''); // ← pehle clear
+        inputRef.current?.focus();
+        setPosting(true);
+
+        const tempId = 'temp_' + Date.now();
+        const tempComment = {
+            _id: tempId,
+            text,
+            userId: { _id: currentUserId, name: userData?.name || '' },
+            createdAt: 'Just now',
+        };
+        setComments(prev => [tempComment, ...prev]);
+
+        try {
+            const res = await postComment(postId, text);
+            if (res.success) {
+                // sirf _id update karo — baaki sab temp wala rakho
+                setComments(prev =>
+                    prev.map(c => c._id === tempId
+                        ? { ...tempComment, _id: res.data?._id || tempId }
+                        : c
+                    )
+                );
+                onCommentAdded?.();
+            } else {
+                setComments(prev => prev.filter(c => c._id !== tempId));
+            }
+        } catch (e) {
+            setComments(prev => prev.filter(c => c._id !== tempId));
+        } finally {
+            setPosting(false);
+        }
+    };
+
+    // Delete comment
+    const handleDelete = async (commentId) => {
+        // Optimistic remove
+        setComments(prev => prev.filter(c => (c._id || c.id) !== commentId));
+        onCommentDeleted?.();
+        try {
+            await deleteComment(commentId);
+        } catch (e) {
+            console.log('Delete comment error:', e);
+            loadComments(); // fail → reload
+        }
+    };
+
+    // Pan responder — drag to close
     const panResponder = useRef(
         PanResponder.create({
             onStartShouldSetPanResponder: () => true,
-            onMoveShouldSetPanResponder: (_, gestureState) => {
-                // Sirf neeche drag aur list top pe ho tab
-                return gestureState.dy > 5 && listScrollOffset.current <= 0;
+            onPanResponderMove: (_, gesture) => {
+                if (gesture.dy > 0) translateY.setValue(gesture.dy);
             },
-            onPanResponderMove: (_, gestureState) => {
-                if (gestureState.dy > 0) {
-                    translateY.setValue(gestureState.dy);
-                }
-            },
-            onPanResponderRelease: (_, gestureState) => {
-                if (gestureState.dy > SHEET_HEIGHT * 0.25) {
-                    // 25% se zyada drag → close
-                    Animated.timing(translateY, {
-                        toValue: SHEET_HEIGHT,
-                        duration: 250,
-                        useNativeDriver: true,
-                    }).start(onClose);
+            onPanResponderRelease: (_, gesture) => {
+                if (gesture.dy > 150) {
+                    onClose();
                 } else {
-                    // Wapas upar
                     Animated.spring(translateY, {
                         toValue: 0,
                         useNativeDriver: true,
-                        bounciness: 4,
                     }).start();
                 }
             },
         })
     ).current;
-
-    // ─── Post Comment ─────────────────────────────────────────
-    const handlePostComment = () => {
-        if (!comment.trim()) return;
-        const newComment = {
-            id: Date.now(),
-            user: 'You',
-            initials: 'ME',
-            time: 'Just now',
-            text: comment.trim(),
-        };
-        setComments([newComment, ...comments]);
-        setComment('');
-    };
-
-    if (!isOpen) return null;
 
     return (
         <Modal
@@ -136,15 +247,18 @@ const CommentSheet = ({ isOpen, onClose, postId }) => {
             animationType="none"
             onRequestClose={onClose}
         >
-            {/* Backdrop */}
             <TouchableWithoutFeedback onPress={onClose}>
                 <View style={styles.backdrop} />
             </TouchableWithoutFeedback>
 
-            {/* Sheet */}
-            <Animated.View style={[styles.sheet, { transform: [{ translateY }] }]}>
+            <Animated.View style={[styles.sheet, {
+                transform: [{ translateY }],
+                maxHeight: keyboardHeight > 0
+                    ? SCREEN_HEIGHT - keyboardHeight - (SCREEN_HEIGHT * 0.15)
+                    : SHEET_HEIGHT,
+            }]}>
 
-                {/* ── Drag Handle — sirf yahan se drag hoga ── */}
+                {/* Drag Handle */}
                 <View {...panResponder.panHandlers} style={styles.dragArea}>
                     <View style={styles.indicator} />
                 </View>
@@ -155,52 +269,71 @@ const CommentSheet = ({ isOpen, onClose, postId }) => {
                     <Text style={styles.commentCount}>{comments.length}</Text>
                 </View>
 
-                {/* Comments List — freely scroll hogi, drag nahi hogi */}
-                <FlatList
-                    data={comments}
-                    keyExtractor={(item) => item.id.toString()}
-                    renderItem={({ item, index }) => (
-                        <CommentRow item={item} index={index} />
-                    )}
-                    contentContainerStyle={styles.listContent}
-                    showsVerticalScrollIndicator={false}
-                    onScroll={(e) => {
-                        listScrollOffset.current = e.nativeEvent.contentOffset.y;
-                    }}
-                    scrollEventThrottle={16}
-                    style={styles.list}
-                />
-
-                {/* Input Bar */}
-                <KeyboardAvoidingView
-                    behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-                >
-                    <View style={styles.inputBar}>
-                        <View style={[styles.avatar, { backgroundColor: '#FFF3EB' }]}>
-                            <Text style={[styles.avatarText, { color: COLOURS.primary }]}>ME</Text>
-                        </View>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Write a comment..."
-                            placeholderTextColor={COLOURS.grey}
-                            value={comment}
-                            onChangeText={setComment}
-                            multiline
-                        />
-                        <TouchableOpacity
-                            onPress={handlePostComment}
-                            disabled={!comment.trim()}
-                            style={[styles.sendBtn, !comment.trim() && { opacity: 0.4 }]}
-                            activeOpacity={0.7}
-                        >
-                            <Image
-                                source={globalImages.send_icon}
-                                style={{ width: responsiveWidth(5), height: responsiveWidth(5) }}
-                                tintColor={COLOURS.primary}
+                {/* List */}
+                {loading || !userIdLoaded ? (
+                    <ActivityIndicator
+                        color={COLOURS.primary}
+                        style={{ marginTop: responsiveWidth(10) }}
+                    />
+                ) : (
+                    <FlatList data={comments} keyExtractor={(item) => (item._id || item.id).toString()}
+                        renderItem={({ item, index }) => (
+                            <CommentRow
+                                item={item}
+                                index={index}
+                                currentUserId={currentUserId}
+                                onDelete={handleDelete}
                             />
-                        </TouchableOpacity>
-                    </View>
-                </KeyboardAvoidingView>
+                        )}
+                        contentContainerStyle={styles.listContent}
+                        showsVerticalScrollIndicator={false}
+                        onScroll={(e) => {
+                            listScrollOffset.current = e.nativeEvent.contentOffset.y;
+                        }}
+                        scrollEventThrottle={16}
+                        style={styles.list}
+                        ListEmptyComponent={
+                            <Text style={{
+                                textAlign: 'center', color: COLOURS.grey,
+                                marginTop: responsiveWidth(10),
+                                fontFamily: Fonts.Regular
+                            }}>
+                                No comments yet. Be the first!
+                            </Text>
+                        }
+                    />
+                )}
+
+                {/* Input */}
+                {!loading ?
+                    <View>
+                        <View style={styles.inputBar}>
+                            <View style={[styles.avatar, { backgroundColor: '#FFF3EB' }]}>
+                                <Text style={[styles.avatarText, { color: COLOURS.primary }]}>ME</Text>
+                            </View>
+                            <TextInput
+                                ref={inputRef}
+                                style={styles.input}
+                                placeholder="Write a comment..."
+                                placeholderTextColor={COLOURS.grey}
+                                value={comment}
+                                onChangeText={setComment}
+                                multiline
+                            />
+                            <TouchableOpacity
+                                onPressIn={handlePostComment}
+                                disabled={!comment.trim() || posting}
+                                style={[styles.sendBtn, (!comment.trim() || posting) && { opacity: 0.4 }]}
+                                activeOpacity={0.7}
+                            >
+                                <Image
+                                    source={globalImages.send_icon}
+                                    style={{ width: responsiveWidth(5), height: responsiveWidth(5) }}
+                                    tintColor={COLOURS.primary}
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    </View> : ''}
 
             </Animated.View>
         </Modal>

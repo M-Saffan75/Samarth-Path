@@ -12,14 +12,20 @@ import Wait_Modal from '../../../components/Wait_Modal';
 import Input_Field from '../../../components/Input_Field';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Number_Select from '../../../components/Number_Select';
+import { useTheme } from '../../../assets/themecontext/ThemeContext';
 
 import { useLoader } from '../../../loading/LoaderContext';
 import { showError, showSuccess } from '../../../helper/Helper';
 import { registerUser, resendOtp } from '../../../user/screens/auth/auth_backend/Auth_Backend';
+import { FadeDown } from '../../../components/FadeDown';
+import { FadeUp } from '../../../components/FadeUp';
+import { FadeRight } from '../../../components/FadeRight';
+import { FadeLeft } from '../../../components/FadeLeft';
+import { FadeIn } from '../../../components/FadeIn';
 
 const Register = ({ navigation }) => {
 
-
+    const { theme: COLOURS, isDark } = useTheme();
     const { setLoading } = useLoader();
 
     const [name, setName] = useState('');
@@ -124,7 +130,10 @@ const Register = ({ navigation }) => {
 
     return (
         <>
-            <StatusBar barStyle={'dark-content'} backgroundColor={COLOURS.white} />
+            <StatusBar
+                barStyle={isDark ? 'light-content' : 'dark-content'}
+                backgroundColor={COLOURS.light_primary}
+            />
             <SafeAreaView style={{ flex: 1, backgroundColor: COLOURS.white }}>
                 <KeyboardAvoidingView
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -139,93 +148,115 @@ const Register = ({ navigation }) => {
                             <View style={[styles.login_area]}>
                                 <Back_Arrow label={'sign up'} />
 
-                                <Title_Here title={'create account'}
-                                    color={COLOURS.black}
-                                    textAlign={'center'}
-                                    marginTop={responsiveWidth(10)}
-                                    marginBottom={responsiveWidth(2)}
-                                    fontSize={responsiveFontSize(2.5)}
-                                />
-
-                                <Title_Here title={'being your spiritual energy with samarth path'}
-                                    color={COLOURS.black}
-                                    textAlign={'center'}
-                                    marginTop={responsiveWidth(1)}
-                                    marginBottom={responsiveWidth(8)}
-                                    fontSize={responsiveFontSize(1.7)}
-                                />
-
-                                <Title_Here title={'mobile number'} color={COLOURS.black} />
-                                <Number_Select value={phone} onChangeText={setPhone} />
-
-
-                                <Title_Here title={'name'} color={COLOURS.black} marginTop={responsiveWidth(2)} />
-                                <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}
-                                    borderWidth={1}
-                                    color={COLOURS.black}
-                                    Placeholder={'Your name'}
-                                    first_inpt_Img={globalImages.user_filled}
-                                    tintColor={COLOURS.grey}
-                                    value={name}
-                                    onChangeText={setName}
-                                />
-
-                                <Title_Here title={'email'} color={COLOURS.black} marginTop={0} />
-                                <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}
-                                    borderWidth={1}
-                                    color={COLOURS.black}
-                                    Placeholder={'Your email'}
-                                    first_inpt_Img={globalImages.envelope_filled}
-                                    tintColor={COLOURS.grey}
-                                    value={email}
-                                    onChangeText={setEmail}
-                                />
-
-                                <Title_Here title={'password'} color={COLOURS.black} marginTop={0} />
-                                <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}
-                                    borderWidth={1}
-                                    color={COLOURS.black}
-                                    Placeholder={'Password'}
-                                    first_inpt_Img={globalImages.pswd_key}
-                                    Second_inpt_Img={globalImages.eye}
-                                    tintColor={COLOURS.grey}
-                                    width={responsiveWidth(4.5)}
-                                    height={responsiveWidth(4.5)}
-                                    value={password}
-                                    onChangeText={setPassword}
-                                />
-
-                                <Title_Here title={'confirm password'} color={COLOURS.black} marginTop={0} />
-                                <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}
-                                    borderWidth={1}
-                                    color={COLOURS.black}
-                                    Placeholder={'Confirm Password'}
-                                    first_inpt_Img={globalImages.pswd_key}
-                                    Second_inpt_Img={globalImages.eye}
-                                    tintColor={COLOURS.grey}
-                                    width={responsiveWidth(4.5)}
-                                    height={responsiveWidth(4.5)}
-                                    value={confirmPassword}
-                                    onChangeText={setConfirmPassword}
-                                />
-
-
-
-                                <View style={styles.btn_area}>
-                                    <Button label={'Send OTP'} onPress={handleRegister}
+                                <FadeDown>
+                                    <Title_Here title={'create account'}
+                                        color={COLOURS.black}
+                                        textAlign={'center'}
+                                        marginTop={responsiveWidth(10)}
+                                        marginBottom={responsiveWidth(2)}
+                                        fontSize={responsiveFontSize(2.5)}
                                     />
-                                </View>
+                                </FadeDown>
+
+                                <FadeUp>
+                                    <Title_Here title={'being your spiritual energy with samarth path'}
+                                        color={COLOURS.black}
+                                        textAlign={'center'}
+                                        marginTop={responsiveWidth(1)}
+                                        marginBottom={responsiveWidth(8)}
+                                        fontSize={responsiveFontSize(1.7)}
+                                    />
+
+                                </FadeUp>
+                                <FadeLeft>
+                                    <Title_Here title={'mobile number'} color={COLOURS.black} />
+                                </FadeLeft>
+                                <FadeIn delay={200}>
+                                    <Number_Select value={phone} onChangeText={setPhone} />
+                                </FadeIn>
+
+                                <FadeLeft>
+                                    <Title_Here title={'name'} color={COLOURS.black} marginTop={responsiveWidth(2)} />
+                                </FadeLeft>
+                                <FadeIn delay={300}>
+                                    <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}
+                                        borderWidth={1}
+                                        color={COLOURS.black}
+                                        Placeholder={'Your name'}
+                                        first_inpt_Img={globalImages.user_filled}
+                                        tintColor={COLOURS.grey}
+                                        value={name}
+                                        onChangeText={setName}
+                                    />
+                                </FadeIn>
+                                <FadeLeft>
+                                    <Title_Here title={'email'} color={COLOURS.black} marginTop={0} />
+                                </FadeLeft>
+                                <FadeIn delay={400}>
+                                    <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}
+                                        borderWidth={1}
+                                        color={COLOURS.black}
+                                        Placeholder={'Your email'}
+                                        first_inpt_Img={globalImages.envelope_filled}
+                                        tintColor={COLOURS.grey}
+                                        value={email}
+                                        onChangeText={setEmail}
+                                    />
+
+                                </FadeIn>
+                                <FadeLeft>
+                                    <Title_Here title={'password'} color={COLOURS.black} marginTop={0} />
+                                </FadeLeft>
+                                <FadeIn delay={400}>
+                                    <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}
+                                        borderWidth={1}
+                                        color={COLOURS.black}
+                                        Placeholder={'Password'}
+                                        first_inpt_Img={globalImages.pswd_key}
+                                        Second_inpt_Img={globalImages.eye}
+                                        tintColor={COLOURS.grey}
+                                        width={responsiveWidth(4.5)}
+                                        height={responsiveWidth(4.5)}
+                                        value={password}
+                                        onChangeText={setPassword}
+                                    />
+                                </FadeIn>
+                                <FadeLeft>
+                                    <Title_Here title={'confirm password'} color={COLOURS.black} marginTop={0} />
+                                </FadeLeft>
+                                <FadeIn delay={500}>
+                                    <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}
+                                        borderWidth={1}
+                                        color={COLOURS.black}
+                                        Placeholder={'Confirm Password'}
+                                        first_inpt_Img={globalImages.pswd_key}
+                                        Second_inpt_Img={globalImages.eye}
+                                        tintColor={COLOURS.grey}
+                                        width={responsiveWidth(4.5)}
+                                        height={responsiveWidth(4.5)}
+                                        value={confirmPassword}
+                                        onChangeText={setConfirmPassword}
+                                    />
+                                </FadeIn>
 
 
-                                <View style={styles.dont_accnt}>
-                                    <Text style={[styles.dont_text_1, { color: COLOURS.black }]}>Already have an account ?</Text>
-                                    <TouchableOpacity activeOpacity={0.6}
-                                        onPress={() => navigation.replace(UserRoutes.Login)}
-                                    >
-                                        <Text style={[styles.dont_text_2, { color: COLOURS.primary }]}> sign In</Text>
-                                    </TouchableOpacity>
-                                </View>
+                                <FadeUp>
+                                    <View style={styles.btn_area}>
+                                        <Button label={'Send OTP'} onPress={handleRegister}
+                                        />
+                                    </View>
+                                </FadeUp>
 
+                                <FadeIn>
+                                    <View style={styles.dont_accnt}>
+                                        <Text style={[styles.dont_text_1, { color: COLOURS.black }]}>Already have an account ?</Text>
+                                        <TouchableOpacity activeOpacity={0.6}
+                                            onPress={() => navigation.replace(UserRoutes.Login)}
+                                        >
+                                            <Text style={[styles.dont_text_2, { color: COLOURS.primary }]}> sign In</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </FadeIn>
                             </View>
                         </ScrollView>
                     </View>

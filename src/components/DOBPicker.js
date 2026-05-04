@@ -3,11 +3,12 @@ import {
   View, Text, TouchableOpacity, Modal, Platform, StyleSheet,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useTheme } from '../assets/themecontext/ThemeContext';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
-import { COLOURS } from '../assets/theme/Theme';
 
 export const DOBPicker = ({ value, onChange }) => {
 
+  const { theme: COLOURS, isDark } = useTheme();
   const [show, setShow] = useState(false);
   const [tempDate, setTempDate] = useState(
     value instanceof Date ? value : new Date()
@@ -35,11 +36,11 @@ export const DOBPicker = ({ value, onChange }) => {
   return (
     <View>
       <TouchableOpacity
-        style={[styles.input, value && styles.inputFilled]}
+        style={[[styles.input, { backgroundColor: COLOURS.light_primary }], value && [styles.inputFilled, { borderColor: COLOURS.light_grey, }]]}
         onPress={() => setShow(true)}
         activeOpacity={0.8}
       >
-        <Text style={value ? styles.valueText : styles.placeholder}>
+        <Text style={value ? [styles.valueText, { color: COLOURS.grey, }] : styles.placeholder}>
           {value ? formatDate(value) : 'dd/mm/yyyy'}
         </Text>
       </TouchableOpacity>
@@ -96,12 +97,8 @@ const styles = StyleSheet.create({
     width: responsiveWidth(42),
     borderRadius: responsiveWidth(2),
     paddingVertical: responsiveWidth(3.5),
-    backgroundColor: COLOURS.light_primary,
-    paddingHorizontal: responsiveWidth(4),
-  },
 
-  inputFilled: {
-    borderColor: COLOURS.light_grey,
+    paddingHorizontal: responsiveWidth(4),
   },
 
   placeholder: {
@@ -109,7 +106,6 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(2),
   },
   valueText: {
-    color: '#222',
     fontSize: responsiveFontSize(2),
   },
   overlay: {

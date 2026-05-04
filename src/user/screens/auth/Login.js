@@ -11,20 +11,24 @@ import Back_Arrow from '../../../components/Back_Arrow';
 import Input_Field from '../../../components/Input_Field';
 import Number_Select from '../../../components/Number_Select';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
 import Wait_Modal from '../../../components/Wait_Modal';
 import { useLoader } from '../../../loading/LoaderContext';
 import { showError, showSuccess } from '../../../helper/Helper';
+import { useTheme } from '../../../assets/themecontext/ThemeContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getUserMe, loginUser, resendOtp } from './auth_backend/Auth_Backend';
 
 
 import { useUser } from './user_context/UserContext';
+import { FadeDown } from '../../../components/FadeDown';
+import { FadeUp } from '../../../components/FadeUp';
+import { FadeIn } from '../../../components/FadeIn';
+import { FadeLeft } from '../../../components/FadeLeft';
+import { FadeRight } from '../../../components/FadeRight';
 
 const Login = ({ navigation }) => {
 
-
-
+    const { theme: COLOURS, isDark } = useTheme();
     const { setLoading } = useLoader();
     const { updateUser } = useUser();
     const [phone, setPhone] = useState('');
@@ -120,10 +124,10 @@ const Login = ({ navigation }) => {
     return (
         <>
             <StatusBar
-                barStyle={'dark-content'}
-                backgroundColor={COLOURS.white}
+                barStyle={isDark ? 'light-content' : 'dark-content'}
+                backgroundColor={COLOURS.light_primary}
             />
-            <SafeAreaView style={{ flex: 1 }}>
+            <SafeAreaView style={{ flex: 1, backgroundColor: COLOURS.light_primary }}>
                 <View style={[styles.container, { backgroundColor: COLOURS.white }]}>
 
                     <ImageBackground source={globalImages.bg_auth} style={styles.login_img} resizeMode='cover'>
@@ -131,58 +135,77 @@ const Login = ({ navigation }) => {
                         <View style={[styles.login_area]}>
                             <Back_Arrow label={'sign In'} />
 
-                            <Title_Here title={'welcome back'}
-                                color={COLOURS.black}
-                                fontSize={responsiveFontSize(2.5)}
-                                textAlign={'center'}
-                                marginBottom={responsiveWidth(2)}
-                                marginTop={responsiveWidth(10)}
-                            />
-
-                            <Title_Here title={'being your spiritual energy with samarth path'}
-                                color={COLOURS.black}
-                                fontSize={responsiveFontSize(1.7)}
-                                textAlign={'center'}
-                                marginBottom={responsiveWidth(8)}
-                                marginTop={responsiveWidth(1)}
-                            />
-
-                            <Title_Here title={'mobile number'} color={COLOURS.black} marginBottom={responsiveWidth(3)}/>
-                            <Number_Select value={phone} onChangeText={setPhone} />
-
-                            <Title_Here title={'password'} color={COLOURS.black} marginTop={responsiveWidth(4)} marginBottom={responsiveWidth(2)} />
-                            <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}
-                                borderWidth={1}
-                                color={COLOURS.black}
-                                Placeholder={'Password'}
-                                first_inpt_Img={globalImages.pswd_key}
-                                Second_inpt_Img={globalImages.eye}
-                                tintColor={COLOURS.grey}
-                                width={responsiveWidth(4.5)}
-                                height={responsiveWidth(4.5)}
-                                value={password}
-                                onChangeText={setPassword}
-                            />
-
-                            <TouchableOpacity activeOpacity={0.7} style={styles.forgot_text} onPress={() => navigation.navigate(UserRoutes.Forgot_Password)}>
-                                <Title_Here title={'forgot password ?'} color={COLOURS.primary} fontSize={responsiveFontSize(1.6)}
-                                    marginTop={0} marginRight={0} />
-                            </TouchableOpacity>
-
-                            <View style={styles.btn_area}>
-                                <Button label={'sign in'} onPress={handleLogin}
+                            <FadeDown>
+                                <Title_Here title={'welcome back'}
+                                    color={COLOURS.black}
+                                    fontSize={responsiveFontSize(2.5)}
+                                    textAlign={'center'}
+                                    marginBottom={responsiveWidth(2)}
+                                    marginTop={responsiveWidth(10)}
                                 />
-                            </View>
 
-                            <View style={styles.dont_accnt}>
-                                <Text style={[styles.dont_text_1, { color: COLOURS.black }]}>Don't have an account ?</Text>
-                                <TouchableOpacity activeOpacity={0.6}
-                                    onPress={() => navigation.replace(UserRoutes.Register)}
-                                >
-                                    <Text style={[styles.dont_text_2, { color: COLOURS.primary }]}> sign up</Text>
+                            </FadeDown>
+
+                            <FadeUp>
+                                <Title_Here title={'being your spiritual energy with samarth path'}
+                                    color={COLOURS.black}
+                                    fontSize={responsiveFontSize(1.7)}
+                                    textAlign={'center'}
+                                    marginBottom={responsiveWidth(8)}
+                                    marginTop={responsiveWidth(1)}
+                                />
+                            </FadeUp>
+
+                            <FadeLeft>
+                                <Title_Here title={'mobile number'} color={COLOURS.black} marginBottom={responsiveWidth(3)} />
+                            </FadeLeft>
+                            <FadeIn delay={300}>
+                                <Number_Select value={phone} onChangeText={setPhone} />
+                            </FadeIn>
+
+                            <FadeLeft>
+                                <Title_Here title={'password'} color={COLOURS.black} marginTop={responsiveWidth(4)} marginBottom={responsiveWidth(2)} />
+                            </FadeLeft>
+
+                            <FadeIn delay={400}>
+                                <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}
+                                    borderWidth={1}
+                                    color={COLOURS.black}
+                                    Placeholder={'Password'}
+                                    first_inpt_Img={globalImages.pswd_key}
+                                    Second_inpt_Img={globalImages.eye}
+                                    tintColor={COLOURS.grey}
+                                    width={responsiveWidth(4.5)}
+                                    height={responsiveWidth(4.5)}
+                                    value={password}
+                                    onChangeText={setPassword}
+                                />
+                            </FadeIn>
+
+                            <FadeRight>
+                                <TouchableOpacity activeOpacity={0.7} style={styles.forgot_text} onPress={() => navigation.navigate(UserRoutes.Forgot_Password)}>
+                                    <Title_Here title={'forgot password ?'} color={COLOURS.primary} fontSize={responsiveFontSize(1.6)}
+                                        marginTop={0} marginRight={0} />
                                 </TouchableOpacity>
-                            </View>
+                            </FadeRight>
 
+                            <FadeUp>
+                                <View style={styles.btn_area}>
+                                    <Button label={'sign in'} onPress={handleLogin}
+                                    />
+                                </View>
+
+                            </FadeUp>
+                            <FadeIn delay={500}>
+                                <View style={styles.dont_accnt}>
+                                    <Text style={[styles.dont_text_1, { color: COLOURS.black }]}>Don't have an account ?</Text>
+                                    <TouchableOpacity activeOpacity={0.6}
+                                        onPress={() => navigation.replace(UserRoutes.Register)}
+                                    >
+                                        <Text style={[styles.dont_text_2, { color: COLOURS.primary }]}> sign up</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </FadeIn>
                         </View>
 
                     </ImageBackground>
@@ -191,8 +214,8 @@ const Login = ({ navigation }) => {
                         message={rateLimitMessage}
                         onClose={() => setRateLimitModal(false)}
                     />
-                </View>
-            </SafeAreaView>
+                </View >
+            </SafeAreaView >
         </>
     )
 }

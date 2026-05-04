@@ -10,6 +10,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { globalImages } from '../../assets/images/images_file/All_Images';
 import { StyleSheet, Text, View, Image, Dimensions, Easing } from 'react-native';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
+import { useTheme } from '../../assets/themecontext/ThemeContext';
 
 const { height, width } = Dimensions.get('window')
 
@@ -17,6 +18,7 @@ const Bottom_Navigation = () => {
 
   const Tab = createBottomTabNavigator();
 
+    const { theme: COLOURS } = useTheme();
 
   return (
     <>

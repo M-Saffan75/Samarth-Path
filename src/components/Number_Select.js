@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { COLOURS } from '../assets/theme/Theme';
 import countries from '../components/Country_Here';
+import { useTheme } from '../assets/themecontext/ThemeContext';
 import { responsiveWidth, responsiveFontSize } from 'react-native-responsive-dimensions';
 import { View, Text, TextInput, TouchableOpacity, Modal, FlatList, StyleSheet } from 'react-native';
 
@@ -15,6 +16,7 @@ const getFlag = (code) => {
 
 const Number_Select = ({ value, onChangeText, onChangeFormatted }) => {
 
+    const { theme: COLOURS, isDark } = useTheme();
     const [selected, setSelected] = useState(
         countries.find(c => c.code === 'IN') || countries[0]  // India default
     );
@@ -42,7 +44,10 @@ const Number_Select = ({ value, onChangeText, onChangeFormatted }) => {
         <View style={styles.wrapper}>
 
             {/* Input Row */}
-            <View style={styles.container}>
+            <View style={[styles.container, {
+                borderColor: COLOURS.light_black,
+                backgroundColor: COLOURS.transparent,
+            }]}>
 
                 {/* Flag + Code Button */}
                 <TouchableOpacity
@@ -51,16 +56,16 @@ const Number_Select = ({ value, onChangeText, onChangeFormatted }) => {
                     activeOpacity={0.7}
                 >
                     <Text style={styles.flagText}>{getFlag(selected.code)}</Text>
-                    <Text style={styles.dialText}>{selected.dial}</Text>
-                    <Text style={styles.arrow}>▾</Text>
+                    <Text style={[styles.dialText, { color: COLOURS.black, }]}>{selected.dial}</Text>
+                    <Text style={[styles.arrow, { color: COLOURS.black, }]}>▾</Text>
                 </TouchableOpacity>
 
                 {/* Divider */}
-                <View style={styles.divider} />
+                <View style={[styles.divider, { backgroundColor: COLOURS.light_black, }]} />
 
                 {/* Number Input */}
                 <TextInput
-                    style={styles.input}
+                    style={[styles.input, { color: COLOURS.black, }]}
                     placeholder='Mobile Number'
                     placeholderTextColor={COLOURS.grey}
                     keyboardType='phone-pad'
@@ -72,12 +77,12 @@ const Number_Select = ({ value, onChangeText, onChangeFormatted }) => {
             {/* Country Picker Modal */}
             <Modal visible={modalVisible} animationType='fade' transparent>
                 <View style={styles.modalOverlay}>
-                    <View style={styles.modalBox}>
+                    <View style={[styles.modalBox, { backgroundColor: COLOURS.white, }]}>
 
-                        <Text style={styles.modalTitle}>Select Country</Text>
+                        <Text style={[styles.modalTitle, { color: COLOURS.black, }]}>Select Country</Text>
 
                         <TextInput
-                            style={styles.searchInput}
+                            style={[styles.searchInput, { color: COLOURS.black, }]}
                             placeholder='Search country...'
                             placeholderTextColor={COLOURS.grey}
                             value={search}
@@ -89,22 +94,22 @@ const Number_Select = ({ value, onChangeText, onChangeFormatted }) => {
                             keyExtractor={(item) => item.code}
                             renderItem={({ item }) => (
                                 <TouchableOpacity
-                                    style={styles.countryRow}
+                                    style={[styles.countryRow, { borderBottomColor: COLOURS.light_black, }]}
                                     onPress={() => handleSelect(item)}
                                     activeOpacity={0.7}
                                 >
                                     <Text style={styles.flagText}>{getFlag(item.code)}</Text>
-                                    <Text style={styles.countryName}>{item.name}</Text>
-                                    <Text style={styles.countryDial}>{item.dial}</Text>
+                                    <Text style={[styles.countryName, { color: COLOURS.black, }]}>{item.name}</Text>
+                                    <Text style={[styles.countryDial, { color: COLOURS.grey, }]}>{item.dial}</Text>
                                 </TouchableOpacity>
                             )}
                         />
 
                         <TouchableOpacity
-                            style={styles.closeBtn}
+                            style={[styles.closeBtn, { backgroundColor: COLOURS.primary, }]}
                             onPress={() => setModalVisible(false)}
                         >
-                            <Text style={styles.closeBtnText}>Close</Text>
+                            <Text style={[styles.closeBtnText, { color: COLOURS.white, }]}>Close</Text>
                         </TouchableOpacity>
 
                     </View>
@@ -127,8 +132,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         height: responsiveWidth(13),
         borderRadius: responsiveWidth(2),
-        borderColor: COLOURS.light_black,
-        backgroundColor: COLOURS.transparent,
+
     },
     flagBtn: {
         flexDirection: 'row',
@@ -143,23 +147,19 @@ const styles = StyleSheet.create({
     },
     dialText: {
         fontSize: responsiveFontSize(1.8),
-        color: COLOURS.black,
         fontFamily: 'Poppins-Medium',
     },
     arrow: {
         top: responsiveWidth(-.5),
-        color: COLOURS.black,
         fontSize: responsiveFontSize(1.5),
     },
     divider: {
         width: 1,
         height: '60%',
-        backgroundColor: COLOURS.light_black,
     },
     input: {
         flex: 1,
         top: responsiveWidth(.5),
-        color: COLOURS.black,
         fontFamily: 'Poppins-Medium',
         fontSize: responsiveFontSize(1.8),
         paddingHorizontal: responsiveWidth(3),
@@ -173,20 +173,18 @@ const styles = StyleSheet.create({
     modalBox: {
         maxHeight: '80%',
         padding: responsiveWidth(5),
-        backgroundColor: COLOURS.white,
+
         borderTopLeftRadius: responsiveWidth(5),
         borderTopRightRadius: responsiveWidth(5),
     },
     modalTitle: {
         textAlign: 'center',
-        color: COLOURS.black,
         fontFamily: 'Poppins-Bold',
         fontSize: responsiveFontSize(2),
         marginBottom: responsiveWidth(3),
     },
     searchInput: {
         borderWidth: 1,
-        color: COLOURS.black,
         fontFamily: 'Poppins-Medium',
         marginBottom: responsiveWidth(3),
         borderColor: COLOURS.light_black,
@@ -201,28 +199,27 @@ const styles = StyleSheet.create({
         borderBottomWidth: 0.5,
         gap: responsiveWidth(3),
         paddingVertical: responsiveWidth(3),
-        borderBottomColor: COLOURS.light_black,
     },
     countryName: {
         flex: 1,
-        color: COLOURS.black,
+
         fontFamily: 'Poppins-Medium',
         fontSize: responsiveFontSize(1.8),
     },
     countryDial: {
-        color: COLOURS.grey,
+
         fontFamily: 'Poppins-Medium',
         fontSize: responsiveFontSize(1.8),
     },
     closeBtn: {
         alignItems: 'center',
         marginTop: responsiveWidth(3),
-        backgroundColor: COLOURS.primary,
+
         borderRadius: responsiveWidth(2),
         paddingVertical: responsiveWidth(3),
     },
     closeBtnText: {
-        color: COLOURS.white,
+
         fontFamily: 'Poppins-Medium',
         fontSize: responsiveFontSize(1.8),
     },

@@ -7,6 +7,7 @@ import Input_Field from '../../../components/Input_Field';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GenderPicker } from '../../../components/GenderPicker';
 import { StatusBar, StyleSheet, View, Text, } from 'react-native';
+import { useTheme } from '../../../assets/themecontext/ThemeContext';
 import { globalImages } from '../../../assets/images/images_file/All_Images';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 
@@ -22,8 +23,9 @@ import { useUser } from '../auth/user_context/UserContext';
 
 const Edit_Profile = () => {
 
-    const { userData } = useUser();
+    const { theme: COLOURS, isDark } = useTheme();
 
+    const { userData } = useUser();
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
@@ -56,10 +58,10 @@ const Edit_Profile = () => {
     return (
         <>
             <StatusBar
-                barStyle={'dark-content'}
+                barStyle={isDark ? 'light-content' : 'dark-content'}
                 backgroundColor={COLOURS.light_primary}
             />
-            <SafeAreaView style={{ flex: 1, backgroundColor: COLOURS.light_primary}}>
+            <SafeAreaView style={{ flex: 1, backgroundColor: COLOURS.light_primary }}>
 
                 <View style={[styles.container, { backgroundColor: COLOURS.white }]}>
 
@@ -93,7 +95,7 @@ const Edit_Profile = () => {
                     </FadeUp>
                     <FadeIn delay={150}>
 
-                        <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_grey}
+                        <Input_Field backgroundColor={COLOURS.light_primary} borderColor={COLOURS.transparent}
                             borderWidth={responsiveWidth(.3)}
                             Input_marginTop={responsiveWidth(6)}
                             color={COLOURS.black}
@@ -109,7 +111,7 @@ const Edit_Profile = () => {
                     <FadeIn delay={250}>
 
 
-                        <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_grey}
+                        <Input_Field backgroundColor={COLOURS.light_primary} borderColor={COLOURS.transparent}
                             borderWidth={responsiveWidth(.3)}
                             Input_marginTop={responsiveWidth(4)}
                             color={COLOURS.black}
@@ -125,7 +127,7 @@ const Edit_Profile = () => {
                     </FadeIn>
                     <FadeIn delay={350}>
 
-                        <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_grey}
+                        <Input_Field backgroundColor={COLOURS.light_primary} borderColor={COLOURS.transparent}
                             borderWidth={responsiveWidth(.3)}
                             Input_marginTop={responsiveWidth(4)}
                             color={COLOURS.black}
@@ -188,14 +190,6 @@ const styles = StyleSheet.create({
         marginTop: responsiveWidth(6),
         justifyContent: 'space-between',
         marginHorizontal: responsiveWidth(2.5),
-    },
-
-    profile_here: {
-        borderColor: COLOURS.green,
-        borderWidth: responsiveWidth(.4),
-        height: responsiveWidth(22),
-        width: responsiveWidth(22),
-        borderRadius: responsiveWidth(100)
     },
 
     container: {

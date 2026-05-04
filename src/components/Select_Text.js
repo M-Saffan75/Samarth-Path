@@ -21,12 +21,12 @@ const Select_Text = ({ label, count, borderBottomWidth, borderBottomColor,
                     top: responsiveWidth(.4), textTransform: 'capitalize',
                     paddingRight: responsiveWidth(1.5), fontSize: responsiveFontSize(1.7)
                 }}>{label}</Text>
-                <Text style={{
+                {/* <Text style={{
                     backgroundColor: backgroundColor ?? COLOURS.primary, width: responsiveWidth(5),
                     height: responsiveWidth(5), borderRadius: responsiveWidth(100),
                     textAlign: 'center', textAlignVertical: 'center', color: countColor ?? COLOURS.white,
 
-                }}>{count}</Text>
+                }}>{count}</Text> */}
             </TouchableOpacity>
         </>
     )

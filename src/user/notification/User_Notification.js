@@ -3,6 +3,7 @@ import {
     View, Text, FlatList, StyleSheet,
     TouchableOpacity, StatusBar
 } from 'react-native';
+import { useTheme } from '../../assets/themecontext/ThemeContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 
@@ -37,6 +38,8 @@ const NOTIF_CONFIG = {
 const User_Notification = () => {
 
     // Replace with real API data
+    const { theme: COLOURS, } = useTheme();
+
     const notifications = [
         {
             id: '1',
@@ -68,7 +71,7 @@ const User_Notification = () => {
         const config = NOTIF_CONFIG[item.type];
         return (
             <FadeDown>
-                <View style={[styles.card, !item.isRead && styles.card_unread]}>
+                <View style={[[styles.card, { backgroundColor: COLOURS.light_primary, }], !item.isRead && [styles.card_unread, { borderLeftColor: COLOURS.primary, }]]}>
 
                     {/* Icon */}
                     <View style={[styles.icon_box, { backgroundColor: config.iconBg }]}>
@@ -78,7 +81,7 @@ const User_Notification = () => {
                     {/* Body */}
                     <View style={styles.body}>
                         <View style={styles.top_row}>
-                            <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
+                            <Text style={[styles.title, { color: COLOURS.black, }]} numberOfLines={1} ellipsizeMode="tail">
                                 {item.title}
                             </Text>
                             <View style={[styles.badge, { backgroundColor: config.badgeBg }]}>
@@ -88,7 +91,7 @@ const User_Notification = () => {
                             </View>
                         </View>
 
-                        <Text style={styles.message} numberOfLines={2} ellipsizeMode="tail">
+                        <Text style={[styles.message, { color: COLOURS.grey, }]} numberOfLines={2} ellipsizeMode="tail">
                             {item.message}
                         </Text>
 
@@ -103,10 +106,10 @@ const User_Notification = () => {
     return (
         <>
             <StatusBar barStyle="dark-content" backgroundColor={COLOURS.light_primary} />
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={[styles.container, { backgroundColor: COLOURS.white, }]}>
 
-                <View style={styles.circle_lg} />
-                <View style={styles.circle_sm} />
+                <View style={[styles.circle_lg, { backgroundColor: COLOURS.primary, }]} />
+                <View style={[styles.circle_sm, { backgroundColor: COLOURS.primary, }]} />
 
                 {/* Topbar */}
                 <Back_Arrow label={'notifications'} />
@@ -133,21 +136,20 @@ const styles = StyleSheet.create({
 
     container: {
         flex: 1,
-        backgroundColor: COLOURS.white,
     },
     circle_lg: {
         position: 'absolute',
         top: -responsiveWidth(20), right: -responsiveWidth(20),
         width: responsiveWidth(65), height: responsiveWidth(65),
         borderRadius: responsiveWidth(32.5),
-        backgroundColor: COLOURS.primary, opacity: 0.08,
+        opacity: 0.08,
     },
     circle_sm: {
         position: 'absolute',
         bottom: responsiveWidth(20), left: -responsiveWidth(15),
         width: responsiveWidth(45), height: responsiveWidth(45),
         borderRadius: responsiveWidth(22.5),
-        backgroundColor: COLOURS.primary, opacity: 0.06,
+        opacity: 0.06,
     },
 
     list: {
@@ -161,7 +163,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'flex-start',
         gap: responsiveWidth(3),
-        backgroundColor: COLOURS.light_primary,
         borderRadius: responsiveWidth(4),
         borderWidth: 1,
         borderColor: 'rgba(200,169,110,0.2)',
@@ -169,7 +170,6 @@ const styles = StyleSheet.create({
     },
     card_unread: {
         borderLeftWidth: 3,
-        borderLeftColor: COLOURS.primary,
     },
 
     icon_box: {
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     title: {
         fontFamily: 'Poppins-SemiBold',
         fontSize: responsiveFontSize(1.55),
-        color: COLOURS.black,
+
         flex: 1,
     },
     badge: {
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     message: {
         fontFamily: 'Poppins-Regular',
         fontSize: responsiveFontSize(1.4),
-        color: COLOURS.grey,
+
         lineHeight: responsiveFontSize(2.2),
         marginBottom: responsiveWidth(1.5),
     },

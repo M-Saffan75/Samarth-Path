@@ -11,14 +11,14 @@ import Back_Arrow from '../../../components/Back_Arrow';
 import Input_Field from '../../../components/Input_Field';
 import Number_Select from '../../../components/Number_Select';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
 import { useLoader } from '../../../loading/LoaderContext';
 import { resetPassword } from './auth_backend/Auth_Backend';
 import { showError, showSuccess } from '../../../helper/Helper';
+import { useTheme } from '../../../assets/themecontext/ThemeContext';
 
 const Reset_Password = ({ navigation, route }) => {
 
-
+    const { theme: COLOURS, isDark } = useTheme();
     const { setLoading } = useLoader();
     const { phone } = route.params;
     const [password, setPassword] = useState('');
@@ -74,10 +74,10 @@ const Reset_Password = ({ navigation, route }) => {
     return (
         <>
             <StatusBar
-                barStyle={'dark-content'}
-                backgroundColor={COLOURS.white}
+                barStyle={isDark ? 'light-content' : 'dark-content'}
+                backgroundColor={COLOURS.light_primary}
             />
-            <SafeAreaView>
+            <SafeAreaView style={{ flex: 1, backgroundColor: COLOURS.white }}>
                 <View style={[styles.container, { backgroundColor: COLOURS.white }]}>
 
                     <ImageBackground source={globalImages.bg_auth} style={styles.login_img} resizeMode='cover'>

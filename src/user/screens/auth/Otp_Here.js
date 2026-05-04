@@ -14,18 +14,20 @@ import Modal_Verify from '../../../components/Modal_Verify';
 
 import { useLoader } from '../../../loading/LoaderContext';
 import { showError, showSuccess } from '../../../helper/Helper';
+import { useTheme } from '../../../assets/themecontext/ThemeContext';
 import { forgotPassword, resendOtp, verifyOtp, verifyResetOtp } from './auth_backend/Auth_Backend';
 
 
 const Otp_Here = ({ navigation, route }) => {
 
+    const { theme: COLOURS, isDark } = useTheme();
     const { setLoading } = useLoader();
     const [modalVisible, setModalVisible] = useState(false);
     const [modalPhone, setModalPhone] = useState('');
     const [modalLoading, setModalLoading] = useState(false);
 
     const { phone } = route.params;
-    
+
     useEffect(() => {
         setModalPhone(phone);
     }, [phone]);
@@ -103,8 +105,8 @@ const Otp_Here = ({ navigation, route }) => {
     return (
         <>
             <StatusBar
-                barStyle={'dark-content'}
-                backgroundColor={COLOURS.transparent}
+                barStyle={isDark ? 'light-content' : 'dark-content'}
+                backgroundColor={COLOURS.light_primary}
             />
             <SafeAreaView style={{ height: '100%', width: '100%', backgroundColor: COLOURS.white }}>
                 <View>

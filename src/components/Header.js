@@ -1,10 +1,13 @@
 import React from 'react'
 import { Fonts } from '../assets/fonts/Fonts'
-import { COLOURS } from '../assets/theme/Theme'
 import { StyleSheet, Text, View } from 'react-native'
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions'
+import { useTheme } from '../assets/themecontext/ThemeContext'
 
 const Header = ({ title }) => {
+    
+    const { theme: COLOURS } = useTheme();
+    
     return (
         <>
             <View style={{ backgroundColor: COLOURS.light_primary, paddingVertical: responsiveWidth(3) }}>

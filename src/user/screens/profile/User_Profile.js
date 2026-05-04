@@ -1,16 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Header from '../../../components/Header';
 import { FadeUp } from '../../../components/FadeUp';
 import { FadeIn } from '../../../components/FadeIn';
 import UserRoutes from '../../user_routes/UserRoutes';
-import { COLOURS } from '../../../assets/theme/Theme';
+import ThemeModal from '../../../components/ThemeModal';
 import Title_Here from '../../../components/Title_Here';
 import Trial_Text from '../../../components/Trial_Text';
 import { FadeDown } from '../../../components/FadeDown';
 import Profile_Row from '../../../components/Profile_Row';
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { ThemeOverlay } from '../../../components/ThemeOverlay';
 import { globalImages } from '../../../assets/images/images_file/All_Images';
-import { Image, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { Animated, Image, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 
 import { showError } from '../../../helper/Helper';
@@ -18,10 +19,12 @@ import { Pulse } from '../../../components/Pulse';
 import Profile from '../../../components/Profile';
 import { useUser } from '../auth/user_context/UserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTheme } from '../../../assets/themecontext/ThemeContext';
 
 const User_Profile = ({ navigation }) => {
 
     const { userData } = useUser();
+    const [showTheme, setShowTheme] = useState(false);
 
 
     const handleLogout = async () => {
@@ -36,14 +39,17 @@ const User_Profile = ({ navigation }) => {
         }
     };
 
+    const { theme: COLOURS, isDark } = useTheme();
+
     return (
         <>
             <StatusBar
-                barStyle={'dark-content'}
+                barStyle={isDark ? 'light-content' : 'dark-content'}
                 backgroundColor={COLOURS.light_primary}
             />
             <SafeAreaView style={{ flex: 1, backgroundColor: COLOURS.light_primary }}>
-                <View style={[styles.container, { backgroundColor: COLOURS.white }]}>
+
+                <Animated.View style={{ flex: 1, backgroundColor: COLOURS.white }}>
 
                     {/*  */}
                     <Header title={'profile'} />
@@ -86,7 +92,7 @@ const User_Profile = ({ navigation }) => {
 
                     {/*  */}
 
-                    <ScrollView>
+                    <ScrollView showsVerticalScrollIndicator={false}>
 
                         <Title_Here title={'quick access'}
                             color={COLOURS.light_black}
@@ -128,8 +134,11 @@ const User_Profile = ({ navigation }) => {
                                     onPress={() => navigation.navigate(UserRoutes.User_Notification)} />
                                 <Profile_Row label={'about samarth path'} source={globalImages.about_icon}
                                     onPress={() => navigation.navigate(UserRoutes.AboutSamarthPath)} />
-                                <Profile_Row label={'change password'} bordernone={false} paddingBottom={responsiveWidth(.1)}
-                                    source={globalImages.lock_icon} onPress={() => navigation.navigate(UserRoutes.Change_Password)} />
+                                <Profile_Row label={'change password'} source={globalImages.lock_icon}
+                                    onPress={() => navigation.navigate(UserRoutes.Change_Password)} />
+                                <Profile_Row label={'Appearance'} bordernone={false} paddingBottom={responsiveWidth(.1)}
+                                    source={globalImages.theme_icon} onPress={() => setShowTheme(true)} />
+
                             </View>
                         </FadeUp>
 
@@ -157,8 +166,11 @@ const User_Profile = ({ navigation }) => {
                         <View style={{ marginBottom: responsiveWidth(15) }} />
 
                     </ScrollView>
-
-                </View>
+                    <ThemeModal
+                        visible={showTheme}
+                        onClose={() => setShowTheme(false)}
+                    />
+                </Animated.View>
 
             </SafeAreaView>
         </>
