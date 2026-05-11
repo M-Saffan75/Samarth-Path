@@ -4,7 +4,7 @@ import { COLOURS } from '../assets/theme/Theme';
 import { useTheme } from '../assets/themecontext/ThemeContext';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 
-const OPTIONS = ['Male', 'Female', 'Others'];
+const OPTIONS = ['Male', 'Female', 'Other'];
 
 const ICONS = {
     Male: '♂',

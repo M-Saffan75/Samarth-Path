@@ -15,6 +15,7 @@ import { FadeUp } from './FadeUp';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { deleteComment, fetchComments, postComment } from '../user/screens/home/homebackend/HomeBackend';
 import { useUser } from '../user/screens/auth/user_context/UserContext';
+import { useTheme } from '../assets/themecontext/ThemeContext';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const SHEET_HEIGHT = SCREEN_HEIGHT * 0.80;
@@ -38,6 +39,7 @@ const getInitials = (name = '') => {
 // ─── Comment Row ───────────────────────────────────────────────────────────
 
 const CommentRow = ({ item, index, currentUserId, onDelete }) => {
+    const { theme: COLOURS, isDark } = useTheme();
     const color = avatarColors[index % avatarColors.length];
     const isOwner = item.userId?._id === currentUserId;
     const isTemp = item._id?.startsWith('temp_');
@@ -52,13 +54,13 @@ const CommentRow = ({ item, index, currentUserId, onDelete }) => {
 
             {/* Content */}
             <View style={styles.commentContent}>
-                <View style={styles.commentBubble}>
-                    <Text style={styles.commentUser}>
+                <View style={[styles.commentBubble,{backgroundColor: COLOURS.light_primary,}]}>
+                    <Text style={[styles.commentUser, { color: COLOURS.black, }]}>
                         {item.userId?.name || item.user || 'User'}
                     </Text>
-                    <Text style={styles.commentText}>{item.text}</Text>
+                    <Text style={[styles.commentText, { color: COLOURS.light_black, }]}>{item.text}</Text>
                 </View>
-                <Text style={styles.commentTime}>{item.time || item.createdAt || ''}</Text>
+                <Text style={[styles.commentTime, { color: COLOURS.grey, }]}>{item.time || item.createdAt || ''}</Text>
             </View>
 
             {/* Delete — sirf apne comment pe */}
@@ -90,6 +92,7 @@ const CommentRow = ({ item, index, currentUserId, onDelete }) => {
 // ─── Main Component ────────────────────────────────────────────────────────
 const CommentSheet = ({ isOpen, onClose, postId, onCommentAdded, onCommentDeleted }) => {
 
+    const { theme: COLOURS, isDark } = useTheme();
     const { userData } = useUser();
     const [comment, setComment] = useState('');
     const [comments, setComments] = useState([]);
@@ -251,7 +254,7 @@ const CommentSheet = ({ isOpen, onClose, postId, onCommentAdded, onCommentDelete
                 <View style={styles.backdrop} />
             </TouchableWithoutFeedback>
 
-            <Animated.View style={[styles.sheet, {
+            <Animated.View style={[[styles.sheet, { backgroundColor: COLOURS.white }], {
                 transform: [{ translateY }],
                 maxHeight: keyboardHeight > 0
                     ? SCREEN_HEIGHT - keyboardHeight - (SCREEN_HEIGHT * 0.15)
@@ -260,13 +263,13 @@ const CommentSheet = ({ isOpen, onClose, postId, onCommentAdded, onCommentDelete
 
                 {/* Drag Handle */}
                 <View {...panResponder.panHandlers} style={styles.dragArea}>
-                    <View style={styles.indicator} />
+                    <View style={[styles.indicator, { backgroundColor: COLOURS.light_grey, }]} />
                 </View>
 
                 {/* Header */}
-                <View style={styles.sheetHeader}>
-                    <Text style={styles.sheetTitle}>Comments</Text>
-                    <Text style={styles.commentCount}>{comments.length}</Text>
+                <View style={[styles.sheetHeader, { borderBottomColor: COLOURS.light_grey, }]}>
+                    <Text style={[styles.sheetTitle, { color: COLOURS.black, }]}>Comments</Text>
+                    <Text style={[styles.commentCount, { color: COLOURS.grey, }]}>{comments.length}</Text>
                 </View>
 
                 {/* List */}
@@ -307,13 +310,16 @@ const CommentSheet = ({ isOpen, onClose, postId, onCommentAdded, onCommentDelete
                 {/* Input */}
                 {!loading ?
                     <View>
-                        <View style={styles.inputBar}>
+                        <View style={[styles.inputBar, {
+                            borderTopColor: COLOURS.light_grey,
+                            backgroundColor: COLOURS.white,
+                        }]}>
                             <View style={[styles.avatar, { backgroundColor: '#FFF3EB' }]}>
                                 <Text style={[styles.avatarText, { color: COLOURS.primary }]}>ME</Text>
                             </View>
                             <TextInput
                                 ref={inputRef}
-                                style={styles.input}
+                                style={[styles.input,{color: COLOURS.black,backgroundColor:COLOURS.light_primary}]}
                                 placeholder="Write a comment..."
                                 placeholderTextColor={COLOURS.grey}
                                 value={comment}
@@ -354,7 +360,7 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         height: SHEET_HEIGHT,
-        backgroundColor: COLOURS.white,
+
         borderTopLeftRadius: responsiveWidth(5),
         borderTopRightRadius: responsiveWidth(5),
     },
@@ -366,7 +372,6 @@ const styles = StyleSheet.create({
     indicator: {
         width: responsiveWidth(10),
         height: responsiveWidth(1),
-        backgroundColor: COLOURS.light_grey,
         borderRadius: responsiveWidth(1),
     },
     sheetHeader: {
@@ -376,17 +381,15 @@ const styles = StyleSheet.create({
         paddingHorizontal: responsiveWidth(4),
         paddingBottom: responsiveWidth(3),
         borderBottomWidth: 0.5,
-        borderBottomColor: COLOURS.light_grey,
     },
     sheetTitle: {
         fontSize: responsiveFontSize(1.9),
         fontFamily: Fonts.Medium,
-        color: COLOURS.black,
+
     },
     commentCount: {
         fontSize: responsiveFontSize(1.5),
         fontFamily: Fonts.Regular,
-        color: COLOURS.grey,
     },
     list: {
         flex: 1,
@@ -416,7 +419,6 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     commentBubble: {
-        backgroundColor: COLOURS.light_primary,
         borderRadius: responsiveWidth(3),
         paddingHorizontal: responsiveWidth(3),
         paddingVertical: responsiveWidth(2),
@@ -424,19 +426,17 @@ const styles = StyleSheet.create({
     commentUser: {
         fontSize: responsiveFontSize(1.5),
         fontFamily: Fonts.Medium,
-        color: COLOURS.black,
+
         marginBottom: responsiveWidth(0.5),
     },
     commentText: {
         fontSize: responsiveFontSize(1.5),
         fontFamily: Fonts.Regular,
-        color: COLOURS.light_black,
         lineHeight: responsiveWidth(4.5),
     },
     commentTime: {
         fontSize: responsiveFontSize(1.2),
         fontFamily: Fonts.Regular,
-        color: COLOURS.grey,
         marginTop: responsiveWidth(1),
         marginLeft: responsiveWidth(2),
     },
@@ -447,18 +447,14 @@ const styles = StyleSheet.create({
         paddingHorizontal: responsiveWidth(4),
         paddingVertical: responsiveWidth(3),
         borderTopWidth: 0.5,
-        borderTopColor: COLOURS.light_grey,
-        backgroundColor: COLOURS.white,
     },
     input: {
         flex: 1,
-        backgroundColor: COLOURS.light_primary,
         borderRadius: responsiveWidth(5),
         paddingHorizontal: responsiveWidth(4),
         paddingVertical: responsiveWidth(2.5),
         fontSize: responsiveFontSize(1.6),
         fontFamily: Fonts.Regular,
-        color: COLOURS.black,
         maxHeight: responsiveWidth(25),
     },
     sendBtn: {

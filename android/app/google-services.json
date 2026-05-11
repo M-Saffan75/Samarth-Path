@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "103641214555",
+    "project_id": "samarth-path",
+    "storage_bucket": "samarth-path.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:103641214555:android:60035b05b78b70eac5597e",
+        "android_client_info": {
+          "package_name": "com.samarth"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBloNmNG0R6h78Z6kL9XVdKe-XpppFfGnk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

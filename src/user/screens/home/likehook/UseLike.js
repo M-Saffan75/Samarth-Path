@@ -1,31 +1,39 @@
 // hooks/useLike.js
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { likeContent, unlikeContent } from '../homebackend/HomeBackend';
+import { useContent } from '../../../../user/context/ContentProvider';
+
 
 const useLike = (initialLiked, initialCount, contentId) => {
-    const [isLiked, setIsLiked] = useState(initialLiked);
-    const [count, setCount] = useState(initialCount);
+
+    const { likedIds, likeCounts, toggleLike, initializeLike } = useContent();
+
+
+    useEffect(() => {
+        initializeLike(contentId, initialLiked ?? false, initialCount ?? 0);
+    }, []);
+
+
+    const isLiked = likedIds.has(contentId);
+    const count = likeCounts[contentId] ?? initialCount ?? 0;
+
+    // useEffect(() => {
+    //     if (initialLiked) {
+    //         toggleLike(contentId, true);
+    //     }
+    // }, []);
 
     const handleLike = async () => {
         const newLiked = !isLiked;
-        setIsLiked(newLiked);
-        setCount(prev => newLiked ? prev + 1 : prev - 1);
-
+        toggleLike(contentId, newLiked, count);
         try {
-            if (newLiked) {
-                await likeContent(contentId);
-            } else {
-                await unlikeContent(contentId);
-            }
+            if (newLiked) await likeContent(contentId);
+            else await unlikeContent(contentId);
         } catch (e) {
-            // API fail → revert karo
-            setIsLiked(!newLiked);
-            setCount(prev => newLiked ? prev - 1 : prev + 1);
-            console.log('Like error:', e);
+            toggleLike(contentId, !newLiked, count); // revert
         }
-    };
+    }
 
     return { isLiked, count, handleLike };
 };
-
 export default useLike;

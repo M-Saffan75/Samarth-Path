@@ -20,10 +20,12 @@ import { resendOtp, verifyOtp, getUserMe, } from './auth_backend/Auth_Backend';
 
 
 import { useUser } from './user_context/UserContext';
+import { useTheme } from '../../../assets/themecontext/ThemeContext';
 
 
 const Verify_Email = ({ navigation, route }) => {
 
+    const { theme: COLOURS, isDark } = useTheme();
     const { setLoading } = useLoader();
     const { updateUser } = useUser();
 
@@ -35,7 +37,7 @@ const Verify_Email = ({ navigation, route }) => {
     const [rateLimitModal, setRateLimitModal] = useState(false);
     const [rateLimitMessage, setRateLimitMessage] = useState('');
 
-    const { phone } = route.params;
+    const { phone } = route?.params;
     useEffect(() => {
         setModalPhone(phone);
     }, [phone]);
@@ -120,8 +122,8 @@ const Verify_Email = ({ navigation, route }) => {
     return (
         <>
             <StatusBar
-                barStyle={'dark-content'}
-                backgroundColor={COLOURS.transparent}
+                barStyle={isDark ? 'light-content' : 'dark-content'}
+                backgroundColor={COLOURS.light_primary}
             />
             <SafeAreaView style={{ height: '100%', width: '100%', backgroundColor: COLOURS.white }}>
                 <View>

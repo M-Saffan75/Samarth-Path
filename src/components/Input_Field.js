@@ -9,8 +9,8 @@ import { globalImages } from '../assets/images/images_file/All_Images';
 
 const Input_Field = ({
     Placeholder, Second_inpt_Img, first_inpt_Img, textAlignVertical, display, borderWidth, borderColor, height, width, color,
-    secureTextEntry, tintColor, onChangeText, keyboardType, maxLength, third_inpt_Img, left, backgroundColor, marginTop,Input_marginTop,
-    numberOfLines, pointerEvents, defaultValue, textTransform, editable, multiline, onValueChange, borderRadius, onPress }) => {
+    secureTextEntry, tintColor, onChangeText, keyboardType, maxLength, third_inpt_Img, left, backgroundColor, marginTop, Input_marginTop,
+    numberOfLines, pointerEvents, defaultValue, textTransform, editable, multiline, onValueChange, borderRadius, onPress, third_width, third_height }) => {
 
     const [isPasswordVisible, setPasswordVisible] = useState(secureTextEntry);
 
@@ -23,7 +23,7 @@ const Input_Field = ({
             <View style={styles.align_body}>
                 <View style={[styles.inpt_area, {
                     backgroundColor: backgroundColor ?? COLOURS.grey,
-                    borderWidth, borderColor,marginTop:Input_marginTop,
+                    borderWidth, borderColor, marginTop: Input_marginTop,
                     display: display, borderRadius: responsiveWidth(2) ?? borderRadius
                 }]}>
                     {first_inpt_Img ? <Image source={first_inpt_Img} style={[styles.inpt_icon, {
@@ -44,13 +44,19 @@ const Input_Field = ({
                     {Second_inpt_Img ?
                         <TouchableOpacity onPress={toggleSecureTextEntry}>
                             <Image source={isPasswordVisible ? globalImages.eye_slash : Second_inpt_Img} resizeMode='contain'
-                                tintColor={tintColor} style={[styles.inpt_icon, { left: responsiveWidth(-2) }]} />
+                                tintColor={tintColor} style={[styles.inpt_icon, {
+                                    left: responsiveWidth(-2),
+                                }]} />
                         </TouchableOpacity>
                         : ''}
                     {third_inpt_Img ?
                         <TouchableOpacity onPress={onPress}>
                             <Image source={third_inpt_Img} resizeMode='contain' pointerEvents={pointerEvents}
-                                tintColor={tintColor} style={[styles.inpt_icon, { left: left }]} />
+                                tintColor={tintColor} style={[styles.inpt_icon, {
+                                    left: left,
+                                    height: third_height ?? responsiveWidth(6.5),
+                                    width: third_width ?? responsiveWidth(6.5),
+                                }]} />
                         </TouchableOpacity>
                         : ''}
                 </View>

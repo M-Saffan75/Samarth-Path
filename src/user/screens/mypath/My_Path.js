@@ -8,9 +8,8 @@ import { COLOURS } from '../../../assets/theme/Theme';
 import Select_Text from '../../../components/Select_Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { responsiveWidth } from 'react-native-responsive-dimensions';
-import { ScrollView, StatusBar, StyleSheet, View, Dimensions } from 'react-native';
-import { FadeUp } from '../../../components/FadeUp';
 import { useTheme } from '../../../assets/themecontext/ThemeContext';
+import { ScrollView, StatusBar, StyleSheet, View, Dimensions } from 'react-native';
 
 
 const My_Path = () => {
@@ -19,7 +18,7 @@ const My_Path = () => {
     const { width } = Dimensions.get('window');
     const [activeTab, setActiveTab] = useState('Text');
     const scrollRef = useRef(null);
-    const tabs = ['Text', 'Quiz', 'Videos'];
+    const tabs = ['Text', 'Videos'];
 
 
     const handleTabPress = (tab) => {
@@ -54,17 +53,6 @@ const My_Path = () => {
                                 backgroundColor={activeTab === 'Text' ? COLOURS.primary : COLOURS.light_grey}
                             />
                         </ZoomIn>
-                        <ZoomIn delay={500}>
-                            <Select_Text
-                                label={'Quiz'}
-                                onPress={() => handleTabPress('Quiz')}
-                                borderBottomColor={activeTab === 'Quiz' ? COLOURS.primary : COLOURS.transparent}
-                                color={activeTab === 'Quiz' ? COLOURS.primary : COLOURS.black}
-                                countColor={activeTab === 'Quiz' ? COLOURS.white : COLOURS.light_black}
-                                backgroundColor={activeTab === 'Quiz' ? COLOURS.primary : COLOURS.light_grey}
-                            />
-                        </ZoomIn>
-
                         <ZoomIn delay={600}>
                             <Select_Text
                                 label={'Videos'}
@@ -92,7 +80,6 @@ const My_Path = () => {
                         style={{ flex: 1 }}
                     >
                         <View style={{ width }}><Text_Here /></View>
-                        <View style={{ width }}><Quiz_Here /></View>
                         <View style={{ width }}><Videos_Here /></View>
                     </ScrollView>
                 </View>
@@ -107,7 +94,7 @@ const styles = StyleSheet.create({
     row_select: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
+        justifyContent: 'space-around',
         marginHorizontal: responsiveWidth(3),
         marginTop: responsiveWidth(4),
     },

@@ -5,17 +5,42 @@ import { responsiveWidth } from 'react-native-responsive-dimensions';
 import { globalImages } from '../assets/images/images_file/All_Images';
 import { useUser } from '../user/screens/auth/user_context/UserContext';
 
-const Profile = ({ alignSelf, marginBottom, marginTop, edit }) => {
+const Profile = ({ alignSelf, marginBottom, marginTop, edit, onPress, selectedImage }) => {
 
     const { userData } = useUser();
+    const firstLetter = userData?.name
+        ? userData.name.charAt(0).toUpperCase()
+        : '?';
+
+    const imageUri = selectedImage?.uri || userData?.profilePicture || null;
 
     return (
         <>
-            <View style={{ alignSelf: alignSelf, marginBottom: marginBottom, marginTop: marginTop }}>
-                <Image source={globalImages.profile} style={[styles.profile_here,]} tintColor={'contain'} />
-                {edit === true ? < TouchableOpacity style={styles.edit_icon} activeOpacity={0.9}>
-                    <Image source={globalImages.edit_pencil} style={styles.profile_edit} resizeMode='contain' tintColor={COLOURS.white}></Image>
-                </TouchableOpacity> : ""}
+            <View style={{ alignSelf, marginBottom, marginTop }}>
+                {imageUri ? (
+                    <Image
+                        source={{ uri: imageUri }}
+                        style={styles.profile_here}
+                        resizeMode="cover"
+                    />
+                ) : (
+                    <View style={[styles.profile_here, { backgroundColor: COLOURS.light_grey, justifyContent: 'center', alignItems: 'center' }]}>
+                        <Text style={{ fontSize: responsiveFontSize(4), color: COLOURS.primary, fontFamily: Fonts.Medium }}>
+                            {firstLetter}
+                        </Text>
+                    </View>
+                )}
+
+                {edit === true && (
+                    <TouchableOpacity style={styles.edit_icon} activeOpacity={0.8} onPress={onPress}>
+                        <Image
+                            source={globalImages.edit_pencil}
+                            style={styles.profile_edit}
+                            resizeMode="contain"
+                            tintColor={COLOURS.white}
+                        />
+                    </TouchableOpacity>
+                )}
             </View>
         </>
     )

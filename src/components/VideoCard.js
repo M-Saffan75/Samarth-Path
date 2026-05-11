@@ -13,7 +13,9 @@ import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dim
 
 const VideoCard = ({ item, activeVideoId, setActiveVideoId, onPress, onUnbookmark }) => {
 
-    const { theme: COLOURS, isDark } = useTheme();
+
+    console.log(item?.likesCount)
+    const { theme: COLOURS } = useTheme();
     const [showComments, setShowComments] = useState(false);
     const [commentsCount, setCommentsCount] = useState(item?.commentsCount);
 
@@ -112,7 +114,7 @@ const VideoCard = ({ item, activeVideoId, setActiveVideoId, onPress, onUnbookmar
                         <Reaction
                             isBookmark
                             contentId={item.id}
-                            initialBookmarked={item.isArchived}
+                            initialBookmarked={item.isBookmarked}
                             onUnbookmark={() => onUnbookmark?.(item.id)}
                         />
                     </View>

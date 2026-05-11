@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, AppState ,StyleSheet} from 'react-native';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
-
-import Reaction from './Reaction';
 import { Fonts } from '../assets/fonts/Fonts';
 import { PlayLottie } from '../components/PlayLottie';
 import UserRoutes from '../user/user_routes/UserRoutes';
@@ -15,190 +13,181 @@ import { showError } from '../helper/Helper';
 import CommentSheet from './CommentSheet';
 import { FadeDown } from './FadeDown';
 
-const QUIZ_STORAGE_KEY = 'quiz_state_';
+const TIMER_KEY = 'quiz_timer_';
 
 const QuizCard = ({ item, onPress, navigation }) => {
 
-    const { theme: COLOURS, isDark } = useTheme();
-    const [showComments, setShowComments] = useState(false);
-    const [commentsCount, setCommentsCount] = useState(item?.commentsCount);
+    const { theme: COLOURS } = useTheme();
 
-    useEffect(() => {
-        setCommentsCount(item?.commentsCount);
-    }, [item?.commentsCount]); // ← item change hone pe update
+    // ── Data from API ──────────────────────────────────────────
+    const question = item?.question;
+    const options = item?.options || [];
+    const schedule = item?.schedule || 'afternoon';
+    const timerSeconds = item?.timerSeconds || 180;
+    const quizAttempt = item?.quizAttempt; // API se already attempt
 
+    // ── Already attempted ──────────────────────────────────────
+    const alreadyAttempted = !!quizAttempt;
+    const selectedFromApi = quizAttempt?.selectedOptionId; // "3"
+    const isCorrectFromApi = quizAttempt?.isCorrect;
+    const timeTakenFromApi = quizAttempt?.timeTakenSeconds;
+    const correctOptionId = item?.correctOptionId?.toString();
 
-    const [selectedOption, setSelectedOption] = useState(null);
-    const [submitted, setSubmitted] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(180);
-    const [loading, setLoading] = useState(true); // pehle load karo
-
-    const [correctOptionId, setCorrectOptionId] = useState(null);
-    const [explanation, setExplanation] = useState('');
+    // ── States ─────────────────────────────────────────────────
+    const [selectedOption, setSelectedOption] = useState(
+        alreadyAttempted ? selectedFromApi : null
+    );
+    const [submitted, setSubmitted] = useState(alreadyAttempted);
+    const [isCorrect, setIsCorrect] = useState(isCorrectFromApi ?? null);
+    const [timeLeft, setTimeLeft] = useState(timerSeconds);
+    const [loading, setLoading] = useState(!alreadyAttempted);
+    const [submitting, setSubmitting] = useState(false);
     const [showModal, setShowModal] = useState(false);
-    const startTimeRef = useRef(Date.now());
+    const [explanation, setExplanation] = useState(item?.explanation || '');
+    const [selectedMongoId, setSelectedMongoId] = useState(null);
 
     const timerRef = useRef(null);
-    const storageKey = QUIZ_STORAGE_KEY + item?.id; // har quiz ka alag key
-    const todayDate = new Date().toDateString(); //
-    const [submitting, setSubmitting] = useState(false)
-    const question = item?.question;
-    const options = item?.options;
-    const correct_id = correctOptionId?.toString();
-    const schedule = item?.schedule || 'afternoon';
+    const startTimeRef = useRef(Date.now());
+    const timerKey = TIMER_KEY + item?.id;
 
-    // ─── App open hone par saved state load karo ───────────────
+    // ── Load saved timer (sirf agar attempt nahi ki) ───────────
     useEffect(() => {
-        const loadSavedState = async () => {
+        if (alreadyAttempted) return;
+
+        const loadTimer = async () => {
             try {
-                const saved = await AsyncStorage.getItem(storageKey);
-                console.log('Saved Quiz State:', saved);
+                const saved = await AsyncStorage.getItem(timerKey);
                 if (saved) {
                     const parsed = JSON.parse(saved);
-
-                    // Check karo — aaj ka hai ya purana?
-                    if (parsed.date === todayDate) {
-                        setSelectedOption(parsed.selectedOption);
-                        setSubmitted(parsed.submitted);
-                        setTimeLeft(parsed.timeLeft ?? 0);
-                        setCorrectOptionId(parsed.correctOptionId); // ← add karo
+                    const today = new Date().toDateString();
+                    if (parsed.date === today && parsed.timeLeft > 0) {
+                        setTimeLeft(parsed.timeLeft);
                     } else {
-                        // Naya din → purana data clear karo
-                        await AsyncStorage.removeItem(storageKey);
+                        await AsyncStorage.removeItem(timerKey);
                     }
                 }
             } catch (e) {
-                console.log('Quiz load error:', e);
+                console.log('Timer load error:', e);
             } finally {
                 setLoading(false);
             }
         };
-
-        loadSavedState();
+        loadTimer();
     }, []);
 
-    // ─── Timer ─────────────────────────────────────────────────
+    // ── AppState — app close hone pe timer band ────────────────
+    useEffect(() => {
+        if (alreadyAttempted) return;
+
+        const sub = AppState.addEventListener('change', (state) => {
+            if (state !== 'active') {
+                clearInterval(timerRef.current);
+            } else if (!submitted) {
+                // App wapas open — timer resume
+                startTimer();
+            }
+        });
+        return () => sub.remove();
+    }, [submitted, timeLeft]);
+
+    // ── Timer ─────────────────────────────────────────────────
     useEffect(() => {
         if (loading) return;
-        if (submitted) return;
+        if (submitted || alreadyAttempted) return;
         if (timeLeft <= 0) {
-            // Auto select — agar koi option select nahi hua toh pehla option select karo
-            const autoSelected = selectedOption ?? options[0]?.id;
-            setSelectedOption(autoSelected);
-            handleSubmit(autoSelected);
+            handleAutoSubmit();
             return;
         }
-        timerRef.current = setInterval(() => {
-            setTimeLeft((prev) => {
-                const newTime = prev - 1;
-                if (!submitted) saveState(selectedOption, false, newTime, null); // ← submitted check
-                return newTime;
-            });
-        }, 1000);
-
+        startTimer();
         return () => clearInterval(timerRef.current);
     }, [loading, submitted, timeLeft]);
 
-    // ─── State save karo AsyncStorage mein ────────────────────
-    const saveState = async (option, isSubmitted, time, correct = null) => {
-        try {
-            await AsyncStorage.setItem(storageKey, JSON.stringify({
-                date: todayDate,
-                selectedOption: option,
-                submitted: isSubmitted,
-                timeLeft: time,
-                correctOptionId: correct,
-            }));
-        } catch (e) {
-            console.log('Quiz save error:', e);
-        }
+    const startTimer = () => {
+        clearInterval(timerRef.current);
+        timerRef.current = setInterval(() => {
+            setTimeLeft(prev => {
+                const newTime = prev - 1;
+                // Save timer
+                AsyncStorage.setItem(timerKey, JSON.stringify({
+                    date: new Date().toDateString(),
+                    timeLeft: newTime,
+                }));
+                return newTime;
+            });
+        }, 1000);
     };
 
-    // ─── Option select ─────────────────────────────────────────
-    const handleSelectOption = (optionId) => {
+    // ── Auto submit (timer 0) ──────────────────────────────────
+    const handleAutoSubmit = () => {
+        const randomOption = options[Math.floor(Math.random() * options.length)];
+        const randomId = randomOption?.id;
+        const randomMongoId = randomOption?._id;
+        setSelectedOption(randomId);
+        setSelectedMongoId(randomMongoId);
+        handleSubmit(randomId, randomMongoId);
+    };
+
+    // ── Option select ─────────────────────────────────────────
+    const handleSelectOption = (optionId, optionMongoId) => {
+        if (submitted) return;
         setSelectedOption(optionId);
-        saveState(optionId, false, timeLeft); // select hote hi save
+        setSelectedMongoId(optionMongoId);
     };
 
-    // ─── Submit ────────────────────────────────────────────────
-    const handleSubmit = async (forcedOption = null) => {
+    // ── Submit ────────────────────────────────────────────────
+    const handleSubmit = async (forcedId = null, forcedMongoId = null) => {
         if (submitting) return;
         setSubmitting(true);
-        clearInterval(timerRef.current); // ← timer band karo sabse pehle
+        clearInterval(timerRef.current);
 
-        const finalOption = forcedOption ?? selectedOption;
+        const finalId = forcedId ?? selectedOption;
+        const finalMongoId = forcedMongoId ?? selectedMongoId ?? options.find(o => o.id === finalId)?._id;
         const timeTaken = Math.floor((Date.now() - startTimeRef.current) / 1000);
 
         try {
             const res = await submitQuizAnswer({
                 contentId: item.id,
-                selectedOptionId: finalOption,
+                selectedOptionId: finalMongoId,
                 timeTakenSeconds: timeTaken,
             });
 
-            console.log('Quiz API Response:', JSON.stringify(res));
-
             if (res.success) {
-                const correct = res.data.correctOptionId;
-                setCorrectOptionId(correct);
+                setIsCorrect(res.data.isCorrect);
                 setExplanation(res.data.explanation || '');
                 setSubmitted(true);
-                await saveState(finalOption, true, 0, correct); // ← correct save ho raha hai
-
-                if (!res.data.isCorrect) {
-                    setShowModal(true); // ← modal bhi open hoga
-                }
-                showSuccess(res.data.isCorrect ? 'Correct Answer! ✅' : 'Wrong Answer ❌');
-
-            } else if (res.code === 400 && res.message.includes('already submitted')) {
-                // correctOptionId already AsyncStorage mein hoga pehli baar ka
-                const saved = await AsyncStorage.getItem(storageKey);
-                const parsed = saved ? JSON.parse(saved) : null;
-                const correct = parsed?.correctOptionId;
-
-                if (correct) {
-                    setCorrectOptionId(correct);
-                    setSubmitted(true);
-                    // wrong tha tab modal open karo
-                    if (finalOption?.toString() !== correct?.toString()) {
-                        setShowModal(true);
-                    }
-                } else {
-                    setSubmitted(true);
-                }
+                await AsyncStorage.removeItem(timerKey); // timer clear
+                if (!res.data.isCorrect) setShowModal(true);
+            } else if (res.code === 400) {
+                // Already submitted
+                setSubmitted(true);
             }
-
-
         } catch (e) {
-            console.log('Quiz submit error:', e);
             showError('Network error — please try again');
         } finally {
             setSubmitting(false);
         }
     };
 
-    // Timer format → 2:30
+    // ── Helpers ───────────────────────────────────────────────
     const formatTime = (seconds) => {
         const m = Math.floor(seconds / 60);
         const s = seconds % 60;
         return `${m}:${s < 10 ? '0' : ''}${s}`;
     };
 
-    // Timer color
     const timerColor = timeLeft <= 30 ? 'red' : timeLeft <= 60 ? 'orange' : COLOURS.primary;
 
-    // Option color after submit
     const getOptionColor = (optionId) => {
         if (!submitted) return selectedOption === optionId ? COLOURS.primary : COLOURS.black;
-        if (optionId === correct_id) return 'green';
-        if (optionId === selectedOption) return 'red';
+        if (optionId?.toString() === correctOptionId) return 'green';
+        if (optionId?.toString() === selectedOption?.toString()) return 'red';
         return COLOURS.black;
     };
 
-    // Fallback
+    // ── Fallback ──────────────────────────────────────────────
     if (!question || !options || options.length === 0) {
         return (
-            <View style={[styles.fallback, { backgroundColor: COLOURS.light_primary, }]}>
+            <View style={[styles.fallback, { backgroundColor: COLOURS.light_primary }]}>
                 <Text style={[styles.fallback_text, { color: COLOURS.grey }]}>📝 Quiz is Coming Soon...</Text>
             </View>
         );
@@ -206,32 +195,38 @@ const QuizCard = ({ item, onPress, navigation }) => {
 
     return (
         <FadeDown>
-            <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={[styles.card, { backgroundColor: COLOURS.light_primary, }]}>
+            <TouchableOpacity activeOpacity={0.9} onPress={onPress}
+                style={[styles.card, { backgroundColor: COLOURS.light_primary }]}>
+
                 {/* Header */}
                 <View style={styles.header}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Image source={globalImages.app_logo}
                             style={{ height: responsiveWidth(6), width: responsiveWidth(6) }}
                             tintColor={COLOURS.primary} />
-                        <Text style={[styles.header_text, { color: COLOURS.primary }]}>
-                            {schedule}
-                        </Text>
+                        <Text style={[styles.header_text, { color: COLOURS.primary }]}>{schedule}</Text>
                     </View>
                     <Text style={[styles.header_text, { color: COLOURS.grey }]}>Quiz</Text>
                 </View>
 
-                {/* Timer */}
+                {/* Timer ya Time Taken */}
                 <View style={styles.timer_row}>
-                    <Text style={[styles.timer_text, { color: timerColor }]}>
-                        ⏱ {formatTime(timeLeft)}
-                    </Text>
+                    {submitted ? (
+                        <Text style={[styles.timer_text, { color: COLOURS.grey }]}>
+                            ⏱ {formatTime(alreadyAttempted ? timeTakenFromApi : 0)}
+                        </Text>
+                    ) : (
+                        <Text style={[styles.timer_text, { color: timerColor }]}>
+                            ⏱ {formatTime(timeLeft)}
+                        </Text>
+                    )}
                     {submitted && (
                         <Text style={{
                             fontFamily: Fonts.Medium,
                             fontSize: responsiveFontSize(1.6),
-                            color: selectedOption === correct_id ? 'green' : 'red',
+                            color: isCorrect ? 'green' : 'red',
                         }}>
-                            {selectedOption === correct_id ? 'Correct!' : 'Wrong Answer!'}
+                            {isCorrect ? 'Correct' : 'Wrong Answer!'}
                         </Text>
                     )}
                 </View>
@@ -244,7 +239,7 @@ const QuizCard = ({ item, onPress, navigation }) => {
                         lineHeight: responsiveWidth(5),
                         color: COLOURS.black,
                     }} numberOfLines={4}>
-                        {question.slice(0, 120)}
+                        {question}
                     </Text>
                 </View>
 
@@ -253,15 +248,15 @@ const QuizCard = ({ item, onPress, navigation }) => {
                     <TouchableOpacity
                         activeOpacity={0.7}
                         key={option.id}
-                        disabled={submitted} // lock after submit
-                        onPress={() => handleSelectOption(option.id)}
+                        disabled={submitted}
+                        onPress={() => handleSelectOption(option.id, option._id)}
                         style={styles.option_row}
                     >
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                             <Image
                                 source={
                                     submitted
-                                        ? (option.id === correct_id || option.id === selectedOption)
+                                        ? (option.id?.toString() === correctOptionId || option.id?.toString() === selectedOption?.toString())
                                             ? globalImages.select
                                             : globalImages.unselect
                                         : selectedOption === option.id
@@ -279,84 +274,70 @@ const QuizCard = ({ item, onPress, navigation }) => {
                                 fontFamily: selectedOption === option.id ? Fonts.Regular : Fonts.Medium,
                                 color: getOptionColor(option.id),
                             }}>
-                                {option.text.slice(0, 50)}
+                                {option.text}
                             </Text>
                         </View>
 
-                        {/* Right side icon after submit */}
-                        {submitted && option.id.toString() === correct_id && (
+                        {/* Lottie icons */}
+                        {submitted && option.id?.toString() === correctOptionId && (
                             <PlayLottie source={globalImages.check_icon_json} size={responsiveWidth(6)} />
                         )}
-
-                        {submitted && option.id.toString() === selectedOption?.toString() && selectedOption?.toString() !== correct_id && (
+                        {submitted && option.id?.toString() === selectedOption?.toString() && selectedOption?.toString() !== correctOptionId && (
                             <PlayLottie source={globalImages.cross_icon} size={responsiveWidth(6)} />
                         )}
                     </TouchableOpacity>
                 ))}
 
-                {/* Submit Button — sirf tab dikhe jab option select ho aur submit na hua ho */}
+                {/* Submit Button */}
                 {selectedOption && !submitted && (
                     <TouchableOpacity
                         onPress={() => handleSubmit()}
                         disabled={submitting}
-                        style={[[styles.submit_btn, { backgroundColor: COLOURS.primary, }], submitting && { opacity: 0.6 }]}
+                        style={[styles.submit_btn, { backgroundColor: COLOURS.primary },
+                            submitting && { opacity: 0.6 }]}
                     >
-                        <Text style={[styles.submit_text,{color: COLOURS.white,}]}>
+                        <Text style={[styles.submit_text, { color: COLOURS.white }]}>
                             {submitting ? 'Submitting...' : 'Submit Answer'}
                         </Text>
                     </TouchableOpacity>
                 )}
 
-                {/* Divider + Reactions */}
-                <View style={{ width: '91%', height: responsiveWidth(.2), backgroundColor: COLOURS.grey, marginTop: responsiveWidth(3), alignSelf: 'center' }} />
-
+                {/* Divider */}
                 <View style={{
-                    marginLeft: responsiveWidth(4), marginTop: responsiveWidth(2.5), flexDirection: 'row',
-                    justifyContent: 'space-between'
-                }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <Reaction
-                            isHeart
-                            contentId={item.id}
-                            isLiked={item.isLiked}
-                            count={item.likesCount}
-                        />
-                        <Reaction source={globalImages.comment} count={commentsCount} onPress={() => setShowComments(true)} />
+                    width: '91%', height: responsiveWidth(.2),
+                    backgroundColor: COLOURS.grey, marginTop: responsiveWidth(3), alignSelf: 'center'
+                }} />
 
-                        <Reaction
-                            isBookmark
-                            contentId={item.id}
-                            initialBookmarked={item.isArchived}
-                        />
-                    </View>
-
-                    <View>
-                        <TouchableOpacity activeOpacity={0.9} onPress={() => navigation.navigate(UserRoutes.Weekly_Winners)} style={{
-                            backgroundColor: COLOURS.light_green, padding: responsiveWidth(1),
-                            paddingHorizontal: responsiveWidth(2), borderRadius: responsiveWidth(20)
+                {/* Weekly Winners */}
+                <View style={{ marginTop: responsiveWidth(2.5), alignItems: 'center' }}>
+                    <TouchableOpacity
+                        activeOpacity={0.9}
+                        onPress={() => navigation.navigate(UserRoutes.Weekly_Winners)}
+                        style={{
+                            backgroundColor: COLOURS.light_green,
+                            padding: responsiveWidth(2),
+                            width: responsiveWidth(80),
+                            borderRadius: responsiveWidth(2),
                         }}>
-                            <Text style={{
-                                fontSize: responsiveFontSize(1.5), fontFamily: Fonts.Medium, textTransform: 'capitalize', color: COLOURS.black,
-                                top: responsiveWidth(.4)
-                            }}>
-                                weekly winners
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-
+                        <Text style={{
+                            fontSize: responsiveFontSize(1.5),
+                            fontFamily: Fonts.Medium,
+                            textTransform: 'capitalize',
+                            color: COLOURS.black,
+                            textAlign: 'center',
+                            top: responsiveWidth(.4),
+                        }}>
+                            weekly winners
+                        </Text>
+                    </TouchableOpacity>
                 </View>
+
                 <ExplanationModal
                     visible={showModal}
                     explanation={explanation}
                     onClose={() => setShowModal(false)}
                 />
-                <CommentSheet
-                    isOpen={showComments}
-                    onClose={() => setShowComments(false)}
-                    postId={item?.id}
-                    onCommentAdded={() => setCommentsCount(prev => prev + 1)}
-                    onCommentDeleted={() => setCommentsCount(prev => prev - 1)}
-                />
+
             </TouchableOpacity>
         </FadeDown>
     );

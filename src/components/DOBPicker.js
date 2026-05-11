@@ -40,7 +40,7 @@ export const DOBPicker = ({ value, onChange }) => {
         onPress={() => setShow(true)}
         activeOpacity={0.8}
       >
-        <Text style={value ? [styles.valueText, { color: COLOURS.grey, }] : styles.placeholder}>
+        <Text style={value ? [styles.valueText, { color: COLOURS.black, }] : styles.placeholder}>
           {value ? formatDate(value) : 'dd/mm/yyyy'}
         </Text>
       </TouchableOpacity>

@@ -1,25 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { bookmarkContent, removeBookmarkContent } from '../homebackend/HomeBackend';
+import { useContent } from '../../../../user/context/ContentProvider';
 
 const useBookMark = (initialBookmarked, contentId, onUnbookmark) => {
-    const [isBookmarked, setIsBookmarked] = useState(initialBookmarked);
+    const { bookmarkedIds, toggleBookmark } = useContent();
+    
+    const isBookmarked = bookmarkedIds.has(contentId) ?? initialBookmarked;
+
+    useEffect(() => {
+        if (initialBookmarked) {
+            toggleBookmark(contentId, true);
+        }
+    }, []);
 
     const handleBookmark = async () => {
         const newBookmarked = !isBookmarked;
-        setIsBookmarked(newBookmarked); // optimistic
-
+        toggleBookmark(contentId, newBookmarked); // ← global update
         try {
-            if (newBookmarked) {
-                const res = await bookmarkContent(contentId);
-                console.log('Bookmark res:', res);
-            } else {
-                const res = await removeBookmarkContent(contentId);
-                console.log('Unbookmark res:', res);
+            if (newBookmarked) await bookmarkContent(contentId);
+            else {
+                await removeBookmarkContent(contentId);
                 onUnbookmark?.();
             }
         } catch (e) {
-            setIsBookmarked(!newBookmarked); // revert
-            console.log('Bookmark error:', e);
+            toggleBookmark(contentId, !newBookmarked); // revert
         }
     };
 

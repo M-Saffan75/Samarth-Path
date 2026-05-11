@@ -9,6 +9,7 @@ export const USER_API_URL = {
     RESET_OTP: '/user/auth/verify-reset-otp',
     NEW_PASSWORD: '/user/auth/set-new-password',
     CHANGE_PASSWORD: '/user/auth/change-password',
+    UPDATE_PROFILE:'/user/auth/update-profile',
     ME: '/user/auth/me',
 
     // Fcm-Token

@@ -1,14 +1,27 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import Header from '../../../components/Header';
+import { Pulse } from '../../../components/Pulse';
 import { Calendar } from 'react-native-calendars';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, StatusBar } from 'react-native';
 import { useTheme } from '../../../assets/themecontext/ThemeContext';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Archives = () => {
 
     const { theme: COLOURS, isDark } = useTheme();
+
+    useFocusEffect(
+        useCallback(() => {
+            getData();
+        }, [])
+    );
+
+    const getData = () => {
+        console.log('Screen Refreshed');
+    };
+
     const today = new Date().toISOString().split('T')[0];
     const [selectedDate, setSelectedDate] = useState(today);
 
@@ -39,12 +52,18 @@ const Archives = () => {
                     <Header title={'archives'} />
 
                     {/* Calendar */}
-                    <View style={[styles.calendar_box, { backgroundColor: COLOURS.white, }]}>
+                    <View style={[styles.calendar_box, { backgroundColor: COLOURS.prim, }]}>
                         <Calendar
+                            key={COLOURS.white}
                             current={today}
                             onDayPress={handleDateSelect}
                             renderArrow={(direction) => (
-                                <Text style={{ color: COLOURS.primary, fontSize: responsiveFontSize(2.5), fontFamily: 'Poppins-Bold' }}>
+                                <Text
+                                    style={{
+                                        color: COLOURS.primary,
+                                        fontSize: responsiveFontSize(2.5),
+                                        fontFamily: 'Poppins-Bold'
+                                    }}>
                                     {direction === 'left' ? '‹' : '›'}
                                 </Text>
                             )}
@@ -55,7 +74,8 @@ const Archives = () => {
                                 }
                             }}
                             theme={{
-                                backgroundColor: COLOURS.white,
+                                calendarBackground: COLOURS.white,
+                                textSectionTitleColor: COLOURS.light_black,
                                 calendarBackground: COLOURS.white,
                                 textSectionTitleColor: COLOURS.light_black,
                                 selectedDayBackgroundColor: COLOURS.primary,
@@ -75,13 +95,15 @@ const Archives = () => {
                     </View>
 
                     {/* Selected Date */}
-                    <Text style={[styles.selected_date,{color: COLOURS.black,}]}>
+                    <Text style={[styles.selected_date, { color: COLOURS.black, }]}>
                         {formatDisplayDate(selectedDate)}
                     </Text>
 
                     {/* No Content */}
                     <View style={styles.empty_area}>
-                        <Text style={[styles.empty_icon,{color: COLOURS.primary,}]}>𝌮</Text>
+                        <Pulse>
+                            <Text style={[styles.empty_icon, { color: COLOURS.primary, }]}>𝌮</Text>
+                        </Pulse>
                         <Text style={[styles.empty_text, { color: COLOURS.primary, }]}>No content available for this date</Text>
                     </View>
 
@@ -125,7 +147,7 @@ const styles = StyleSheet.create({
     },
     empty_text: {
         fontFamily: 'Poppins-Medium',
-        fontSize: responsiveFontSize(1.8),  
+        fontSize: responsiveFontSize(1.8),
         textAlign: 'center',
     },
 });

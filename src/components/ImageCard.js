@@ -11,8 +11,8 @@ import CommentSheet from './CommentSheet';
 
 const ImageCard = ({ item, onPress, onUnbookmark }) => {
 
-    const { theme: COLOURS, isDark } = useTheme();
-
+    const { theme: COLOURS } = useTheme();
+    console.log('liked imagecard', item?.isLiked)
     const [showComments, setShowComments] = useState(false);
     const [commentsCount, setCommentsCount] = useState(item?.commentsCount);
     useEffect(() => {
@@ -83,15 +83,15 @@ const ImageCard = ({ item, onPress, onUnbookmark }) => {
                                 <Reaction
                                     isHeart
                                     contentId={item.id}
-                                    isLiked={item.isLiked}
-                                    count={item.likesCount}
+                                    isLiked={item?.isLiked}
+                                    count={item.likesCount || 0}
                                 />
                                 <Reaction source={globalImages.comment} count={commentsCount} onPress={() => setShowComments(true)} />
 
                                 <Reaction
                                     isBookmark
                                     contentId={item.id}
-                                    initialBookmarked={item.isArchived}
+                                    initialBookmarked={item.isBookmarked}
                                     onUnbookmark={() => onUnbookmark?.(item.id)}
                                 />
                             </View>

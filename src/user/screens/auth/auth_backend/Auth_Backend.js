@@ -12,7 +12,7 @@ export const registerUser = async ({ name, phone, email, password }) => {
     });
 
     const data = await response.json();
-    console.log('data', data)
+    // console.log('data', data)
     if (!response.ok) {
         const error = new Error(data.message || 'Registration failed');
         error.code = data.code; // ✅ phir code set karo
@@ -83,8 +83,8 @@ export const loginUser = async ({ phone, password }) => {
 
     if (!response.ok) {
         const error = new Error(data.message || 'Login failed');
-        error.code = response.status;  
-        error.status = response.status;    
+        error.code = response.status;
+        error.status = response.status;
         throw error;
     }
 
@@ -190,4 +190,40 @@ export const getUserMe = async (token) => {
     const data = await response.json();
     if (!response.ok) throw new Error(data.message);
     return data.data;
+};
+
+// updateProfile function
+import ReactNativeBlobUtil from 'react-native-blob-util';
+
+export const updateProfile = async ({ name, gender, dateOfBirth, selectedImage }) => {
+    const token = await AsyncStorage.getItem('token');
+
+    const parts = [
+        { name: 'name', data: name },
+        { name: 'gender', data: gender },
+        { name: 'dateOfBirth', data: dateOfBirth },
+    ];
+
+    if (selectedImage?.base64) {
+        parts.push({
+            name: 'profilePicture',
+            filename: 'profile.jpg',
+            type: 'image/jpeg',
+            data: selectedImage.base64, // ← base64 string directly
+        });
+    }
+
+    const res = await ReactNativeBlobUtil.fetch(
+        'PUT',
+        `${BASE_URL}${USER_API_URL.UPDATE_PROFILE}`,
+        {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+        },
+        parts
+    );
+
+    const json = JSON.parse(res.data);
+    console.log('Raw response:', JSON.stringify(json));
+    return { ...json, statusCode: res.respInfo?.status };
 };

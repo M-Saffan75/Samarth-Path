@@ -16,7 +16,7 @@ const getFlag = (code) => {
 
 const Number_Select = ({ value, onChangeText, onChangeFormatted }) => {
 
-    const { theme: COLOURS, isDark } = useTheme();
+    const { theme: COLOURS } = useTheme();
     const [selected, setSelected] = useState(
         countries.find(c => c.code === 'IN') || countries[0]  // India default
     );

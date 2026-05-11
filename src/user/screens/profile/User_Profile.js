@@ -11,8 +11,8 @@ import Profile_Row from '../../../components/Profile_Row';
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ThemeOverlay } from '../../../components/ThemeOverlay';
 import { globalImages } from '../../../assets/images/images_file/All_Images';
-import { Animated, Image, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
+import { Animated, Image, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 
 import { showError } from '../../../helper/Helper';
 import { Pulse } from '../../../components/Pulse';
@@ -109,10 +109,10 @@ const User_Profile = ({ navigation }) => {
                             <View style={[styles.box_profile_new, { backgroundColor: COLOURS.light_primary }]}>
                                 <Profile_Row label={'edit profile'} source={globalImages.user_filled}
                                     onPress={() => navigation.navigate(UserRoutes.Edit_Profile)} />
-                                <Profile_Row label={'my path'} source={globalImages.access_icon} />
-                                <Profile_Row label={'archives'} source={globalImages.archive_icon} />
+                                {/* <Profile_Row label={'my path'} source={globalImages.access_icon} />
+                                <Profile_Row label={'archives'} source={globalImages.archive_icon} /> */}
                                 <Profile_Row label={'guidance'} bordernone={false} paddingBottom={responsiveWidth(.1)}
-                                    source={globalImages.signpost_icon} />
+                                    source={globalImages.signpost_icon} onPress={() => navigation.navigate(UserRoutes.Guidance_Widget)} />
                             </View>
                         </FadeDown>
 

@@ -45,6 +45,9 @@ const UserRoutes = {
     // WeeklyWinners
     Weekly_Winners:'Weekly_Winners',
 
+    // Guidance_Widget
+    Guidance_Widget:'Guidance_Widget',
+
     // Bottom_Navigation
     Bottom_Navigation: 'Bottom_Navigation',
     User_Auth_Navigation: 'User_Auth_Navigation',

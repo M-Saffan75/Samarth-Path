@@ -93,6 +93,8 @@ const Register = ({ navigation }) => {
     };
 
     const handleApiCall = async () => {
+        console.log(name, phone, email, password)
+        return
         try {
             setLoading(true);
             const data = await registerUser({ name, phone, email, password });
@@ -115,12 +117,14 @@ const Register = ({ navigation }) => {
                         setRateLimitModal(true);
                         console.log('429 error:', resendError.message);
                     } else {
-                        console.log(resendError.message || 'Something went wrong. Try again!');
+                        showError(resendError.message || 'Something went wrong. Try again!');
+                        console.log(resendError || 'Something went wrong. Try again!')
                     }
                 } finally {
                     setLoading(false);
                 }
             } else {
+                // console.log(first)
                 showError(error.message || 'Something went wrong. Try again!');
             }
         } finally {

@@ -1,10 +1,9 @@
 import Card_info from '../../../data/Data';
 import Header from '../../../components/Header';
-import { COLOURS } from '../../../assets/theme/Theme';
 import Title_Here from '../../../components/Title_Here';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, { useCallback, useEffect, useState } from 'react';
-import {useTheme} from '../../../assets/themecontext/ThemeContext';
+import { useTheme } from '../../../assets/themecontext/ThemeContext';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 import { AppState, RefreshControl, StatusBar, StyleSheet, Text, View } from 'react-native';
 
@@ -17,14 +16,15 @@ import ImageCard from '../../../components/ImageCard';
 import QuizCard from '../../../components/QuizCard';
 import { useLoader } from '../../../loading/LoaderContext';
 import { useFocusEffect } from '@react-navigation/native';
+import { Pulse } from '../../../components/Pulse';
 
 const Home = ({ navigation }) => {
-  
+
   const { theme: COLOURS, isDark } = useTheme();
   const [activeVideoId, setActiveVideoId] = useState(null);
   const [contentList, setContentList] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
-  const { setLoading } = useLoader();
+  const { loading, setLoading } = useLoader();
 
   useEffect(() => {
     loadContent();
@@ -35,31 +35,39 @@ const Home = ({ navigation }) => {
       if (!isRefresh) setLoading(true);
       const res = await fetchTodayContent();
       if (res.success && res.data.length > 0) {
-        // API ka content array nikalo
-        const items = res.data[0].content;
-        const normalized = items.map((item) => ({
-          id: item._id,
-          type: item.contentType === 'text' ? 'image' : item.contentType,
-          // Video
-          video: item.videoContent?.videoUrl || null,
-          thumbnail: item.videoContent?.thumbnail || null,
-          // Image/Text
-          image: item.textContent?.image || null,
-          label: item.textContent?.label || null,
-          // Common
-          schedule: item.videoContent?.title || item.textContent?.title || item.quizContent?.title || '',
-          title: item.videoContent?.title || item.textContent?.title || item.quizContent?.title || '',
-          description: item.videoContent?.description || item.textContent?.description || '',
-          // Quiz
-          question: item.quizContent?.question || null,
-          options: item.quizContent?.options || [],
-          correct_id: null, // API submit ke baad aayega
-          timerSeconds: item.quizContent?.timerSeconds || 180,
-          isLiked: item.isLiked,
-          likesCount: item.likesCount,
-          commentsCount: item.commentsCount,
-          bookmarksCount: item?.bookmarkssCount || 0,
-        }));
+        const items = res?.data;
+        const normalized = items.map((item) => {
+          if (!item) return null;
+          return {
+            id: item?._id,
+            type: item?.contentType === 'text' ? 'image' : item?.contentType,
+            // Video
+            video: item?.videoContent?.videoUrl || null,
+            thumbnail: item?.videoContent?.thumbnail || null,
+            // Image/Text
+            image: item?.textContent?.image || null,
+            label: item?.textContent?.label || null,
+            // Common
+            schedule: item?.videoContent?.title || item?.textContent?.title || item?.quizContent?.title || '',
+            title: item?.videoContent?.title || item?.textContent?.title || item?.quizContent?.title || '',
+            description: item?.videoContent?.description || item?.textContent?.description || '',
+            // Engagement
+            isLiked: item?.isLiked ?? false,
+            isBookmarked: item?.isBookmarked ?? false,
+            likesCount: item?.likesCount || 0,
+            commentsCount: item?.commentsCount || 0,
+            // Quiz
+            question: item?.quizContent?.question || null,
+            options: item?.quizContent?.options || [],
+            correctOptionId: item?.quizContent?.correctOptionId || null,
+            timerSeconds: item?.quizContent?.timerSeconds || 180,
+            explanation: item?.quizContent?.explanation || '',
+            quizAttempt: item?.quizAttempt || null,
+          };
+        })
+          .filter(Boolean)
+          .filter(item => item?.id); // ← yahan
+
         setContentList(normalized);
       }
     } catch (e) {
@@ -92,18 +100,17 @@ const Home = ({ navigation }) => {
 
   const refreshCounts = async () => {
     try {
-      // koi loader nahi — background mein
-      const res = await fetchTodayContent(true);
-      if (res.success && res.data.length > 0) {
-        const items = res.data[0].content;
+      const res = await fetchTodayContent();
+      if (res?.success && res?.data?.length > 0) {
+        const items = res.data[0]?.content || []; // ← fallback
+        if (!items?.length) return; // ← empty toh return
         setContentList(prev => prev.map(card => {
-          const fresh = items.find(i => i._id === card.id);
+          const fresh = items?.find(i => i._id === card.id);
           if (!fresh) return card;
           return {
             ...card,
-            likesCount: fresh.likesCount,
-            commentsCount: fresh.commentsCount,
-            bookmarksCount: fresh?.bookmarksCount,
+            likesCount: fresh.likesCount || card.likesCount,
+            commentsCount: fresh.commentsCount || card.commentsCount,
           };
         }));
       }
@@ -133,35 +140,38 @@ const Home = ({ navigation }) => {
 
           {/*  */}
 
-          <View style={[styles.card_area,{backgroundColor: COLOURS.white,}]}>
-            {contentList.length > 0 ? (
+          <View style={[styles.card_area, { backgroundColor: COLOURS.white, }]}>
+            {loading ? null : contentList.length > 0 ? (
               <FlashList
                 refreshControl={
                   <RefreshControl
                     refreshing={refreshing}
                     onRefresh={onRefresh}
-                    colors={[COLOURS.primary]}
-                    tintColor={COLOURS.primary}
+                    colors={[COLOURS.primary]}      // Android
+                    tintColor={COLOURS.primary}     // iOS
+                    progressBackgroundColor={COLOURS.light_primary}
                   />
                 }
                 data={contentList}
-                keyExtractor={(item) => item.id.toString()}
+                keyExtractor={(item) => item?.id?.toString() ?? Math.random().toString()}
                 showsVerticalScrollIndicator={false}
                 estimatedItemSize={responsiveWidth(100)}
                 onScrollBeginDrag={() => setActiveVideoId(null)}
                 removeClippedSubviews={true}
                 contentContainerStyle={{ paddingBottom: responsiveWidth(5) }}
                 renderItem={({ item }) => {
-                  if (item.type === 'video') return <VideoCard item={item} activeVideoId={activeVideoId} setActiveVideoId={setActiveVideoId} />;
-                  if (item.type === 'image') return <ImageCard item={item} />;
-                  if (item.type === 'quiz') return <QuizCard item={item} navigation={navigation} />;
+                  if (item?.type === 'video') return <VideoCard item={item} activeVideoId={activeVideoId} setActiveVideoId={setActiveVideoId} />;
+                  if (item?.type === 'image') return <ImageCard item={item} />;
+                  if (item?.type === 'quiz') return <QuizCard item={item} navigation={navigation} />;
                   return null;
                 }}
               />
             ) : (
               <View style={styles.empty}>
-                <Text style={[styles.empty_icon,{color: COLOURS.light_grey,}]}>𝌮</Text>
-                <Text style={[styles.empty_text,{color: COLOURS.light_grey,}]}>No content available for today!</Text>
+                <Pulse>
+                  <Text style={[styles.empty_icon, { color: COLOURS.primary, }]}>𝌮</Text>
+                </Pulse>
+                <Text style={[styles.empty_text, { color: COLOURS.primary, }]}>No content available for today!</Text>
               </View>
             )}
           </View>

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { COLOURS } from '../../../assets/theme/Theme';
 import Title_Here from '../../../components/Title_Here';
 import { Image, StyleSheet, View, Text, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
 import { globalImages } from '../../../assets/images/images_file/All_Images';
@@ -98,6 +97,7 @@ const QuizItem = ({ item, onUnbookmark }) => {
 
 const Quiz_Here = () => {
 
+  const { theme: COLOURS } = useTheme();
   const [quizzes, setQuizzes] = useState([]);
   const { setLoading } = useLoader();
   const [refreshing, setRefreshing] = useState(false);
@@ -111,7 +111,8 @@ const Quiz_Here = () => {
       if (!isRefresh) setLoading(true);
       const res = await fetchBookmarks();
       if (res.success) {
-        const onlyQuizzes = res.data
+        const dataArray = res.data?.items || []; // ✅ fix
+        const onlyQuizzes = dataArray
           .filter(item => item.contentType === 'quiz')
           .map(item => ({
             id: item._id,
@@ -147,6 +148,7 @@ const Quiz_Here = () => {
           onRefresh={onRefresh}
           colors={[COLOURS.primary]}      // Android
           tintColor={COLOURS.primary}     // iOS
+          progressBackgroundColor={COLOURS.light_primary}
         />
       }
       keyExtractor={(item) => item.id.toString()}
@@ -164,7 +166,7 @@ const Quiz_Here = () => {
       )}
       ListEmptyComponent={
         <View>
-          <View style={styles.bg_img}>
+          <View style={[styles.bg_img, { backgroundColor: COLOURS.light_grey, }]}>
             <Image source={globalImages.app_logo} style={styles.logo_img} tintColor={COLOURS.primary} />
           </View>
           <Title_Here title={'no saved Quiz'} textAlign={'center'} />
@@ -188,7 +190,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center', alignItems: 'center', justifyContent: 'center',
     width: responsiveWidth(20), height: responsiveWidth(20),
     marginTop: responsiveWidth(80), borderRadius: responsiveWidth(3),
-    backgroundColor: COLOURS.light_grey,
+
   },
   logo_img: {
     alignSelf: 'center', width: responsiveWidth(15), height: responsiveWidth(15),

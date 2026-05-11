@@ -5,6 +5,7 @@ import { COLOURS } from '../../../assets/theme/Theme';
 import { DOBPicker } from '../../../components/DOBPicker';
 import Input_Field from '../../../components/Input_Field';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { launchImageLibrary } from 'react-native-image-picker';
 import { GenderPicker } from '../../../components/GenderPicker';
 import { StatusBar, StyleSheet, View, Text, } from 'react-native';
 import { useTheme } from '../../../assets/themecontext/ThemeContext';
@@ -20,17 +21,22 @@ import Title_Here from '../../../components/Title_Here';
 import { FadeDown } from '../../../components/FadeDown';
 import Trial_Text from '../../../components/Trial_Text';
 import { useUser } from '../auth/user_context/UserContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { showError, showSuccess } from '../../../helper/Helper';
+import { getUserMe, updateProfile } from '../auth/auth_backend/Auth_Backend';
 
-const Edit_Profile = () => {
+const Edit_Profile = ({ navigation }) => {
 
     const { theme: COLOURS, isDark } = useTheme();
 
-    const { userData } = useUser();
+    const { userData, updateUser } = useUser();
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
-    const [dob, setDob] = useState(null);
-    const [gender, setGender] = useState('Male');
+    const [dob, setDob] = useState(userData?.dateOfBirth || '');
+    const [gender, setGender] = useState(userData?.gender || '');
+    const [selectedImage, setSelectedImage] = useState(null); // local picked image
+    const [loading, setLoading] = useState(false);
 
     const parseDate = (dateStr) => {
         if (!dateStr) return null;
@@ -55,6 +61,69 @@ const Edit_Profile = () => {
         }
     }, [userData]);
 
+    // ── Image Picker ───────────────────────────────────────────
+    const handlePickImage = () => {
+        launchImageLibrary({
+            mediaType: 'photo',
+            quality: 0.8,
+            includeBase64: true, // ← add karo
+        }, (response) => {
+            if (response.didCancel || response.errorCode) return;
+            const asset = response.assets?.[0];
+            if (asset) setSelectedImage(asset);
+        });
+    };
+
+    // ── Check karo kuch badla ya nahi ─────────────────────────
+    const hasChanged = () => {
+        return (
+            name !== (userData?.name || '') ||
+            gender !== (userData?.gender || '') ||
+            dob !== (userData?.dateOfBirth || '') ||
+            selectedImage !== null
+        );
+    };
+
+    // ── Submit ────────────────────────────────────────────────
+    const handleUpdate = async () => {
+        const token = await AsyncStorage.getItem('token');
+
+        if (!hasChanged()) {
+            console.log('first')
+            showError('Nothing changed.');
+            return;
+        }
+        setLoading(true);
+        try {
+            const dobString = dob instanceof Date
+                ? dob.toISOString().split('T')[0]  // "2003-01-21"
+                : dob || '';
+
+            const json = await updateProfile({
+                name,
+                gender: gender?.toLowerCase(),
+                dateOfBirth: dobString,
+                selectedImage
+            });
+
+            if (json.success) {
+                showSuccess(json.message || 'Profile updated!');
+                console.log(json?.sucess)
+                const user = await getUserMe(token);
+                updateUser(user);
+                navigation.goBack();
+            } else {
+                showError(json.message || 'Update failed');
+            }
+        } catch (e) {
+            console.log('Update error:', e);
+            showError('Something went wrong');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
     return (
         <>
             <StatusBar
@@ -68,7 +137,13 @@ const Edit_Profile = () => {
                     <Header title={'edit profile'} />
 
                     <FadeDown>
-                        <Profile alignSelf={'center'} marginTop={responsiveWidth(12)} edit={true} />
+                        <Profile
+                            alignSelf={'center'}
+                            marginTop={responsiveWidth(12)}
+                            edit={true}
+                            onPress={handlePickImage}
+                            selectedImage={selectedImage}
+                        />
                     </FadeDown>
 
                     <FadeUp>
@@ -103,7 +178,7 @@ const Edit_Profile = () => {
                             Placeholder={'Your name'}
                             first_inpt_Img={globalImages.user_filled}
                             tintColor={COLOURS.grey}
-                            defaultValue={userData?.name}
+                            defaultValue={name}
                             value={name}
                             onChangeText={setName}
                         />
@@ -117,9 +192,14 @@ const Edit_Profile = () => {
                             color={COLOURS.black}
                             maxLength={35}
                             Placeholder={'Your email'}
+                            disabled={true}
                             editable={false}
-                            defaultValue={userData?.email}
+                            defaultValue={email}
+                            third_height={responsiveWidth(4)}
+                            third_width={responsiveWidth(4)}
                             first_inpt_Img={globalImages.envelope_filled}
+                            third_inpt_Img={globalImages.disabled_icon}
+                            left={responsiveWidth(-10)}
                             tintColor={COLOURS.grey}
                             value={email}
                             onChangeText={setEmail}
@@ -132,11 +212,16 @@ const Edit_Profile = () => {
                             Input_marginTop={responsiveWidth(4)}
                             color={COLOURS.black}
                             keyboardType={'numeric'}
+                            disabled={true}
                             Placeholder={'Your Phone'}
+                            third_height={responsiveWidth(4)}
+                            third_width={responsiveWidth(4)}
                             maxLength={12}
                             editable={false}
-                            defaultValue={userData?.phone}
+                            defaultValue={phone}
                             first_inpt_Img={globalImages.phone_filled}
+                            third_inpt_Img={globalImages.disabled_icon}
+                            left={responsiveWidth(-10)}
                             tintColor={COLOURS.grey}
                             value={phone}
                             onChangeText={setPhone}
@@ -163,7 +248,8 @@ const Edit_Profile = () => {
                     </FadeIn>
 
                     <FadeUp>
-                        <Button label={'update'} alignSelf={'center'} marginTop={responsiveWidth(20)} />
+                        <Button label={loading ? 'update....' : 'update'} alignSelf={'center'}
+                            marginTop={responsiveWidth(20)} onPress={handleUpdate} disabled={loading} />
                     </FadeUp>
 
 

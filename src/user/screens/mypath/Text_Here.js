@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Title_Here from '../../../components/Title_Here';
 import { FlashList } from '@shopify/flash-list';
 import { FadeUp } from '../../../components/FadeUp';
@@ -9,6 +9,7 @@ import { useTheme } from '../../../assets/themecontext/ThemeContext';
 import { Image, RefreshControl, StyleSheet, View } from 'react-native';
 import { globalImages } from '../../../assets/images/images_file/All_Images';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Images_Here = () => {
 
@@ -17,18 +18,21 @@ const Images_Here = () => {
     const [refreshing, setRefreshing] = useState(false);
     const { setLoading } = useLoader();
 
-
-    useEffect(() => {
-        loadBookmarkedImages();
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            loadBookmarkedImages();
+        }, [])
+    );
 
     const loadBookmarkedImages = async (isRefresh = false) => {
         try {
             if (!isRefresh) setLoading(true);
             const res = await fetchBookmarks();
+            console.log('res>>>>>>', res)
             if (res.success) {
-                const onlyImages = res.data
-                    .filter(item => item.contentType === 'text') // ← text type = image card
+                const dataArray = res.data?.bookmarks || res.data?.items || res.data?.data || [];
+                const onlyImages = dataArray
+                    .filter(item => item.contentType === 'text')
                     .map(item => ({
                         id: item._id,
                         type: 'image',
@@ -40,7 +44,7 @@ const Images_Here = () => {
                         isLiked: item.isLiked || false,
                         likesCount: item.likesCount || 0,
                         commentsCount: item.commentsCount || 0,
-                        isArchived: true,
+                        isBookmarked: item.isBookmarked || false,
                     }));
                 setImages(onlyImages);
             }
@@ -66,6 +70,8 @@ const Images_Here = () => {
                     onRefresh={onRefresh}
                     colors={[COLOURS.primary]}      // Android
                     tintColor={COLOURS.primary}     // iOS
+                    progressBackgroundColor={COLOURS.light_primary}
+
                 />
             }
             keyExtractor={(item) => item.id.toString()}

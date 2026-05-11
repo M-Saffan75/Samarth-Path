@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { COLOURS } from '../../../assets/theme/Theme';
 import Title_Here from '../../../components/Title_Here';
 import { Image, RefreshControl, StyleSheet, Text, View } from 'react-native';
@@ -8,29 +8,35 @@ import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dim
 import { FlashList } from '@shopify/flash-list';
 import VideoCard from '../../../components/VideoCard';
 import { fetchBookmarks } from '../../screens/mypath/mypathbackend/MyPathBackend';
-import { useLoader } from '../../../loading/LoaderContext';
 import { useTheme } from '../../../assets/themecontext/ThemeContext';
+import { useLoader } from '../../../loading/LoaderContext';
 import { FadeUp } from '../../../components/FadeUp';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Videos_Here = ({ navigation }) => {
 
-  const { theme: COLOURS, isDark } = useTheme();
+  const { theme: COLOURS } = useTheme();
   const [videos, setVideos] = useState([]);
   const [activeVideoId, setActiveVideoId] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const { setLoading } = useLoader();
 
-  useEffect(() => {
-    loadBookmarkedVideos();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadBookmarkedVideos(false);
+    }, [])
+  );
 
-  const loadBookmarkedVideos = async () => {
+  const loadBookmarkedVideos = async (showLoader = true) => {
     try {
-      setLoading(true);
+
+      if (showLoader) {
+        setLoading(true);
+      }
       const res = await fetchBookmarks();
       if (res.success) {
-        // sirf video type filter karo
-        const onlyVideos = res.data
+        const dataArray = res.data?.items || [];
+        const onlyVideos = dataArray
           .filter(item => item.contentType === 'video')
           .map(item => ({
             id: item._id,
@@ -41,24 +47,30 @@ const Videos_Here = ({ navigation }) => {
             title: item.videoContent?.title || '',
             description: item.videoContent?.description || '',
             isLiked: item.isLiked || false,
+            isBookmarked: item.isBookmarked || false,
             likesCount: item.likesCount || 0,
             commentsCount: item.commentsCount || 0,
-            isArchived: true, // bookmark screen pe hamesha bookmarked
+            bookmarksCount: item.bookmarksCount || 0,
           }));
         setVideos(onlyVideos);
       }
+
     } catch (e) {
+
       console.log('Bookmark videos error:', e);
+
     } finally {
-      setLoading(false);
+
+      if (showLoader) {
+        setLoading(false);
+      }
     }
   };
 
 
-
   const onRefresh = async () => {
     setRefreshing(true);
-    await loadBookmarkedVideos();
+    await loadBookmarkedVideos(false);
     setRefreshing(false);
   };
 
@@ -72,6 +84,7 @@ const Videos_Here = ({ navigation }) => {
           onRefresh={onRefresh}
           colors={[COLOURS.primary]}      // Android
           tintColor={COLOURS.primary}     // iOS
+          progressBackgroundColor={COLOURS.light_primary}
         />
       }
       keyExtractor={(item) => item.id.toString()}
@@ -92,7 +105,7 @@ const Videos_Here = ({ navigation }) => {
       )}
       ListEmptyComponent={
         <View>
-          <View style={styles.bg_img}>
+          <View style={[styles.bg_img, { backgroundColor: COLOURS.light_grey, }]}>
             <Image source={globalImages.app_logo} style={styles.logo_img} tintColor={COLOURS.primary} />
           </View>
           <Title_Here title={'no saved videos'} textAlign={'center'} />
@@ -120,7 +133,6 @@ const styles = StyleSheet.create({
     height: responsiveWidth(20),
     marginTop: responsiveWidth(80),
     borderRadius: responsiveWidth(3),
-    backgroundColor: COLOURS.light_grey,
   },
   logo_img: {
     alignSelf: 'center',

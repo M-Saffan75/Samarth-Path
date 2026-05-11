@@ -1,6 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Animated, Modal } from 'react-native'; // ← sirf react-native ka
-// react-native-modal wala hatao
+import { View, Text, TouchableOpacity, Animated, Modal } from 'react-native';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 import { useTheme } from '../assets/themecontext/ThemeContext';
 import { Fonts } from '../assets/fonts/Fonts';
@@ -19,6 +18,7 @@ const ThemeModal = ({ visible, onClose }) => {
         changeTheme(value);
         onClose();
     };
+
     const opacity = useRef(new Animated.Value(0)).current;
     const scale = useRef(new Animated.Value(0.9)).current;
 
@@ -40,12 +40,12 @@ const ThemeModal = ({ visible, onClose }) => {
             Animated.parallel([
                 Animated.timing(opacity, {
                     toValue: 0,
-                    duration: 150,
+                    duration: 350,
                     useNativeDriver: true,
                 }),
                 Animated.timing(scale, {
                     toValue: 0.9,
-                    duration: 150,
+                    duration: 350,
                     useNativeDriver: true,
                 }),
             ]).start();

@@ -31,7 +31,7 @@ const AboutSamarthPath = () => {
         { icon: '📖', title: 'Morning Read', desc: 'Daily text post published at 8:00 AM' },
         { icon: '🧠', title: 'Daily Quiz', desc: 'Test yourself every afternoon at 2:00 PM' },
         { icon: '🎬', title: 'Evening Video', desc: 'Curated video drops at 7:00 PM daily' },
-        { icon: '🏆', title: 'Weekly Winners', desc: 'Quiz leaderboard with prizes every week' },
+        { icon: '🏆', title: 'Weekly Winners', desc: 'Quiz leaderboard every week' },
         { icon: '🔖', title: 'My Path', desc: 'Save & bookmark your favourite content' },
         { icon: '💬', title: 'Guidance', desc: '3 free personal consultation messages/month' },
     ];
