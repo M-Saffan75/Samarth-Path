@@ -12,12 +12,12 @@ import CommentSheet from './CommentSheet';
 const ImageCard = ({ item, onPress, onUnbookmark }) => {
 
     const { theme: COLOURS } = useTheme();
-    console.log('liked imagecard', item?.isLiked)
     const [showComments, setShowComments] = useState(false);
     const [commentsCount, setCommentsCount] = useState(item?.commentsCount);
     useEffect(() => {
         setCommentsCount(item?.commentsCount);
     }, [item?.commentsCount]);
+
 
     return (
         <FadeDown>

@@ -57,6 +57,7 @@ const theme_icon = require('../all_images/theme.png')
 
 const check_icon_json = require('../../images/all_images/check-icon.json')
 const cross_icon = require('../../images/all_images/cross.json')
+const arrow_icon = require('../../images/all_images/arrow.json')
 const like_json = require('../../images/all_images/like-heart.json')
 const send_icon = require('../../icons/Filled/send.png')
 const disabled_icon = require('../all_images/disabled.png')
@@ -72,7 +73,7 @@ export const globalImages = {
     eye, pswd_key, pause, play, volume, mute, lock_icon, cross_icon,
     spiritual_6, edit_pencil, unselect, select, check_icon, check_icon_json,
     spiritual_7, like_json,trash,send_icon,theme_icon,disabled_icon,
-    spiritual_8,
+    spiritual_8,arrow_icon,
     spiritual_9,
     spiritual_10,
 }

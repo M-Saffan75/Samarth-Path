@@ -1,9 +1,10 @@
 import React from 'react'
 import { COLOURS } from '../assets/theme/Theme';
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
-import { responsiveWidth } from 'react-native-responsive-dimensions';
+import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 import { globalImages } from '../assets/images/images_file/All_Images';
 import { useUser } from '../user/screens/auth/user_context/UserContext';
+import { Fonts } from '../assets/fonts/Fonts';
 
 const Profile = ({ alignSelf, marginBottom, marginTop, edit, onPress, selectedImage }) => {
 
@@ -24,8 +25,8 @@ const Profile = ({ alignSelf, marginBottom, marginTop, edit, onPress, selectedIm
                         resizeMode="cover"
                     />
                 ) : (
-                    <View style={[styles.profile_here, { backgroundColor: COLOURS.light_grey, justifyContent: 'center', alignItems: 'center' }]}>
-                        <Text style={{ fontSize: responsiveFontSize(4), color: COLOURS.primary, fontFamily: Fonts.Medium }}>
+                    <View style={[styles.profile_here, { backgroundColor: COLOURS.purple, justifyContent: 'center', alignItems: 'center' }]}>
+                        <Text style={{ fontSize: responsiveFontSize(4), color: COLOURS.black, fontFamily: Fonts.Medium }}>
                             {firstLetter}
                         </Text>
                     </View>

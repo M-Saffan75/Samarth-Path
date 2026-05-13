@@ -77,7 +77,7 @@ const My_Path = () => {
                             const index = Math.round(e.nativeEvent.contentOffset.x / width);
                             setActiveTab(tabs[index]);
                         }}
-                        style={{ flex: 1 }}
+                        style={{ flex: 1, paddingBottom:responsiveWidth(10) }}
                     >
                         <View style={{ width }}><Text_Here /></View>
                         <View style={{ width }}><Videos_Here /></View>

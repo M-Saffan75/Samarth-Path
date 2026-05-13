@@ -15,13 +15,14 @@ const Trial_Text = ({ backgroundColor, width, alignSelf }) => {
     return (
         <View style={{
             backgroundColor: backgroundColor ?? COLOURS.white, padding: responsiveWidth(2),
-            borderRadius: responsiveWidth(100), width: width ?? responsiveWidth(50),
+            borderRadius: responsiveWidth(100), 
+            width: userData?.subscription?.status === 'trial' ? width ?? responsiveWidth(50) : width ?? responsiveWidth(60),
             alignSelf: alignSelf
         }}>
             <Text style={{
                 fontFamily: Fonts.Medium, color: COLOURS.primary, top: responsiveWidth(.4),
                 fontSize: responsiveFontSize(1.8), textTransform: 'capitalize', textAlign: 'center'
-            }}>{userData?.subscription?.status === 'trial' ? 'trial' + ': ' + '3 days remaining' : 'trial' + ': ' + '1 month Access'}</Text>
+            }}>{userData?.subscription?.status === 'trial' ? 'Trial : 3 days remaining' : 'Premium : 1 month Access'}</Text>
         </View>
     )
 }

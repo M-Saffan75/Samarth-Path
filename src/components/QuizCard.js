@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View, Text, Image, TouchableOpacity, AppState ,StyleSheet} from 'react-native';
+import { View, Text, Image, TouchableOpacity, AppState, StyleSheet } from 'react-native';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 import { Fonts } from '../assets/fonts/Fonts';
 import { PlayLottie } from '../components/PlayLottie';
@@ -32,10 +32,9 @@ const QuizCard = ({ item, onPress, navigation }) => {
     const isCorrectFromApi = quizAttempt?.isCorrect;
     const timeTakenFromApi = quizAttempt?.timeTakenSeconds;
     const correctOptionId = item?.correctOptionId?.toString();
-
     // ── States ─────────────────────────────────────────────────
     const [selectedOption, setSelectedOption] = useState(
-        alreadyAttempted ? selectedFromApi : null
+        alreadyAttempted ? selectedFromApi?.toString() : null
     );
     const [submitted, setSubmitted] = useState(alreadyAttempted);
     const [isCorrect, setIsCorrect] = useState(isCorrectFromApi ?? null);
@@ -44,7 +43,6 @@ const QuizCard = ({ item, onPress, navigation }) => {
     const [submitting, setSubmitting] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [explanation, setExplanation] = useState(item?.explanation || '');
-    const [selectedMongoId, setSelectedMongoId] = useState(null);
 
     const timerRef = useRef(null);
     const startTimeRef = useRef(Date.now());
@@ -118,36 +116,32 @@ const QuizCard = ({ item, onPress, navigation }) => {
     };
 
     // ── Auto submit (timer 0) ──────────────────────────────────
-    const handleAutoSubmit = () => {
-        const randomOption = options[Math.floor(Math.random() * options.length)];
-        const randomId = randomOption?.id;
-        const randomMongoId = randomOption?._id;
-        setSelectedOption(randomId);
-        setSelectedMongoId(randomMongoId);
-        handleSubmit(randomId, randomMongoId);
+    const handleSelectOption = (optionMongoId) => {
+        if (submitted) return;
+        setSelectedOption(optionMongoId?.toString()); // ✅ sirf _id use karo
     };
 
-    // ── Option select ─────────────────────────────────────────
-    const handleSelectOption = (optionId, optionMongoId) => {
-        if (submitted) return;
-        setSelectedOption(optionId);
-        setSelectedMongoId(optionMongoId);
+    // ── Auto submit ───────────────────────────────────────────
+    const handleAutoSubmit = () => {
+        const randomOption = options[Math.floor(Math.random() * options.length)];
+        const randomId = randomOption?._id?.toString(); // ✅ _id use karo
+        setSelectedOption(randomId);
+        handleSubmit(randomId);
     };
 
     // ── Submit ────────────────────────────────────────────────
-    const handleSubmit = async (forcedId = null, forcedMongoId = null) => {
+    const handleSubmit = async (forcedId = null) => {
         if (submitting) return;
         setSubmitting(true);
         clearInterval(timerRef.current);
 
         const finalId = forcedId ?? selectedOption;
-        const finalMongoId = forcedMongoId ?? selectedMongoId ?? options.find(o => o.id === finalId)?._id;
         const timeTaken = Math.floor((Date.now() - startTimeRef.current) / 1000);
 
         try {
             const res = await submitQuizAnswer({
                 contentId: item.id,
-                selectedOptionId: finalMongoId,
+                selectedOptionId: finalId,
                 timeTakenSeconds: timeTaken,
             });
 
@@ -177,10 +171,11 @@ const QuizCard = ({ item, onPress, navigation }) => {
 
     const timerColor = timeLeft <= 30 ? 'red' : timeLeft <= 60 ? 'orange' : COLOURS.primary;
 
-    const getOptionColor = (optionId) => {
-        if (!submitted) return selectedOption === optionId ? COLOURS.primary : COLOURS.black;
-        if (optionId?.toString() === correctOptionId) return 'green';
-        if (optionId?.toString() === selectedOption?.toString()) return 'red';
+    const getOptionColor = (optionMongoId) => {
+        const id = optionMongoId?.toString();
+        if (!submitted) return selectedOption === id ? COLOURS.primary : COLOURS.black;
+        if (id === correctOptionId) return 'green';
+        if (id === selectedOption) return 'red';
         return COLOURS.black;
     };
 
@@ -247,42 +242,42 @@ const QuizCard = ({ item, onPress, navigation }) => {
                 {options.map((option) => (
                     <TouchableOpacity
                         activeOpacity={0.7}
-                        key={option.id}
+                        key={option._id}                          // ✅ _id
                         disabled={submitted}
-                        onPress={() => handleSelectOption(option.id, option._id)}
+                        onPress={() => handleSelectOption(option._id)}  // ✅ _id
                         style={styles.option_row}
                     >
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                             <Image
                                 source={
                                     submitted
-                                        ? (option.id?.toString() === correctOptionId || option.id?.toString() === selectedOption?.toString())
+                                        ? (option._id?.toString() === correctOptionId || option._id?.toString() === selectedOption)
                                             ? globalImages.select
                                             : globalImages.unselect
-                                        : selectedOption === option.id
+                                        : selectedOption === option._id?.toString()
                                             ? globalImages.select
                                             : globalImages.unselect
                                 }
                                 style={{ height: responsiveWidth(5), width: responsiveWidth(5) }}
-                                tintColor={getOptionColor(option.id)}
+                                tintColor={getOptionColor(option._id)}
                             />
                             <Text style={{
                                 paddingLeft: responsiveWidth(3),
                                 fontSize: responsiveFontSize(1.6),
                                 width: '87%',
                                 textTransform: 'capitalize',
-                                fontFamily: selectedOption === option.id ? Fonts.Regular : Fonts.Medium,
-                                color: getOptionColor(option.id),
+                                fontFamily: selectedOption === option._id?.toString() ? Fonts.Regular : Fonts.Medium,
+                                color: getOptionColor(option._id),
                             }}>
                                 {option.text}
                             </Text>
                         </View>
 
                         {/* Lottie icons */}
-                        {submitted && option.id?.toString() === correctOptionId && (
+                        {submitted && option._id?.toString() === correctOptionId && (
                             <PlayLottie source={globalImages.check_icon_json} size={responsiveWidth(6)} />
                         )}
-                        {submitted && option.id?.toString() === selectedOption?.toString() && selectedOption?.toString() !== correctOptionId && (
+                        {submitted && option._id?.toString() === selectedOption && option._id?.toString() !== correctOptionId && (
                             <PlayLottie source={globalImages.cross_icon} size={responsiveWidth(6)} />
                         )}
                     </TouchableOpacity>
@@ -294,7 +289,7 @@ const QuizCard = ({ item, onPress, navigation }) => {
                         onPress={() => handleSubmit()}
                         disabled={submitting}
                         style={[styles.submit_btn, { backgroundColor: COLOURS.primary },
-                            submitting && { opacity: 0.6 }]}
+                        submitting && { opacity: 0.6 }]}
                     >
                         <Text style={[styles.submit_text, { color: COLOURS.white }]}>
                             {submitting ? 'Submitting...' : 'Submit Answer'}

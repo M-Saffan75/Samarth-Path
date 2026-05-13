@@ -1,5 +1,6 @@
 import React from 'react';
 import Toast from 'react-native-toast-message';
+import { StyleSheet, View } from 'react-native';
 import UserRoutes from '../user_routes/UserRoutes';
 import { ToastConfig } from '../../helper/ToastConfig';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -11,6 +12,7 @@ import Network from '../../internet/Network';
 import My_Path from '../screens/mypath/My_Path';
 import PayWall from '../screens/paywall/PayWall';
 import Archives from '../screens/archives/Archives';
+import { AppToast } from '../../components/AppToast';
 import { LoaderProvider } from '../../loading/LoaderContext';
 import Bottom_Navigation from '../bottom_tabs/Bottom_Navigation';
 import User_Notification from '../notification/User_Notification';
@@ -35,7 +37,6 @@ import Weekly_Winners from '../screens/weekly_winners/Weekly_Winners';
 
 import { ThemeProvider } from '../../assets/themecontext/ThemeContext';
 import { ContentProvider } from '../../user/context/ContentProvider';
-import { StyleSheet, View } from 'react-native';
 
 const User_Navigator = ({ isConnected }) => {
 
@@ -105,8 +106,9 @@ const User_Navigator = ({ isConnected }) => {
                         </LoaderProvider>
                     </UserProvider>
                 </ContentProvider>
+                <AppToast />
+                <Toast config={ToastConfig} />
             </ThemeProvider>
-            <Toast config={ToastConfig} />
         </>
     );
 };

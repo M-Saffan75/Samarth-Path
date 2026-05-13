@@ -93,8 +93,8 @@ const Register = ({ navigation }) => {
     };
 
     const handleApiCall = async () => {
-        console.log(name, phone, email, password)
-        return
+        // console.log(name, phone, email, password)
+        // return
         try {
             setLoading(true);
             const data = await registerUser({ name, phone, email, password });

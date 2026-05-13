@@ -1,17 +1,35 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import {
     View, Text, FlatList, StyleSheet,
-    TouchableOpacity, StatusBar
+    TouchableOpacity, StatusBar, ActivityIndicator,
+    RefreshControl,
 } from 'react-native';
-import { useTheme } from '../../assets/themecontext/ThemeContext';
+import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '../../assets/themecontext/ThemeContext';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
-
-import { COLOURS } from '../../assets/theme/Theme';
+import { fetchNotifications } from '../screens/auth/auth_backend/Auth_Backend';
 import Back_Arrow from '../../components/Back_Arrow';
 import { FadeDown } from '../../components/FadeDown';
+import { COLOURS } from '../../assets/theme/Theme';
 
-const NOTIF_CONFIG = {
+// ── Icon & style config — newStatus ke hisaab se ──────────
+
+const STATUS_CONFIG = {
+    approved: {
+        icon: '✅',
+        iconBg: '#EAF3DE',
+        badgeBg: '#EAF3DE',
+        badgeColor: '#3B6D11',
+        label: 'Approved',
+    },
+    suspended: {
+        icon: '⛔',
+        iconBg: '#FCEBEB',
+        badgeBg: '#FCEBEB',
+        badgeColor: '#A32D2D',
+        label: 'Suspended',
+    },
     blocked: {
         icon: '🚫',
         iconBg: '#FCEBEB',
@@ -26,53 +44,117 @@ const NOTIF_CONFIG = {
         badgeColor: '#854F0B',
         label: 'Trial',
     },
-    approved: {
+    subscription: {
+        icon: '👑',
+        iconBg: '#EAF3DE',
+        badgeBg: '#EAF3DE',
+        badgeColor: '#3B6D11',
+        label: 'Subscribed',
+    },
+    expired: {
+        icon: '⌛',
+        iconBg: '#FAEEDA',
+        badgeBg: '#FAEEDA',
+        badgeColor: '#854F0B',
+        label: 'Expired',
+    },
+    message: {
+        icon: '💬',
+        iconBg: '#E8F0FE',
+        badgeBg: '#E8F0FE',
+        badgeColor: '#1A56DB',
+        label: 'Message',
+    },
+    // content_published — status field se
+    info: {
+        icon: '📅',
+        iconBg: '#E8F0FE',
+        badgeBg: '#E8F0FE',
+        badgeColor: '#1A56DB',
+        label: 'Info',
+    },
+    warning: {
+        icon: '⚠️',
+        iconBg: '#FAEEDA',
+        badgeBg: '#FAEEDA',
+        badgeColor: '#854F0B',
+        label: 'Warning',
+    },
+    success: {
         icon: '✅',
         iconBg: '#EAF3DE',
         badgeBg: '#EAF3DE',
         badgeColor: '#3B6D11',
-        label: 'Approved',
+        label: 'Success',
     },
 };
 
+// ── Config resolve karo — newStatus pehle, phir status ────
+
+const getConfig = (item) => {
+    const newStatus = item?.data?.newStatus; // "approved", "suspended" etc
+    const status = item?.status;             // "success", "warning", "info"
+    return STATUS_CONFIG[newStatus] || STATUS_CONFIG[status] || {
+        icon: '🔔',
+        iconBg: '#F0F0F0',
+        badgeBg: '#F0F0F0',
+        badgeColor: '#555',
+        label: 'Notification',
+    };
+};
+
+// ── Date format ────────────────────────────────────────────
+const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+    });
+};
+
+// ──────────────────────────────────────────────────────────
 const User_Notification = () => {
 
-    // Replace with real API data
-    const { theme: COLOURS, } = useTheme();
+    const { theme: COLOURS, isDark } = useTheme();
+    const [notifications, setNotifications] = useState([]);
+    const [refreshing, setRefreshing] = useState(false);
+    const [loading, setLoading] = useState(true);
 
-    const notifications = [
-        {
-            id: '1',
-            type: 'blocked',
-            title: 'Account Blocked',
-            message: 'Your account has been temporarily blocked due to a policy violation. Please contact support.',
-            date: '04/30/2026',
-            isRead: false,
-        },
-        {
-            id: '2',
-            type: 'trial',
-            title: 'Trial Period Ended',
-            message: 'Your 3-day free trial has expired. Subscribe now to continue accessing all content.',
-            date: '04/28/2026',
-            isRead: false,
-        },
-        {
-            id: '3',
-            type: 'approved',
-            title: 'Subscription Approved',
-            message: 'Your subscription has been activated successfully. Enjoy full access to Samarth Path.',
-            date: '04/25/2026',
-            isRead: true,
-        },
-    ];
+    useFocusEffect(
+        useCallback(() => {
+            loadNotifications();
+        }, [])
+    );
+
+    const loadNotifications = async (isRefresh = false) => {
+        try {
+            isRefresh ? setRefreshing(true) : setLoading(true);
+            const res = await fetchNotifications();
+            if (res?.success) {
+                setNotifications(res?.data?.data || []);
+            } else {
+                setNotifications([]);
+            }
+        } catch (err) {
+            console.log('Notification load error:', err);
+            setNotifications([]);
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
+        }
+    };
 
     const renderItem = ({ item }) => {
-        const config = NOTIF_CONFIG[item.type];
+        const config = getConfig(item);
         return (
             <FadeDown>
-                <View style={[[styles.card, { backgroundColor: COLOURS.light_primary, }], !item.isRead && [styles.card_unread, { borderLeftColor: COLOURS.primary, }]]}>
-
+                <View style={[
+                    styles.card,
+                    { backgroundColor: COLOURS.light_primary },
+                    !item.isRead && [styles.card_unread, { borderLeftColor: COLOURS.primary }]
+                ]}>
                     {/* Icon */}
                     <View style={[styles.icon_box, { backgroundColor: config.iconBg }]}>
                         <Text style={styles.icon}>{config.icon}</Text>
@@ -81,7 +163,11 @@ const User_Notification = () => {
                     {/* Body */}
                     <View style={styles.body}>
                         <View style={styles.top_row}>
-                            <Text style={[styles.title, { color: COLOURS.black, }]} numberOfLines={1} ellipsizeMode="tail">
+                            <Text
+                                style={[styles.title, { color: COLOURS.black }]}
+                                numberOfLines={1}
+                                ellipsizeMode="tail"
+                            >
                                 {item.title}
                             </Text>
                             <View style={[styles.badge, { backgroundColor: config.badgeBg }]}>
@@ -91,13 +177,18 @@ const User_Notification = () => {
                             </View>
                         </View>
 
-                        <Text style={[styles.message, { color: COLOURS.grey, }]} numberOfLines={2} ellipsizeMode="tail">
-                            {item.message}
+                        <Text
+                            style={[styles.message, { color: COLOURS.grey }]}
+                            numberOfLines={2}
+                            ellipsizeMode="tail"
+                        >
+                            {item.body}
                         </Text>
 
-                        <Text style={styles.date}>{item.date}</Text>
+                        <Text style={[styles.date, { color: COLOURS.grey }]}>
+                            {formatDate(item.sentAt)}
+                        </Text>
                     </View>
-
                 </View>
             </FadeDown>
         );
@@ -105,25 +196,44 @@ const User_Notification = () => {
 
     return (
         <>
-            <StatusBar barStyle="dark-content" backgroundColor={COLOURS.light_primary} />
-            <SafeAreaView style={[styles.container, { backgroundColor: COLOURS.white, }]}>
+            <StatusBar
+                barStyle={isDark ? 'light-content' : 'dark-content'}
+                backgroundColor={COLOURS.light_primary}
+            />
+            <SafeAreaView style={[styles.container, { backgroundColor: COLOURS.white }]}>
 
-                <View style={[styles.circle_lg, { backgroundColor: COLOURS.primary, }]} />
-                <View style={[styles.circle_sm, { backgroundColor: COLOURS.primary, }]} />
+                <View style={[styles.circle_lg, { backgroundColor: COLOURS.primary }]} />
+                <View style={[styles.circle_sm, { backgroundColor: COLOURS.primary }]} />
 
-                {/* Topbar */}
                 <Back_Arrow label={'notifications'} />
 
-                <FlatList
-                    data={notifications}
-                    keyExtractor={(item) => item.id}
-                    renderItem={renderItem}
-                    contentContainerStyle={styles.list}
-                    showsVerticalScrollIndicator={false}
-                    ListEmptyComponent={
-                        <Text style={styles.empty}>No notifications yet</Text>
-                    }
-                />
+                {loading ? (
+                    <View style={styles.center}>
+                        <ActivityIndicator size="large" color={COLOURS.primary} />
+                    </View>
+                ) : (
+                    <FlatList
+                        data={notifications}
+                        keyExtractor={(item) => item._id}
+                        renderItem={renderItem}
+                        contentContainerStyle={styles.list}
+                        showsVerticalScrollIndicator={false}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={refreshing}
+                                onRefresh={() => loadNotifications(true)}
+                                colors={[COLOURS.primary]}
+                                tintColor={COLOURS.primary}
+                                progressBackgroundColor={COLOURS.light_primary}
+                            />
+                        }
+                        ListEmptyComponent={
+                            <Text style={[styles.empty, { color: COLOURS.grey }]}>
+                                No notifications yet
+                            </Text>
+                        }
+                    />
+                )}
 
             </SafeAreaView>
         </>

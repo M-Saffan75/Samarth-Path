@@ -1,6 +1,7 @@
 import Card_info from '../../../data/Data';
 import Header from '../../../components/Header';
 import Title_Here from '../../../components/Title_Here';
+import messaging from '@react-native-firebase/messaging'; // message firebase
 import { SafeAreaView } from 'react-native-safe-area-context';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTheme } from '../../../assets/themecontext/ThemeContext';
@@ -11,12 +12,14 @@ import { AppState, RefreshControl, StatusBar, StyleSheet, Text, View } from 'rea
 import { fetchTodayContent } from '../../screens/home/homebackend/HomeBackend';
 
 import { FlashList } from '@shopify/flash-list';
+import { Pulse } from '../../../components/Pulse';
+import QuizCard from '../../../components/QuizCard';
 import VideoCard from '../../../components/VideoCard';
 import ImageCard from '../../../components/ImageCard';
-import QuizCard from '../../../components/QuizCard';
+import { showToast } from '../../../components/AppToast';
 import { useLoader } from '../../../loading/LoaderContext';
 import { useFocusEffect } from '@react-navigation/native';
-import { Pulse } from '../../../components/Pulse';
+import { getUserFCMToken } from '../../../notifications/FCM_Send';
 
 const Home = ({ navigation }) => {
 
@@ -29,6 +32,7 @@ const Home = ({ navigation }) => {
   useEffect(() => {
     loadContent();
   }, []);
+
 
   const loadContent = async (isRefresh = false) => {
     try {
@@ -47,11 +51,13 @@ const Home = ({ navigation }) => {
             // Image/Text
             image: item?.textContent?.image || null,
             label: item?.textContent?.label || null,
+            
             // Common
             schedule: item?.videoContent?.title || item?.textContent?.title || item?.quizContent?.title || '',
             title: item?.videoContent?.title || item?.textContent?.title || item?.quizContent?.title || '',
             description: item?.videoContent?.description || item?.textContent?.description || '',
             // Engagement
+
             isLiked: item?.isLiked ?? false,
             isBookmarked: item?.isBookmarked ?? false,
             likesCount: item?.likesCount || 0,
@@ -97,6 +103,16 @@ const Home = ({ navigation }) => {
       refreshCounts();
     }, [])
   );
+
+
+  useEffect(() => {
+    getUserFCMToken();
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      showToast('info', remoteMessage.notification.title, remoteMessage.notification.body);
+    });
+
+    return unsubscribe;
+  }, []);
 
   const refreshCounts = async () => {
     try {

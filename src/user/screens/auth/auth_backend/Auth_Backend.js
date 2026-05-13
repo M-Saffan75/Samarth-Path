@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BASE_URL } from '../../../../api_url/BASE_URL';
 import { USER_API_URL } from '../../../user_api_url/USER_API_URL';
+import ReactNativeBlobUtil from 'react-native-blob-util';
 
 export const registerUser = async ({ name, phone, email, password }) => {
     const response = await fetch(`${BASE_URL}${USER_API_URL.REGISTER}`, {
@@ -193,7 +194,6 @@ export const getUserMe = async (token) => {
 };
 
 // updateProfile function
-import ReactNativeBlobUtil from 'react-native-blob-util';
 
 export const updateProfile = async ({ name, gender, dateOfBirth, selectedImage }) => {
     const token = await AsyncStorage.getItem('token');
@@ -226,4 +226,49 @@ export const updateProfile = async ({ name, gender, dateOfBirth, selectedImage }
     const json = JSON.parse(res.data);
     console.log('Raw response:', JSON.stringify(json));
     return { ...json, statusCode: res.respInfo?.status };
+};
+
+export const updateFCMToken = async (fcmToken) => {
+    const authToken = await AsyncStorage.getItem('token');
+    const response = await fetch(`${BASE_URL}${USER_API_URL.FCM_TOKEN}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({ fcmToken }),
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw {
+            status: response.status,
+            message: data.message || 'Failed to update FCM token',
+            data
+        };
+    }
+
+    return {
+        status: response.status,
+        message: data.message || 'Success',
+        data
+    };
+};
+
+export const fetchNotifications = async () => {
+    try {
+        const token = await AsyncStorage.getItem('token');
+        const res = await fetch(`${BASE_URL}/user/notifications`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+        const json = await res.json();
+        return json;
+    } catch (err) {
+        console.log('Notifications fetch error:', err);
+        return { success: false };
+    }
 };

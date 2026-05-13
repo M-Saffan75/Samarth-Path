@@ -23,6 +23,7 @@ const Splash = () => {
   const checkToken = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
+      console.log('token',token)
       if (token) {
         const user = await getUserMe(token)
         updateUser(user)
