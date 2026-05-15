@@ -11,7 +11,7 @@ import { globalImages } from '../../../assets/images/images_file/All_Images';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 import { useFocusEffect } from '@react-navigation/native';
 
-const Images_Here = () => {
+const Images_Here = ({ navigation }) => {
 
     const { theme: COLOURS, isDark } = useTheme();
     const [images, setImages] = useState([]);
@@ -82,6 +82,7 @@ const Images_Here = () => {
             renderItem={({ item }) => (
                 <FadeUp>
                     <ImageCard
+                        navigation={navigation}
                         item={item}
                         onUnbookmark={(id) => setImages(prev => prev.filter(i => i.id !== id))}
                     />

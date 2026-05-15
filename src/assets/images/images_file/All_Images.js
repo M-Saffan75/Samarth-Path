@@ -61,6 +61,9 @@ const arrow_icon = require('../../images/all_images/arrow.json')
 const like_json = require('../../images/all_images/like-heart.json')
 const send_icon = require('../../icons/Filled/send.png')
 const disabled_icon = require('../all_images/disabled.png')
+const maximize_icon = require('../../icons/Extra/maximize.png')
+const minimize_icon = require('../../icons/Extra/minimize.png')
+const consultation_icon = require('../../images/all_images/seo-chatting.png')
 
 export const globalImages = {
     app_logo, image_1, bg_here, icon_new,
@@ -72,8 +75,8 @@ export const globalImages = {
     save_icon, save_filled, spiritual_3, spiritual_4, spiritual_5, eye_slash,
     eye, pswd_key, pause, play, volume, mute, lock_icon, cross_icon,
     spiritual_6, edit_pencil, unselect, select, check_icon, check_icon_json,
-    spiritual_7, like_json,trash,send_icon,theme_icon,disabled_icon,
-    spiritual_8,arrow_icon,
+    spiritual_7, like_json, trash, send_icon, theme_icon, disabled_icon,
+    spiritual_8, arrow_icon, maximize_icon, minimize_icon,consultation_icon,
     spiritual_9,
     spiritual_10,
 }

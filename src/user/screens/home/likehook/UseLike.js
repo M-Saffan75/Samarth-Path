@@ -17,12 +17,6 @@ const useLike = (initialLiked, initialCount, contentId) => {
     const isLiked = likedIds.has(contentId);
     const count = likeCounts[contentId] ?? initialCount ?? 0;
 
-    // useEffect(() => {
-    //     if (initialLiked) {
-    //         toggleLike(contentId, true);
-    //     }
-    // }, []);
-
     const handleLike = async () => {
         const newLiked = !isLiked;
         toggleLike(contentId, newLiked, count);

@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../../assets/themecontext/ThemeContext';
 import { View, Text, StyleSheet, StatusBar, ScrollView, FlatList, RefreshControl, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
+import { globalImages } from '../../../assets/images/images_file/All_Images';
 import { fetchArchive } from '../mypath/mypathbackend/MyPathBackend';
 import { useFocusEffect } from '@react-navigation/native';
 import ImageCard from '../../../components/ImageCard';
@@ -13,7 +14,6 @@ import VideoCard from '../../../components/VideoCard';
 import QuizCard from '../../../components/QuizCard';
 import { Pulse } from '../../../components/Pulse';
 import LottieView from 'lottie-react-native';
-import { globalImages } from '../../../assets/images/images_file/All_Images';
 
 const Archives = ({ navigation }) => {
 
@@ -131,8 +131,14 @@ const Archives = ({ navigation }) => {
 
     // ✅ Moved out of handleDateSelect
     const renderItem = ({ item }) => {
-        if (item?.contentType === 'video') return <VideoCard item={item} activeVideoId={activeVideoId} setActiveVideoId={setActiveVideoId} />;
-        if (item?.contentType === 'text') return <ImageCard item={item} />;
+        if (item?.contentType === 'video') return <VideoCard
+            navigation={navigation}
+            item={item}
+            activeVideoId={activeVideoId}
+            setActiveVideoId={setActiveVideoId}
+            onUnbookmark={(id) => setVideos(prev => prev.filter(v => v.id !== id))}
+        />;
+        if (item?.contentType === 'text') return <ImageCard navigation={navigation} item={item} />;
         if (item?.contentType === 'quiz') return <QuizCard item={item} navigation={navigation} />;
         return null;
     };
@@ -213,7 +219,7 @@ const Archives = ({ navigation }) => {
                             <ActivityIndicator size="large" color={COLOURS.primary} />
                         </View>
                     ) : contentList.length === 0 ? (
-                        <View style={[styles.center,{marginTop:responsiveWidth(5)}]}>
+                        <View style={[styles.center, { marginTop: responsiveWidth(5) }]}>
                             <Pulse>
                                 <Text style={[styles.empty_icon, { color: COLOURS.primary }]}>𝌮</Text>
                             </Pulse>
@@ -224,13 +230,13 @@ const Archives = ({ navigation }) => {
                     ) : (
                         <FlatList
                             data={contentList}
-                            keyExtractor={(item) => item?._id?.toString() ?? Math.random().toString()}
+                            keyExtractor={(item) => item?.id?.toString() ?? Math.random().toString()}
+                            // keyExtractor={(item) => item?._id?.toString() ?? Math.random().toString()}
                             renderItem={renderItem}
                             showsVerticalScrollIndicator={false}
                             removeClippedSubviews={true}
                             onScrollBeginDrag={() => setActiveVideoId(null)}
-                            marginBottom={responsiveWidth(15)}
-                            contentContainerStyle={styles.list_content}
+                            contentContainerStyle={{ paddingBottom: responsiveWidth(15) }}
                             refreshControl={
                                 <RefreshControl
                                     refreshing={refreshing}
@@ -242,7 +248,6 @@ const Archives = ({ navigation }) => {
                             }
                         />
                     )}
-                    <View style={{ marginBottom: responsiveWidth(13) }} />
                 </View>
             </SafeAreaView >
         </>
@@ -281,7 +286,7 @@ const styles = StyleSheet.create({
         marginTop: responsiveWidth(8),
     },
     arrow: {
-        justifyContent:'center',
+        justifyContent: 'center',
         // backgroundColor:'red',
         fontSize: responsiveFontSize(3),
         // paddingHorizontal: responsiveWidth(2),

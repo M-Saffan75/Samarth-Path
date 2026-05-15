@@ -1,49 +1,22 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
     Image,
-    FlatList,
     StyleSheet,
-    TouchableOpacity,
     ScrollView,
+    ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Fonts } from '../../../assets/fonts/Fonts';
 import { FadeUp } from '../../../components/FadeUp';
 import { FadeIn } from '../../../components/FadeIn';
-import { COLOURS } from '../../../assets/theme/Theme';
-import Back_Arrow from '../../../components/Back_Arrow';
 import { FadeDown } from '../../../components/FadeDown';
+import Back_Arrow from '../../../components/Back_Arrow';
+import Title_Here from '../../../components/Title_Here'; // already built component
 import { useTheme } from '../../../assets/themecontext/ThemeContext';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
-
-
-const weeklyScore = {
-    correct: 5,
-    total: 7,
-    rank: 3,
-    rankLabel: 'Top 10%',
-};
-
-const prizeOfWeek = {
-    image: null, // API se aayegi: { uri: '...' }
-    title: '1 Month Free Subscription',
-    description: 'Top scorer of the week wins a free month of Samarth Path premium access.',
-};
-
-const winners = [
-    { id: 1, name: 'Aditya Jajoo', initials: 'AJ', score: 7, total: 7 },
-    { id: 2, name: 'Rahul Kumar', initials: 'RK', score: 6, total: 7 },
-    { id: 3, name: 'Priya Sharma', initials: 'PS', score: 6, total: 7 },
-    { id: 4, name: 'Meera Verma', initials: 'MV', score: 5, total: 7 },
-    { id: 5, name: 'Suresh Kapoor', initials: 'SK', score: 5, total: 7 },
-    { id: 6, name: 'Anita Nair', initials: 'AN', score: 4, total: 7 },
-    { id: 7, name: 'Vikram Rao', initials: 'VR', score: 4, total: 7 },
-    { id: 8, name: 'Divya Patel', initials: 'DP', score: 3, total: 7 },
-    { id: 9, name: 'Karan Mehta', initials: 'KM', score: 3, total: 7 },
-    { id: 10, name: 'Sneha Tiwari', initials: 'ST', score: 2, total: 7 },
-];
+import { fetchWeeklyWinners, fetchWeeklyScore } from './weeklybackend/WeeklyBackend'; // <-- separate api file
 
 // ─── Avatar colors cycling ─────────────────────────────────────────────────
 
@@ -65,144 +38,223 @@ const getMedalEmoji = (rank) => {
     return null;
 };
 
-// ─── Sub Components ────────────────────────────────────────────────────────
+// ─── ScoreBar ──────────────────────────────────────────────────────────────
 
-const ScoreBar = ({ score, total, rank, rankLabel }) => {
-    const { theme: COLOURS, isDark } = useTheme();
-    const dots = Array.from({ length: total }, (_, i) => i < score);
+const ScoreBar = ({ scoreData }) => {
+    const { theme: COLOURS } = useTheme();
+
+    if (!scoreData) return null;
+
+    const { totalQuestions, correctAnswers, rank } = scoreData;
+    const dots = Array.from({ length: totalQuestions }, (_, i) => i < correctAnswers);
 
     return (
         <FadeDown>
-            <View style={[styles.scoreBar, { backgroundColor: COLOURS.primary, }]}>
+            <View style={[styles.scoreBar, { backgroundColor: COLOURS.primary }]}>
                 <View>
                     <Text style={styles.scoreBarLabel}>Your score this week</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: responsiveWidth(1) }}>
-                        <Text style={styles.scoreValue}>{score}</Text>
-                        <Text style={styles.scoreTotal}>/ {total}</Text>
+                        <Text style={[styles.scoreValue, { color: COLOURS.white, }]}>{correctAnswers}</Text>
+                        <Text style={styles.scoreTotal}>/ {totalQuestions}</Text>
                     </View>
                     <View style={styles.dotsRow}>
                         {dots.map((filled, i) => (
                             <View
                                 key={i}
-                                style={[styles.dot, filled ? [styles.dotFilled, { backgroundColor: COLOURS.white, }] : styles.dotEmpty]}
+                                style={[
+                                    styles.dot,
+                                    filled
+                                        ? [styles.dotFilled, { backgroundColor: COLOURS.white }]
+                                        : styles.dotEmpty,
+                                ]}
                             />
                         ))}
                     </View>
                 </View>
                 <View style={{ alignItems: 'flex-end' }}>
                     <Text style={styles.scoreBarLabel}>Rank this week</Text>
-                    <Text style={styles.scoreValue}>#{rank}</Text>
-                    <Text style={styles.rankLabel}>{rankLabel}</Text>
+                    <Text style={[styles.scoreValue, { color: COLOURS.white, }]}>#{rank}</Text>
                 </View>
             </View>
         </FadeDown>
     );
 };
 
-// const PrizeCard = ({ prize }) => (
-//     <View style={styles.card}>
-//         <View style={[styles.cardHeader,{backgroundColor: COLOURS.light_primary,}]}>
-//             <View style={styles.prizeBadge}>
-//                 <Text style={[styles.prizeBadgeText,{color: COLOURS.primary,}]}>Prize of the Week</Text>
-//             </View>
-//         </View>
-//         <View style={styles.prizeBody}>
-//             {/* Prize Image — API se aayegi */}
-//             {prize.image ? (
-//                 <Image source={prize.image} style={styles.prizeImage} resizeMode="cover" />
-//             ) : (
-//                 <View style={[styles.prizeImagePlaceholder,{ borderColor: COLOURS.light_grey,}]}>
-//                     <Text style={{ fontSize: responsiveFontSize(3.5) }}>🎁</Text>
-//                 </View>
-//             )}
-//             <View style={{ flex: 1 }}>
-//                 <Text style={[styles.prizeTitle,{color: COLOURS.black,}]}>{prize.title}</Text>
-//                 <Text style={[styles.prizeDesc,{color: COLOURS.grey,}]}>{prize.description}</Text>
-//             </View>
-//         </View>
-//     </View>
-// );
+// ─── WinnerRow ─────────────────────────────────────────────────────────────
 
-const WinnerRow = ({ item, index }) => {
-    const { theme: COLOURS, isDark } = useTheme();
-    const rank = index + 1;
+const WinnerRow = ({ item, index, isLast }) => {
+    const { theme: COLOURS } = useTheme();
+    const rank = item.rank ?? index + 1;
     const medal = getMedalEmoji(rank);
     const color = avatarColors[index % avatarColors.length];
 
+    // Profile: show image if profilePicture exists, else first letter of name
+    const firstLetter = item.userName ? item.userName.charAt(0).toUpperCase() : '?';
+    const hasImage = item.profilePicture && item.profilePicture.trim() !== '';
+
     return (
         <FadeUp>
-            <View style={[styles.winnerRow, index === winners.length - 1 && { borderBottomWidth: 0 }]}>
+            <View style={[styles.winnerRow, isLast && { borderBottomWidth: 0 }]}>
                 {/* Rank */}
                 <View style={styles.rankBox}>
                     {medal ? (
                         <Text style={styles.medalEmoji}>{medal}</Text>
                     ) : (
-                        <Text style={[styles.rankText, { color: COLOURS.grey, }]}>{rank}</Text>
+                        <Text style={[styles.rankText, { color: COLOURS.grey }]}>{rank}</Text>
                     )}
                 </View>
 
                 {/* Avatar */}
-                <View style={[styles.avatar, { backgroundColor: color.bg }]}>
-                    <Text style={[styles.avatarText, { color: color.text }]}>{item.initials}</Text>
-                </View>
+                {hasImage ? (
+                    <Image
+                        source={{ uri: item.profilePicture }}
+                        style={[styles.avatar, { borderRadius: responsiveWidth(5) }]}
+                    />
+                ) : (
+                    <View style={[styles.avatar, { backgroundColor: color.bg }]}>
+                        <Text style={[styles.avatarText, { color: color.text }]}>{firstLetter}</Text>
+                    </View>
+                )}
 
                 {/* Name + sub */}
                 <View style={{ flex: 1 }}>
-                    <Text style={[styles.winnerName, { color: COLOURS.black, }]}>{item.name}</Text>
-                    <Text style={[styles.winnerSub, { color: COLOURS.grey, }]}>{item.score} correct answers</Text>
+                    <Text style={[styles.winnerName, { color: COLOURS.black }]}>{item.userName}</Text>
+                    <Text style={[styles.winnerSub, { color: COLOURS.grey }]}>{item.score} correct answers</Text>
                 </View>
 
                 {/* Score */}
-                <Text style={[styles.winnerScore, { color: COLOURS.primary, }]}>{item.score}/{item.total}</Text>
+                <Text style={[styles.winnerScore, { color: COLOURS.primary }]}>{item.score}{'/7'}</Text>
             </View>
         </FadeUp>
+    );
+};
+
+// ─── Leaderboard Card ──────────────────────────────────────────────────────
+
+// ─── Leaderboard Card ──────────────────────────────────────────────────────
+
+const LeaderboardCard = ({ title, weekData }) => {
+    const { theme: COLOURS } = useTheme();
+
+    if (!weekData) return null;
+
+    const { week, year, top3, allParticipants } = weekData;
+
+    return (
+        <>
+            {/* ── Top 3 Card ── */}
+            <FadeIn delay={300}>
+                <View style={[styles.card, { marginTop: responsiveWidth(3), borderColor: COLOURS.grey }]}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Title_Here title={title} marginTop={0}/>
+                        <View style={[styles.cardHeader, { borderBottomColor: COLOURS.light_grey }]}>
+                            <View style={[styles.weekTag, { borderColor: COLOURS.grey, backgroundColor: COLOURS.light_primary }]}>
+                                <Text style={[styles.weekTagText, { color: COLOURS.grey }]}>
+                                    Week {week}, {year}
+                                </Text>
+                            </View>
+                        </View>
+                    </View>
+                    {top3.length > 0 ? (
+                        top3.map((item, index) => (
+                            <WinnerRow
+                                key={`top3-${item.userId}-${index}`}
+                                item={item}
+                                index={index}
+                                isLast={index === top3.length - 1}
+                            />
+                        ))
+                    ) : (
+                        <Text style={[styles.emptyText, { color: COLOURS.grey, paddingHorizontal: responsiveWidth(4), paddingBottom: responsiveWidth(3) }]}>No top 3 yet.</Text>
+                    )}
+                </View>
+            </FadeIn>
+
+            {/* ── All Participants Card ── */}
+            <FadeIn delay={450}>
+                <View style={[styles.card, { marginTop: responsiveWidth(3), borderColor: COLOURS.grey }]}>
+                    <View style={[styles.cardHeader, { borderBottomColor: COLOURS.light_grey }]}>
+                        <Text style={[styles.leaderboardTitle, { color: COLOURS.black }]}>All Participants</Text>
+                        <View style={[styles.weekTag, { borderColor: COLOURS.grey, backgroundColor: COLOURS.light_primary }]}>
+                            <Text style={[styles.weekTagText, { color: COLOURS.grey }]}>
+                                Week {week}, {year}
+                            </Text>
+                        </View>
+                    </View>
+                    {allParticipants.length > 0 ? (
+                        allParticipants.map((item, index) => (
+                            <WinnerRow
+                                key={`all-${item.userId}-${index}`}
+                                item={item}
+                                index={index}
+                                isLast={index === allParticipants.length - 1}
+                            />
+                        ))
+                    ) : (
+                        <Text style={[styles.emptyText, { color: COLOURS.grey, paddingHorizontal: responsiveWidth(4), paddingBottom: responsiveWidth(3) }]}>No participants yet.</Text>
+                    )}
+                </View>
+            </FadeIn>
+        </>
     );
 };
 
 // ─── Main Screen ───────────────────────────────────────────────────────────
 
 const Weekly_Winners = () => {
+    const { theme: COLOURS } = useTheme();
 
-    const { theme: COLOURS, isDark } = useTheme();
+    const [scoreData, setScoreData] = useState(null);
+    const [winnersData, setWinnersData] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        loadData();
+    }, []);
+
+    const loadData = async () => {
+        setLoading(true);
+        const [scoreRes, winnersRes] = await Promise.all([
+            fetchWeeklyScore(),
+            fetchWeeklyWinners(),
+        ]);
+
+        if (scoreRes.success) setScoreData(scoreRes.data);
+        if (winnersRes.success) setWinnersData(winnersRes.data);
+        setLoading(false);
+    };
 
     return (
-        <SafeAreaView style={[styles.safeArea, { backgroundColor: COLOURS.light_primary, }]}>
+        <SafeAreaView style={[styles.safeArea, { backgroundColor: COLOURS.light_primary }]}>
             <Back_Arrow label={'weekly winners'} />
 
-            {/* Score Bar */}
-            <ScrollView
-                backgroundColor={COLOURS.white}
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ paddingBottom: responsiveWidth(8) }}
-            >
-                <ScoreBar
-                    score={weeklyScore.correct}
-                    total={weeklyScore.total}
-                    rank={weeklyScore.rank}
-                    rankLabel={weeklyScore.rankLabel}
-                />
+            {loading ? (
+                <View style={styles.loaderContainer}>
+                    <ActivityIndicator size="large" color={COLOURS.primary} />
+                </View>
+            ) : (
+                <ScrollView
+                    backgroundColor={COLOURS.white}
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={{ paddingBottom: responsiveWidth(8) }}
+                >
+                    {/* Score Bar */}
+                    <ScoreBar scoreData={scoreData} />
 
-                {/* Prize of the Week */}
-                {/* <PrizeCard prize={prizeOfWeek} /> */}
+                    {/* Current Week Leaderboard */}
+                    <LeaderboardCard
+                        title="This week"
+                        weekData={winnersData?.currentWeek}
+                    />
 
-                {/* Leaderboard */}
-                <FadeIn delay={500}>
-                    <View style={[styles.card, { marginTop: responsiveWidth(3), borderColor: COLOURS.grey, }]}>
-                        <View style={[styles.cardHeader, { borderBottomColor: COLOURS.light_grey, }]}>
-                            <Text style={[styles.leaderboardTitle, { color: COLOURS.black, }]}>Leaderboard</Text>
-                            <View style={[styles.weekTag, { borderColor: COLOURS.grey, backgroundColor: COLOURS.light_primary, }]}>
-                                <Text style={[styles.weekTagText, { color: COLOURS.grey, }]}>Week 18, 2026</Text>
-                            </View>
-                        </View>
-
-                        {winners.map((item, index) => (
-                            <WinnerRow key={item.id} item={item} index={index} />
-                        ))}
-                    </View>
-                </FadeIn>
-
-            </ScrollView>
-        </SafeAreaView >
+                    {/* Last Week Leaderboard */}
+                    <LeaderboardCard
+                        title="Last week"
+                        weekData={winnersData?.lastWeek}
+                    />
+                </ScrollView>
+            )}
+        </SafeAreaView>
     );
 };
 
@@ -224,12 +276,11 @@ const styles = StyleSheet.create({
         paddingVertical: responsiveWidth(3),
 
         borderBottomWidth: 0.5,
-        borderBottomColor: COLOURS.light_grey,
+
     },
     headerTitle: {
         fontSize: responsiveFontSize(1.9),
         fontFamily: Fonts.Medium,
-        color: COLOURS.black,
         textTransform: 'uppercase',
         letterSpacing: 0.5,
     },
@@ -255,7 +306,6 @@ const styles = StyleSheet.create({
     scoreValue: {
         fontSize: responsiveFontSize(4),
         fontFamily: Fonts.Medium,
-        color: COLOURS.white,
     },
     scoreTotal: {
         fontSize: responsiveFontSize(2),
@@ -292,7 +342,9 @@ const styles = StyleSheet.create({
         marginTop: responsiveWidth(3),
         borderRadius: responsiveWidth(4),
         borderWidth: 0.5,
-
+        // flexDirection:'row',
+        // alignItems:'center',
+        // justifyContent:'space-between',
         overflow: 'hidden',
     },
     cardHeader: {

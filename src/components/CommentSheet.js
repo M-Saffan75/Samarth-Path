@@ -1,89 +1,84 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
     View, Text, Image, FlatList, TextInput,
-    TouchableOpacity, KeyboardAvoidingView,
-    Platform, StyleSheet, Animated, PanResponder,
+    TouchableOpacity,
+    StyleSheet, Animated, PanResponder,
     Dimensions, Modal, TouchableWithoutFeedback,
     ActivityIndicator,
     Keyboard,
 } from 'react-native';
-import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
-import { globalImages } from '../assets/images/images_file/All_Images';
-import { COLOURS } from '../assets/theme/Theme';
-import { Fonts } from '../assets/fonts/Fonts';
 import { FadeUp } from './FadeUp';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { deleteComment, fetchComments, postComment } from '../user/screens/home/homebackend/HomeBackend';
-import { useUser } from '../user/screens/auth/user_context/UserContext';
+import { Fonts } from '../assets/fonts/Fonts';
+import { COLOURS } from '../assets/theme/Theme';
+import { timeAgo, getInitials, avatarColors } from '../components/TimeAgo';
 import { useTheme } from '../assets/themecontext/ThemeContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { globalImages } from '../assets/images/images_file/All_Images';
+import { useUser } from '../user/screens/auth/user_context/UserContext';
+import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
+import { deleteComment, fetchComments, postComment } from '../user/screens/home/homebackend/HomeBackend';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const SHEET_HEIGHT = SCREEN_HEIGHT * 0.80;
 const MAX_SHEET_TOP = SCREEN_HEIGHT * 0.15;
 
-const avatarColors = [
-    { bg: '#FFF3EB', text: '#E8935C' },
-    { bg: '#EAF3DE', text: '#3B6D11' },
-    { bg: '#E6F1FB', text: '#185FA5' },
-    { bg: '#FBEAF0', text: '#993556' },
-    { bg: '#EEEDFE', text: '#534AB7' },
-];
-
-// Name se 2 initials nikalo
-const getInitials = (name = '') => {
-    const words = name.trim().split(' ');
-    if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
-    return name.slice(0, 2).toUpperCase();
-};
 
 // ─── Comment Row ───────────────────────────────────────────────────────────
 
 const CommentRow = ({ item, index, currentUserId, onDelete }) => {
-    const { theme: COLOURS, isDark } = useTheme();
+
+    const { theme: COLOURS } = useTheme();
     const color = avatarColors[index % avatarColors.length];
     const isOwner = item.userId?._id === currentUserId;
     const isTemp = item._id?.startsWith('temp_');
+
     const content = (
         <View style={styles.commentRow}>
+
             {/* Avatar */}
             <View style={[styles.avatar, { backgroundColor: color.bg }]}>
-                <Text style={[styles.avatarText, { color: color.text }]}>
-                    {getInitials(item.userId?.name || item.user || 'U')}
-                </Text>
+                {!item.userId?.profilePicture ?
+                    <Text style={[styles.avatarText, { color: color.text }]}>
+                        {getInitials(item.userId?.name || item.user || 'U',)}
+                    </Text> :
+                    <Image source={{ uri: item?.userId?.profilePicture }} style={styles.avatar} />}
             </View>
 
             {/* Content */}
+
             <View style={styles.commentContent}>
-                <View style={[styles.commentBubble,{backgroundColor: COLOURS.light_primary,}]}>
+                <View style={[styles.commentBubble, { backgroundColor: COLOURS.light_primary, }]}>
                     <Text style={[styles.commentUser, { color: COLOURS.black, }]}>
-                        {item.userId?.name || item.user || 'User'}
+                        {item?.userId?.name || item.user || 'User'}
                     </Text>
-                    <Text style={[styles.commentText, { color: COLOURS.light_black, }]}>{item.text}</Text>
+                    <Text style={[styles.commentText, { color: COLOURS.light_black, }]}>{item?.text}</Text>
                 </View>
-                <Text style={[styles.commentTime, { color: COLOURS.grey, }]}>{item.time || item.createdAt || ''}</Text>
+                <Text style={[styles.commentTime, { color: COLOURS.grey, }]}> {timeAgo(item?.createdAt)}</Text>
             </View>
 
             {/* Delete — sirf apne comment pe */}
-            {isOwner && (
-                <TouchableOpacity
-                    onPress={() => onDelete(item._id || item.id)}
-                    activeOpacity={0.7}
-                    style={{
-                        top: responsiveWidth(4), backgroundColor: COLOURS.primary,
-                        height: responsiveWidth(7),
-                        width: responsiveWidth(7),
-                        borderRadius: responsiveWidth(100),
-                        justifyContent: 'center', alignItems: 'center'
-                    }}
-                >
-                    <Image
-                        source={globalImages.trash}
-                        style={{ width: responsiveWidth(4), height: responsiveWidth(4) }}
-                        tintColor={COLOURS.white}
-                    />
-                </TouchableOpacity>
-            )}
-        </View>
+            {
+                isOwner && (
+                    <TouchableOpacity
+                        onPress={() => onDelete(item._id || item.id)}
+                        activeOpacity={0.7}
+                        style={{
+                            top: responsiveWidth(4), backgroundColor: COLOURS.primary,
+                            height: responsiveWidth(7),
+                            width: responsiveWidth(7),
+                            borderRadius: responsiveWidth(100),
+                            justifyContent: 'center', alignItems: 'center'
+                        }}
+                    >
+                        <Image
+                            source={globalImages.trash}
+                            style={{ width: responsiveWidth(4), height: responsiveWidth(4) }}
+                            tintColor={COLOURS.white}
+                        />
+                    </TouchableOpacity>
+                )
+            }
+        </View >
     );
     return isTemp ? <FadeUp>{content}</FadeUp> : content;
 };
@@ -151,7 +146,9 @@ const CommentSheet = ({ isOpen, onClose, postId, onCommentAdded, onCommentDelete
                 toValue: SHEET_HEIGHT,
                 duration: 300,
                 useNativeDriver: true,
-            }).start();
+
+            }).start()
+
         }
     }, [isOpen]);
 
@@ -177,6 +174,7 @@ const CommentSheet = ({ isOpen, onClose, postId, onCommentAdded, onCommentDelete
         if (!comment.trim() || posting) return;
         const text = comment.trim();
         setComment(''); // ← pehle clear
+        requestAnimationFrame(() => { inputRef.current?.focus(); });
         inputRef.current?.focus();
         setPosting(true);
 
@@ -184,8 +182,12 @@ const CommentSheet = ({ isOpen, onClose, postId, onCommentAdded, onCommentDelete
         const tempComment = {
             _id: tempId,
             text,
-            userId: { _id: currentUserId, name: userData?.name || '' },
-            createdAt: 'Just now',
+            userId: {
+                _id: currentUserId,
+                name: userData?.name || currentUserName || '',
+                profilePicture: userData?.profilePicture || null,  // ← yahi missing tha
+            },
+            createdAt: new Date().toISOString()
         };
         setComments(prev => [tempComment, ...prev]);
 
@@ -280,6 +282,7 @@ const CommentSheet = ({ isOpen, onClose, postId, onCommentAdded, onCommentDelete
                     />
                 ) : (
                     <FlatList data={comments} keyExtractor={(item) => (item._id || item.id).toString()}
+                        keyboardShouldPersistTaps="handled"
                         renderItem={({ item, index }) => (
                             <CommentRow
                                 item={item}
@@ -314,12 +317,17 @@ const CommentSheet = ({ isOpen, onClose, postId, onCommentAdded, onCommentDelete
                             borderTopColor: COLOURS.light_grey,
                             backgroundColor: COLOURS.white,
                         }]}>
-                            <View style={[styles.avatar, { backgroundColor: '#FFF3EB' }]}>
-                                <Text style={[styles.avatarText, { color: COLOURS.primary }]}>ME</Text>
-                            </View>
+
+                            {userData?.profilePicture ?
+                                <Image source={{ uri: userData.profilePicture }} style={styles.avatar} /> :
+                                <View style={[styles.avatar, { backgroundColor: '#FFF3EB' }]}>
+                                    <Text style={[styles.avatarText, { color: COLOURS.primary }]}>ME</Text>
+                                </View>}
+
                             <TextInput
+                                blurOnSubmit={false}
                                 ref={inputRef}
-                                style={[styles.input,{color: COLOURS.black,backgroundColor:COLOURS.light_primary}]}
+                                style={[styles.input, { color: COLOURS.black, backgroundColor: COLOURS.light_primary }]}
                                 placeholder="Write a comment..."
                                 placeholderTextColor={COLOURS.grey}
                                 value={comment}
@@ -410,14 +418,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         flexShrink: 0,
+        borderWidth: responsiveWidth(.3),
+        borderColor: COLOURS.primary
     },
     avatarText: {
         fontSize: responsiveFontSize(1.4),
         fontFamily: Fonts.Medium,
+        top: responsiveWidth(.4),
     },
     commentContent: {
         flex: 1,
     },
+
     commentBubble: {
         borderRadius: responsiveWidth(3),
         paddingHorizontal: responsiveWidth(3),

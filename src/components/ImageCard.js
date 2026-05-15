@@ -8,26 +8,39 @@ import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dim
 
 import { FadeDown } from './FadeDown';
 import CommentSheet from './CommentSheet';
+import UserRoutes from '../user/user_routes/UserRoutes';
 
-const ImageCard = ({ item, onPress, onUnbookmark }) => {
+const ImageCard = ({ item, onPress, onUnbookmark, navigation }) => {
 
     const { theme: COLOURS } = useTheme();
     const [showComments, setShowComments] = useState(false);
+
     const [commentsCount, setCommentsCount] = useState(item?.commentsCount);
+
     useEffect(() => {
         setCommentsCount(item?.commentsCount);
-    }, [item?.commentsCount]);
+    }, [item?.commentsCount]); // ← item change hone pe update
 
 
     return (
         <FadeDown>
             {
                 item?.image ? (
-                    <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={{
-                        backgroundColor: COLOURS.light_primary, paddingHorizontal: responsiveWidth(2), paddingTop: responsiveWidth(4),
-                        paddingVertical: responsiveWidth(1), borderRadius: responsiveWidth(4), marginHorizontal: responsiveWidth(4),
-                        marginTop: responsiveWidth(3), paddingBottom: responsiveWidth(4),
-                    }}>
+                    <TouchableOpacity activeOpacity={0.9}
+                        onPress={
+                            onPress
+                                ? () => onPress(item, onUnbookmark)
+                                : () => {
+                                    navigation.navigate(UserRoutes.Content_Detail, {
+                                        item,
+                                        onUnbookmark,
+                                    });
+                                }
+                        } style={{
+                            backgroundColor: COLOURS.light_primary, paddingHorizontal: responsiveWidth(2), paddingTop: responsiveWidth(4),
+                            paddingVertical: responsiveWidth(1), borderRadius: responsiveWidth(4), marginHorizontal: responsiveWidth(4),
+                            marginTop: responsiveWidth(3), paddingBottom: responsiveWidth(4),
+                        }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: responsiveWidth(2), }}>
 
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -37,7 +50,7 @@ const ImageCard = ({ item, onPress, onUnbookmark }) => {
                                     paddingLeft: responsiveWidth(1),
                                     textTransform: 'uppercase', fontFamily: 'Poppins-Medium',
                                     top: responsiveWidth(.5), color: COLOURS.primary
-                                }}>{item?.schedule}</Text>
+                                }}>{item?.schedule ?? 'MORNING TEXT'}</Text>
                             </View>
 
                             <View>
@@ -52,10 +65,10 @@ const ImageCard = ({ item, onPress, onUnbookmark }) => {
 
                         <View>
 
-                            <Image source={{ uri: item?.image }} style={{
+                            {/* <Image source={{ uri: item?.image }} style={{
                                 height: responsiveWidth(50), width: responsiveWidth(83),
                                 borderRadius: responsiveWidth(4), marginTop: responsiveWidth(5), alignSelf: 'center'
-                            }} />
+                            }} /> */}
 
                             <Text numberOfLines={1} ellipsizeMode='tail' style={{
                                 paddingLeft: responsiveWidth(4), marginTop: responsiveWidth(3),
@@ -63,7 +76,7 @@ const ImageCard = ({ item, onPress, onUnbookmark }) => {
                                 top: responsiveWidth(.5), color: COLOURS.black, fontSize: responsiveFontSize(2)
                             }}>{item?.title}</Text>
 
-                            <Text numberOfLines={5} ellipsizeMode='tail' style={{
+                            <Text numberOfLines={7} ellipsizeMode='tail' style={{
                                 paddingLeft: responsiveWidth(4), marginTop: responsiveWidth(2),
                                 textTransform: 'capitalize', fontFamily: 'Poppins-Medium',
                                 top: responsiveWidth(.5), color: COLOURS.grey, fontSize: responsiveFontSize(1.7)

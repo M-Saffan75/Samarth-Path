@@ -4,7 +4,6 @@ import Quiz_Here from './Quiz_Here';
 import Videos_Here from './Videos_Here';
 import Header from '../../../components/Header';
 import { ZoomIn } from '../../../components/ZoomIn';
-import { COLOURS } from '../../../assets/theme/Theme';
 import Select_Text from '../../../components/Select_Text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { responsiveWidth } from 'react-native-responsive-dimensions';
@@ -12,7 +11,7 @@ import { useTheme } from '../../../assets/themecontext/ThemeContext';
 import { ScrollView, StatusBar, StyleSheet, View, Dimensions } from 'react-native';
 
 
-const My_Path = () => {
+const My_Path = ({ navigation }) => {
 
     const { theme: COLOURS, isDark } = useTheme();
     const { width } = Dimensions.get('window');
@@ -77,10 +76,10 @@ const My_Path = () => {
                             const index = Math.round(e.nativeEvent.contentOffset.x / width);
                             setActiveTab(tabs[index]);
                         }}
-                        style={{ flex: 1, paddingBottom:responsiveWidth(10) }}
+                        style={{ flex: 1, paddingBottom: responsiveWidth(10) }}
                     >
-                        <View style={{ width }}><Text_Here /></View>
-                        <View style={{ width }}><Videos_Here /></View>
+                        <View style={{ width }}><Text_Here navigation={navigation} /></View>
+                        <View style={{ width }}><Videos_Here navigation={navigation} /></View>
                     </ScrollView>
                 </View>
             </SafeAreaView>

@@ -96,6 +96,7 @@ const Videos_Here = ({ navigation }) => {
       renderItem={({ item }) => (
         <FadeUp>
           <VideoCard
+            navigation={navigation}
             item={item}
             activeVideoId={activeVideoId}
             setActiveVideoId={setActiveVideoId}

@@ -7,14 +7,14 @@ import { useTheme } from '../assets/themecontext/ThemeContext';
 
 export const ToastConfig = () => {
   const { theme: COLOURS } = useTheme();
-
+// 7428730894
   return {
     success: (props) => (
       <BaseToast
         {...props}
         style={{
           borderLeftColor: '#4CAF50',
-          backgroundColor: COLOURS.primary,
+          backgroundColor: COLOURS.light_primary,
         }}
         text1Style={{
           fontSize: responsiveFontSize(1.6),
@@ -29,7 +29,7 @@ export const ToastConfig = () => {
         {...props}
         style={{
           borderLeftColor: '#F44336',
-          backgroundColor: COLOURS.primary,
+          backgroundColor: COLOURS.light_primary,
         }}
         text1Style={{
           fontSize: responsiveFontSize(1.6),

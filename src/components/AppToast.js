@@ -24,7 +24,7 @@ export const AppToast = () => {
                 {...props}
                 style={{
                     borderLeftColor: COLOURS.green,
-                    backgroundColor: COLOURS.primary,
+                    backgroundColor: COLOURS.light_primary,
                     borderRadius: responsiveWidth(3),
                     width: '90%',
                 }}
@@ -46,7 +46,7 @@ export const AppToast = () => {
                 {...props}
                 style={{
                     borderLeftColor: COLOURS.red,
-                    backgroundColor: COLOURS.primary,
+                    backgroundColor: COLOURS.light_primary,
                     borderRadius: responsiveWidth(3),
                     width: '90%',
                 }}
@@ -68,7 +68,7 @@ export const AppToast = () => {
                 {...props}
                 style={{
                     borderLeftColor: COLOURS.primary,
-                    backgroundColor: COLOURS.primary,
+                    backgroundColor: COLOURS.light_primary,
                     borderRadius: responsiveWidth(3),
                     width: '90%',
                 }}

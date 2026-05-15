@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { COLOURS } from '../../../assets/theme/Theme';
 import { globalImages } from '../../../assets/images/images_file/All_Images';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 import { ImageBackground, StyleSheet, Text, View, StatusBar, TouchableOpacity } from 'react-native';
@@ -8,11 +7,11 @@ import Button from '../../../components/Button';
 import UserRoutes from '../../user_routes/UserRoutes';
 import Title_Here from '../../../components/Title_Here';
 import Back_Arrow from '../../../components/Back_Arrow';
+import Wait_Modal from '../../../components/Wait_Modal';
 import Input_Field from '../../../components/Input_Field';
+import { useLoader } from '../../../loading/LoaderContext';
 import Number_Select from '../../../components/Number_Select';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Wait_Modal from '../../../components/Wait_Modal';
-import { useLoader } from '../../../loading/LoaderContext';
 import { showError, showSuccess } from '../../../helper/Helper';
 import { useTheme } from '../../../assets/themecontext/ThemeContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,10 +19,10 @@ import { getUserMe, loginUser, resendOtp } from './auth_backend/Auth_Backend';
 
 
 import { useUser } from './user_context/UserContext';
-import { FadeDown } from '../../../components/FadeDown';
 import { FadeUp } from '../../../components/FadeUp';
 import { FadeIn } from '../../../components/FadeIn';
 import { FadeLeft } from '../../../components/FadeLeft';
+import { FadeDown } from '../../../components/FadeDown';
 import { FadeRight } from '../../../components/FadeRight';
 
 const Login = ({ navigation }) => {
@@ -33,13 +32,14 @@ const Login = ({ navigation }) => {
     const { updateUser } = useUser();
     const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
+    const [formattedPhone, setFormattedPhone] = useState('+91');
     const [rateLimitModal, setRateLimitModal] = useState(false);
     const [rateLimitMessage, setRateLimitMessage] = useState('');
 
     const handleLogin = () => {
         // Name
-        if (!phone.trim()) {
-            showError('Phone Number is required');
+        if (!phone.trim() || phone.length < 10) {
+            showError('Please enter a valid phone number');
             return;
         }
         // Password
@@ -53,7 +53,7 @@ const Login = ({ navigation }) => {
     const handleApiCall = async () => {
         try {
             setLoading(true);
-            const data = await loginUser({ phone, password });
+            const data = await loginUser({ phone: formattedPhone, password });
             const user = await getUserMe(data?.data?.token);
             updateUser(user);
             await AsyncStorage.setItem('token', data?.data?.token);
@@ -98,13 +98,13 @@ const Login = ({ navigation }) => {
     const handleUnverifiedUser = async () => {
         try {
             setLoading(true);
-            await resendOtp({ phone });
+            await resendOtp({ phone: formattedPhone });
             showSuccess('OTP sent successfully');
             navigation.reset({
                 index: 0,
                 routes: [{
                     name: UserRoutes.Verify_Email,
-                    params: { phone },
+                    params: { phone: formattedPhone },
                 }],
             });
         } catch (resendError) {
@@ -160,7 +160,8 @@ const Login = ({ navigation }) => {
                                 <Title_Here title={'mobile number'} color={COLOURS.black} marginBottom={responsiveWidth(3)} />
                             </FadeLeft>
                             <FadeIn delay={300}>
-                                <Number_Select value={phone} onChangeText={setPhone} />
+                                <Number_Select value={phone} onChangeText={setPhone} onChangeFormatted={setFormattedPhone}
+                                    placeholder={'Phone without country code'} />
                             </FadeIn>
 
                             <FadeLeft>
@@ -199,9 +200,7 @@ const Login = ({ navigation }) => {
                             <FadeIn delay={500}>
                                 <View style={styles.dont_accnt}>
                                     <Text style={[styles.dont_text_1, { color: COLOURS.black }]}>Don't have an account ?</Text>
-                                    <TouchableOpacity activeOpacity={0.6}
-                                        onPress={() => navigation.replace(UserRoutes.Register)}
-                                    >
+                                    <TouchableOpacity activeOpacity={0.6} onPress={() => navigation.replace(UserRoutes.Register)}>
                                         <Text style={[styles.dont_text_2, { color: COLOURS.primary }]}> sign up</Text>
                                     </TouchableOpacity>
                                 </View>

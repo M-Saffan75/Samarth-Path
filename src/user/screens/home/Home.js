@@ -20,6 +20,8 @@ import { showToast } from '../../../components/AppToast';
 import { useLoader } from '../../../loading/LoaderContext';
 import { useFocusEffect } from '@react-navigation/native';
 import { getUserFCMToken } from '../../../notifications/FCM_Send';
+import FloatingActionButton from '../../floatbutton/FloatingActionButton';
+import { globalImages } from '../../../assets/images/images_file/All_Images';
 
 const Home = ({ navigation }) => {
 
@@ -51,7 +53,7 @@ const Home = ({ navigation }) => {
             // Image/Text
             image: item?.textContent?.image || null,
             label: item?.textContent?.label || null,
-            
+
             // Common
             schedule: item?.videoContent?.title || item?.textContent?.title || item?.quizContent?.title || '',
             title: item?.videoContent?.title || item?.textContent?.title || item?.quizContent?.title || '',
@@ -118,17 +120,18 @@ const Home = ({ navigation }) => {
     try {
       const res = await fetchTodayContent();
       if (res?.success && res?.data?.length > 0) {
-        const items = res.data[0]?.content || []; // ← fallback
-        if (!items?.length) return; // ← empty toh return
-        setContentList(prev => prev.map(card => {
-          const fresh = items?.find(i => i._id === card.id);
-          if (!fresh) return card;
-          return {
-            ...card,
-            likesCount: fresh.likesCount || card.likesCount,
-            commentsCount: fresh.commentsCount || card.commentsCount,
-          };
-        }));
+        setContentList(prev => {
+          if (!prev.length) return prev; // nothing to update yet
+          return prev.map(card => {
+            const fresh = res.data.find(i => i._id === card.id);
+            if (!fresh) return card;
+            return {
+              ...card,
+              likesCount: fresh.likesCount ?? card.likesCount,
+              commentsCount: fresh.commentsCount ?? card.commentsCount,
+            };
+          });
+        });
       }
     } catch (e) {
       console.log('Count refresh error:', e);
@@ -176,8 +179,9 @@ const Home = ({ navigation }) => {
                 removeClippedSubviews={true}
                 contentContainerStyle={{ paddingBottom: responsiveWidth(5) }}
                 renderItem={({ item }) => {
-                  if (item?.type === 'video') return <VideoCard item={item} activeVideoId={activeVideoId} setActiveVideoId={setActiveVideoId} />;
-                  if (item?.type === 'image') return <ImageCard item={item} />;
+                  if (item?.type === 'video') return <VideoCard navigation={navigation} item={item}
+                    activeVideoId={activeVideoId} setActiveVideoId={setActiveVideoId} />;
+                  if (item?.type === 'image') return <ImageCard navigation={navigation} item={item} />;
                   if (item?.type === 'quiz') return <QuizCard item={item} navigation={navigation} />;
                   return null;
                 }}
@@ -192,7 +196,9 @@ const Home = ({ navigation }) => {
             )}
           </View>
 
-
+          <FloatingActionButton
+            image={globalImages.consultation_icon} // apni image ka naam
+          />
 
           <View style={{ marginBottom: responsiveWidth(12) }} />
 

@@ -31,7 +31,9 @@ const Register = ({ navigation }) => {
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
+
     const [password, setPassword] = useState('');
+    const [formattedPhone, setFormattedPhone] = useState('+91');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [rateLimitModal, setRateLimitModal] = useState(false);
     const [rateLimitMessage, setRateLimitMessage] = useState('');
@@ -52,7 +54,7 @@ const Register = ({ navigation }) => {
 
     const handleRegister = () => {
         // Name
-        if (!phone) {
+        if (!phone.trim() || phone.length < 10) {
             showError('Phone number is required');
             return;
         }
@@ -93,11 +95,9 @@ const Register = ({ navigation }) => {
     };
 
     const handleApiCall = async () => {
-        // console.log(name, phone, email, password)
-        // return
         try {
             setLoading(true);
-            const data = await registerUser({ name, phone, email, password });
+            const data = await registerUser({ name, phone: formattedPhone, email, password });
             navigation.replace(UserRoutes.Verify_Email, {
                 phone: data?.data?.phone,
             });
@@ -106,7 +106,7 @@ const Register = ({ navigation }) => {
             if (error.code === 408) {
                 try {
                     setLoading(true);
-                    const resendData = await resendOtp({ phone });
+                    const resendData = await resendOtp({ phone: formattedPhone, });
                     showSuccess(resendData?.message || 'OTP sent successfully');
                     navigation.replace(UserRoutes.Verify_Email, {
                         phone: data?.data?.phone,
@@ -176,7 +176,9 @@ const Register = ({ navigation }) => {
                                     <Title_Here title={'mobile number'} color={COLOURS.black} />
                                 </FadeLeft>
                                 <FadeIn delay={200}>
-                                    <Number_Select value={phone} onChangeText={setPhone} />
+                                    <Number_Select value={phone} onChangeText={setPhone} onChangeFormatted={setFormattedPhone}
+                                        placeholder={'Phone without country code'}
+                                    />
                                 </FadeIn>
 
                                 <FadeLeft>
@@ -191,6 +193,7 @@ const Register = ({ navigation }) => {
                                         tintColor={COLOURS.grey}
                                         value={name}
                                         onChangeText={setName}
+                                        onChangeFormatted={setFormattedPhone}
                                     />
                                 </FadeIn>
                                 <FadeLeft>

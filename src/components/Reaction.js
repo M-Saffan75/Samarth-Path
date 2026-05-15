@@ -16,6 +16,7 @@ const Reaction = ({
     contentId,
     isLiked: initialLiked,
     isHeart,
+    
     isBookmark,
     onUnbookmark,
     initialBookmarked
@@ -35,7 +36,10 @@ const Reaction = ({
                         : <Image source={globalImages.heart} style={{ width: responsiveWidth(6), height: responsiveWidth(6) }} tintColor={COLOURS.grey} />
                 }
 
-                <Text style={{ marginLeft: responsiveWidth(1), fontSize: responsiveFontSize(1.6), color: isLiked ? COLOURS.primary : COLOURS.grey }}>
+                <Text style={{
+                    marginLeft: responsiveWidth(1), fontSize: responsiveFontSize(1.6),
+                    color: isLiked ? COLOURS.primary : COLOURS.grey,/*  width: responsiveWidth(10) */
+                }}>
                     {likeCount}
                 </Text>
             </TouchableOpacity>

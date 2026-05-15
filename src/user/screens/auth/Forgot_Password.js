@@ -22,11 +22,11 @@ const Forgot_Password = ({ navigation }) => {
     const { theme: COLOURS, isDark } = useTheme();
     const { setLoading } = useLoader();
     const [phone, setPhone] = useState('');
-
+    const [formattedPhone, setFormattedPhone] = useState('+91');
 
     const handleForgotPassword = () => {
-        if (!phone.trim()) {
-            showError('Phone is required');
+        if (!phone.trim() || phone.length < 10) {
+            showError('Please enter a valid phone number');
             return;
         }
         handleApiCall();
@@ -35,10 +35,10 @@ const Forgot_Password = ({ navigation }) => {
     const handleApiCall = async () => {
         try {
             setLoading(true);
-            const data = await forgotPassword({ phone });
+            const data = await forgotPassword({ phone: formattedPhone });
             showSuccess(data?.message || 'OTP sent successfully!');
             setLoading(false)
-            navigation.navigate(UserRoutes.Otp_Here, { phone });
+            navigation.navigate(UserRoutes.Otp_Here, { phone: formattedPhone });
         } catch (error) {
             showError(error.message || 'Something went wrong. Try again!');
         } finally {
@@ -69,7 +69,7 @@ const Forgot_Password = ({ navigation }) => {
                             />
 
                             <Title_Here title={'mobile number'} color={COLOURS.black} marginBottom={responsiveWidth(4)} />
-                            <Number_Select value={phone} onChangeText={setPhone} />
+                            <Number_Select value={phone} onChangeText={setPhone} onChangeFormatted={setFormattedPhone} placeholder={'Phone without country code'}/>
 
                             <View style={styles.btn_area}>
                                 <Button label={'send otp'} onPress={handleForgotPassword}

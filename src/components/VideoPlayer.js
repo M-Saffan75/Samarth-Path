@@ -3,11 +3,13 @@ import Video from 'react-native-video'
 import { COLOURS } from '../assets/theme/Theme'
 import Slider from '@react-native-community/slider'
 import React, { useRef, useState, useEffect } from 'react'
+import Orientation from 'react-native-orientation-locker'
 import { globalImages } from '../assets/images/images_file/All_Images';
-import { View, TouchableOpacity, StyleSheet, Text, Image } from 'react-native'
+import { View, TouchableOpacity, StyleSheet, Text, Image, Modal, StatusBar } from 'react-native'
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions'
 
 const formatTime = (seconds) => {
+    if (!seconds || isNaN(seconds)) return '0:00'
     const m = Math.floor(seconds / 60)
     const s = Math.floor(seconds % 60)
     return `${m}:${s < 10 ? '0' : ''}${s}`
@@ -16,54 +18,49 @@ const formatTime = (seconds) => {
 const VideoPlayer = ({ uri, videoId, activeVideoId, setActiveVideoId, style }) => {
 
     const videoRef = useRef(null)
+    const fullscreenVideoRef = useRef(null)
     const paused = activeVideoId !== videoId
+
     const [muted, setMuted] = useState(false)
     const [duration, setDuration] = useState(0)
     const [currentTime, setCurrentTime] = useState(0)
     const [seeking, setSeeking] = useState(false)
-    const [showControls, setShowControls] = useState(true) // ✅ add karo
-    const hideTimeout = useRef(null) // ✅ add karo
+    const [showControls, setShowControls] = useState(true)
+    const [isFullscreen, setIsFullscreen] = useState(false)
+    const hideTimeout = useRef(null)
 
-    // ✅ Controls auto hide
     const resetHideTimer = () => {
         if (hideTimeout.current) clearTimeout(hideTimeout.current)
         setShowControls(true)
-        hideTimeout.current = setTimeout(() => {
-            setShowControls(false)
-        }, 3000) // 3 second baad hide
+        hideTimeout.current = setTimeout(() => setShowControls(false), 3000)
     }
 
-    // ✅ Jab video play ho to timer shuru karo
     useEffect(() => {
         if (!paused) {
             resetHideTimer()
         } else {
             if (hideTimeout.current) clearTimeout(hideTimeout.current)
-            setShowControls(true) // paused ho to hamesha show
+            setShowControls(true)
         }
-        return () => {
-            if (hideTimeout.current) clearTimeout(hideTimeout.current)
-        }
+        return () => { if (hideTimeout.current) clearTimeout(hideTimeout.current) }
     }, [paused])
 
     useEffect(() => {
         return () => {
             if (hideTimeout.current) clearTimeout(hideTimeout.current)
-            if (videoRef.current) videoRef.current = null
+            // fullscreen se bahar niklo agar screen unmount ho
+            if (isFullscreen) exitFullscreen()
         }
     }, [])
 
     const togglePlay = () => {
-        if (paused) {
-            setActiveVideoId(videoId)
-        } else {
-            setActiveVideoId(null)
-        }
+        setActiveVideoId(paused ? videoId : null)
+        resetHideTimer()
     }
 
     const toggleMute = () => {
         setMuted(prev => !prev)
-        resetHideTimer() // ✅ mute press karne par timer reset
+        resetHideTimer()
     }
 
     const onLoad = (data) => setDuration(data.duration)
@@ -76,88 +73,183 @@ const VideoPlayer = ({ uri, videoId, activeVideoId, setActiveVideoId, style }) =
         setActiveVideoId(null)
         setCurrentTime(0)
         videoRef.current?.seek(0)
+        fullscreenVideoRef.current?.seek(0)
     }
 
     const onSliderChange = (value) => {
         setSeeking(true)
         setCurrentTime(value)
-        resetHideTimer() // ✅ slider use karne par timer reset
+        resetHideTimer()
     }
 
     const onSliderComplete = (value) => {
         videoRef.current?.seek(value)
+        fullscreenVideoRef.current?.seek(value)
         setSeeking(false)
         resetHideTimer()
     }
 
-    return (
-        <View style={[styles.wrapper, style]}>
-            <Video
-                ref={videoRef}
-                source={{ uri }}
-                style={styles.video}
-                paused={paused}
-                muted={muted}
-                resizeMode="cover"
-                onLoad={onLoad}
-                onProgress={onProgress}
-                onEnd={onEnd}
-                playInBackground={false}
-                playWhenInactive={false}
-                ignoreSilentSwitch="obey"
-                maxBitRate={2000000}
-                progressUpdateInterval={500} 
-                reportBandwidth={false}
-            />
+    const openFullscreen = () => {
+        setIsFullscreen(true)
+        Orientation.lockToLandscape()
+        resetHideTimer()
+        // video play karo fullscreen mein bhi
+        if (paused) setActiveVideoId(videoId)
+    }
 
-            {/* ✅ Touch anywhere on video to show/hide controls */}
-            <TouchableOpacity
-                style={StyleSheet.absoluteFillObject}
-                activeOpacity={1}
-                onPress={() => {
-                    if (showControls) {
-                        setShowControls(false)
-                        if (hideTimeout.current) clearTimeout(hideTimeout.current)
-                    } else {
-                        resetHideTimer()
-                        if (paused) togglePlay()
-                    }
-                }}
-            />
+    const exitFullscreen = () => {
+        setIsFullscreen(false)
+        Orientation.lockToPortrait()
+        // sync position
+        if (fullscreenVideoRef.current) {
+            fullscreenVideoRef.current?.seek(currentTime)
+        }
+    }
 
-            {/* Controls — sirf showControls true ho tab dikhao */}
-            {showControls && (
-                <View style={styles.controls} pointerEvents="box-none">
+    // ---- Shared Controls UI ----
+    const renderControls = (isFS) => (
+        <View style={[styles.controls, isFS && styles.controls_fs]} pointerEvents="box-none">
 
-                    <View style={styles.top_row}>
-                        <TouchableOpacity onPress={toggleMute} style={styles.icon_btn}>
-                            <Image source={muted ? globalImages.mute : globalImages.volume} style={styles.icon_img} tintColor={COLOURS.white} />
-                        </TouchableOpacity>
-                    </View>
+            {/* Top row: mute + minimize/maximize */}
+            <View style={styles.top_row}>
+                <TouchableOpacity onPress={toggleMute} style={styles.icon_btn}>
+                    <Image
+                        source={muted ? globalImages.mute : globalImages.volume}
+                        style={styles.icon_img}
+                        tintColor={COLOURS.white}
+                    />
+                </TouchableOpacity>
 
-                    <TouchableOpacity onPress={togglePlay} style={styles.center_btn}>
-                        <Image source={paused ? globalImages.play : globalImages.pause} style={styles.icon_pause} tintColor={COLOURS.white} />
-                    </TouchableOpacity>
+                {/* <TouchableOpacity
+                    onPress={isFS ? exitFullscreen : openFullscreen}
+                    style={styles.icon_btn}
+                >
+                    <Image
+                        source={isFS ? globalImages.minimize_icon : globalImages.maximize_icon}
+                        style={styles.icon_img}
+                        tintColor={COLOURS.white}
+                    />
+                </TouchableOpacity> */}
+            </View>
 
-                    <View style={styles.bottom_row}>
-                        <Text style={styles.time}>{formatTime(currentTime)}</Text>
-                        <Slider
-                            style={styles.slider}
-                            minimumValue={0}
-                            maximumValue={duration}
-                            value={currentTime}
-                            onValueChange={onSliderChange}
-                            onSlidingComplete={onSliderComplete}
-                            minimumTrackTintColor={COLOURS.primary}
-                            maximumTrackTintColor={COLOURS.light_grey}
-                            thumbTintColor={COLOURS.primary}
-                        />
-                        <Text style={styles.time}>{formatTime(duration)}</Text>
-                    </View>
+            {/* Center: play/pause */}
+            <TouchableOpacity onPress={togglePlay} style={styles.center_btn} activeOpacity={0.8}>
+                <Image
+                    source={paused ? globalImages.play : globalImages.pause}
+                    style={styles.icon_pause}
+                    tintColor={COLOURS.white}
+                />
+            </TouchableOpacity>
 
-                </View>
-            )}
+            {/* Bottom: time + slider */}
+            <View style={styles.bottom_row}>
+                <Text style={styles.time}>{formatTime(currentTime)}</Text>
+                <Slider
+                    style={styles.slider}
+                    minimumValue={0}
+                    maximumValue={duration || 1}
+                    value={currentTime}
+                    onValueChange={onSliderChange}
+                    onSlidingComplete={onSliderComplete}
+                    minimumTrackTintColor={COLOURS.primary}
+                    maximumTrackTintColor={COLOURS.light_grey}
+                    thumbTintColor={COLOURS.primary}
+                />
+                <Text style={styles.time}>{formatTime(duration)}</Text>
+            </View>
+
         </View>
+    )
+
+    return (
+        <>
+            {/* ---- Normal (inline) player ---- */}
+            <View style={[styles.wrapper, style]}>
+                <Video
+                    ref={videoRef}
+                    source={{ uri }}
+                    style={styles.video}
+                    paused={isFullscreen ? true : paused} // fullscreen open ho tw inline ruk jaye
+                    muted={muted}
+                    resizeMode="cover"
+                    onLoad={onLoad}
+                    onProgress={onProgress}
+                    onEnd={onEnd}
+                    playInBackground={false}
+                    playWhenInactive={false}
+                    ignoreSilentSwitch="obey"
+                    maxBitRate={2000000}
+                    progressUpdateInterval={500}
+                    reportBandwidth={false}
+                />
+
+                {/* Tap to show/hide controls */}
+                <TouchableOpacity
+                    style={StyleSheet.absoluteFillObject}
+                    activeOpacity={1}
+                    onPress={() => {
+                        if (showControls) {
+                            setShowControls(false)
+                            if (hideTimeout.current) clearTimeout(hideTimeout.current)
+                        } else {
+                            resetHideTimer()
+                        }
+                    }}
+                />
+
+                {showControls && renderControls(false)}
+            </View>
+
+            {/* ---- Fullscreen Modal ---- */}
+            <Modal
+                visible={isFullscreen}
+                animationType="fade"
+                supportedOrientations={['landscape']}
+                onRequestClose={exitFullscreen}
+                statusBarTranslucent
+            >
+                <StatusBar hidden />
+                <View style={styles.fs_container}>
+                    <Video
+                        ref={fullscreenVideoRef}
+                        source={{ uri }}
+                        style={StyleSheet.absoluteFillObject}
+                        paused={paused}
+                        muted={muted}
+                        resizeMode="contain"
+                        onLoad={(data) => {
+                            setDuration(data.duration)
+                            // inline ki current position se shuru karo
+                            fullscreenVideoRef.current?.seek(currentTime)
+                        }}
+                        onProgress={onProgress}
+                        onEnd={onEnd}
+                        playInBackground={false}
+                        playWhenInactive={false}
+                        ignoreSilentSwitch="obey"
+                        maxBitRate={2000000}
+                        progressUpdateInterval={500}
+                        reportBandwidth={false}
+                    />
+
+                    {/* Tap to toggle controls in fullscreen */}
+                    <TouchableOpacity
+                        style={StyleSheet.absoluteFillObject}
+                        activeOpacity={1}
+                        onPress={() => {
+                            if (showControls) {
+                                setShowControls(false)
+                                if (hideTimeout.current) clearTimeout(hideTimeout.current)
+                            } else {
+                                resetHideTimer()
+                            }
+                        }}
+                    />
+
+                    {showControls && renderControls(true)}
+                </View>
+            </Modal>
+        </>
     )
 }
 
@@ -174,25 +266,23 @@ const styles = StyleSheet.create({
     video: {
         ...StyleSheet.absoluteFillObject,
     },
-
-    icon_pause: {
-        height: responsiveWidth(7),
-        width: responsiveWidth(7)
+    fs_container: {
+        flex: 1,
+        backgroundColor: '#000',
     },
-
-    icon_img: {
-        height: responsiveWidth(4),
-        width: responsiveWidth(4)
-    },
-
     controls: {
         ...StyleSheet.absoluteFillObject,
         justifyContent: 'space-between',
         padding: responsiveWidth(3),
-        backgroundColor: 'rgba(0,0,0,0.25)',
+        backgroundColor: 'rgba(0,0,0,0.3)',
+    },
+    controls_fs: {
+        padding: responsiveWidth(2),
     },
     top_row: {
-        alignItems: 'flex-end',
+        flexDirection: 'row',
+        justifyContent: 'space-between', // mute left, maximize/minimize right
+        alignItems: 'center',
     },
     icon_btn: {
         padding: responsiveWidth(1),
@@ -213,5 +303,15 @@ const styles = StyleSheet.create({
         color: COLOURS.white,
         fontFamily: 'Poppins-Regular',
         fontSize: responsiveFontSize(1.4),
+        minWidth: responsiveWidth(8),
+        textAlign: 'center',
+    },
+    icon_pause: {
+        height: responsiveWidth(7),
+        width: responsiveWidth(7),
+    },
+    icon_img: {
+        height: responsiveWidth(4),
+        width: responsiveWidth(4),
     },
 })

@@ -14,7 +14,7 @@ const getFlag = (code) => {
         .join('');
 };
 
-const Number_Select = ({ value, onChangeText, onChangeFormatted }) => {
+const Number_Select = ({ value, onChangeText, onChangeFormatted, placeholder }) => {
 
     const { theme: COLOURS } = useTheme();
     const [selected, setSelected] = useState(
@@ -66,10 +66,11 @@ const Number_Select = ({ value, onChangeText, onChangeFormatted }) => {
                 {/* Number Input */}
                 <TextInput
                     style={[styles.input, { color: COLOURS.black, }]}
-                    placeholder='Mobile Number'
                     placeholderTextColor={COLOURS.grey}
                     keyboardType='phone-pad'
+                    maxLength={10}
                     value={value}
+                    placeholder={placeholder ? placeholder : 'Mobile Number...'}
                     onChangeText={handleNumberChange}
                 />
             </View>
@@ -161,7 +162,7 @@ const styles = StyleSheet.create({
         flex: 1,
         top: responsiveWidth(.5),
         fontFamily: 'Poppins-Medium',
-        fontSize: responsiveFontSize(1.8),
+        fontSize: responsiveFontSize(1.7),
         paddingHorizontal: responsiveWidth(3),
     },
     // Modal

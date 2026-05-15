@@ -36,5 +36,8 @@ export const USER_API_URL = {
     DELETE_COMMENT: '/user/content/comment',
 
     // Archieve
-    USER_ARCHIEVE: '/user/archive/by-date/'
+    USER_ARCHIEVE: '/user/archive/by-date/',
+
+    WINNER_SCORE: '/user/winners/score',
+    WINNERS: '/user/winners'
 }

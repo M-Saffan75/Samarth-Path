@@ -43,10 +43,13 @@ const UserRoutes = {
     AboutSamarthPath: 'AboutSamarthPath',
 
     // WeeklyWinners
-    Weekly_Winners:'Weekly_Winners',
+    Weekly_Winners: 'Weekly_Winners',
 
     // Guidance_Widget
-    Guidance_Widget:'Guidance_Widget',
+    Guidance_Widget: 'Guidance_Widget',
+
+    // Content_Detail
+    Content_Detail: 'Content_Detail',
 
     // Bottom_Navigation
     Bottom_Navigation: 'Bottom_Navigation',

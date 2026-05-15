@@ -32,6 +32,7 @@ import Reset_Password from '../screens/auth/Reset_Password';
 import Forgot_Password from '../screens/auth/Forgot_Password';
 import Change_Password from '../screens/auth/Change_Password';
 import Guidance_Widget from '../screens/widget/Guidance_Widget';
+import Content_Detail from '../screens/detailscreen/Content_Detail';
 import AboutSamarthPath from '../screens/about_app/AboutSamarthPath';
 import Weekly_Winners from '../screens/weekly_winners/Weekly_Winners';
 
@@ -77,6 +78,11 @@ const User_Navigator = ({ isConnected }) => {
                                 {/* Guidance Widget */}
                                 <Stack.Screen name={UserRoutes.Guidance_Widget} component={Guidance_Widget} />
                                 {/* Guidance Widget */}
+
+
+                                {/* Content Detail */}
+                                <Stack.Screen name={UserRoutes.Content_Detail} component={Content_Detail} />
+                                {/* Content Detail */}
 
 
                                 {/* user auth */}

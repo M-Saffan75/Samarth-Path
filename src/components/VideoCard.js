@@ -8,13 +8,13 @@ import { useTheme } from '../assets/themecontext/ThemeContext';
 import { globalImages } from '../assets/images/images_file/All_Images'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
+import UserRoutes from '../user/user_routes/UserRoutes';
 
 
 
-const VideoCard = ({ item, activeVideoId, setActiveVideoId, onPress, onUnbookmark }) => {
+const VideoCard = ({ item, activeVideoId, setActiveVideoId, onPress, onUnbookmark, navigation }) => {
 
 
-    console.log(item?.likesCount)
     const { theme: COLOURS } = useTheme();
     const [showComments, setShowComments] = useState(false);
     const [commentsCount, setCommentsCount] = useState(item?.commentsCount);
@@ -34,11 +34,22 @@ const VideoCard = ({ item, activeVideoId, setActiveVideoId, onPress, onUnbookmar
 
     return (
         <FadeUp>
-            <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={{
-                backgroundColor: COLOURS.light_primary, paddingHorizontal: responsiveWidth(2), paddingTop: responsiveWidth(4),
-                paddingVertical: responsiveWidth(1), borderRadius: responsiveWidth(4), marginHorizontal: responsiveWidth(4),
-                marginTop: responsiveWidth(3), paddingBottom: responsiveWidth(4),
-            }}>
+            <TouchableOpacity
+                activeOpacity={0.9}
+                onPress={
+                    onPress
+                        ? () => onPress
+                        : () => {
+                            navigation.navigate(UserRoutes.Content_Detail, {
+                                item,
+                            });
+                        }
+                }
+                style={{
+                    backgroundColor: COLOURS.light_primary, paddingHorizontal: responsiveWidth(2), paddingTop: responsiveWidth(4),
+                    paddingVertical: responsiveWidth(1), borderRadius: responsiveWidth(4), marginHorizontal: responsiveWidth(4),
+                    marginTop: responsiveWidth(3), paddingBottom: responsiveWidth(4),
+                }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: responsiveWidth(2), }}>
 
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -80,7 +91,7 @@ const VideoCard = ({ item, activeVideoId, setActiveVideoId, onPress, onUnbookmar
                     />
 
 
-                    < Text numberOfLines={1} ellipsizeMode='tail' style={{
+                    <Text numberOfLines={1} ellipsizeMode='tail' style={{
                         paddingLeft: responsiveWidth(4), marginTop: responsiveWidth(3),
                         textTransform: 'capitalize', fontFamily: 'Poppins-Medium',
                         top: responsiveWidth(.5), color: COLOURS.black, fontSize: responsiveFontSize(2)
@@ -131,7 +142,7 @@ const VideoCard = ({ item, activeVideoId, setActiveVideoId, onPress, onUnbookmar
                 />
 
             </TouchableOpacity>
-        </FadeUp>
+        </FadeUp >
     )
 }
 

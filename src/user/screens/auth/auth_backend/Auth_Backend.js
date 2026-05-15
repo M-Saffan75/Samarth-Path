@@ -4,6 +4,7 @@ import { USER_API_URL } from '../../../user_api_url/USER_API_URL';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 
 export const registerUser = async ({ name, phone, email, password }) => {
+    console.log(name, phone, email, password )
     const response = await fetch(`${BASE_URL}${USER_API_URL.REGISTER}`, {
         method: 'POST',
         headers: {
@@ -95,7 +96,7 @@ export const loginUser = async ({ phone, password }) => {
 // forogot/reset process
 
 export const forgotPassword = async ({ phone }) => {
-
+console.log(phone)
     const response = await fetch(`${BASE_URL}${USER_API_URL.FORGOT_PASSWORD}`, {
         method: 'POST',
         headers: {
