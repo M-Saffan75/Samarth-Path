@@ -2,10 +2,13 @@
 import React from 'react';
 import { Modal, View, Text, TouchableOpacity } from 'react-native';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
-import { COLOURS } from '../assets/theme/Theme';
 import { Fonts } from '../assets/fonts/Fonts';
+import { useTheme } from '../assets/themecontext/ThemeContext';
 
-const ExplanationModal = ({ visible, explanation, onClose }) => {
+const ExplanationModal = ({ visible, explanation, onClose, title }) => {
+
+    const { theme: COLOURS } = useTheme();
+
     return (
         <Modal
             visible={visible}
@@ -26,7 +29,7 @@ const ExplanationModal = ({ visible, explanation, onClose }) => {
                         fontFamily: Fonts.Medium, fontSize: responsiveFontSize(2),
                         color: COLOURS.black, marginBottom: responsiveWidth(3)
                     }}>
-                        💡 Explanation
+                        {title || '💡 Explanation'}
                     </Text>
                     <Text style={{
                         fontFamily: Fonts.Regular, fontSize: responsiveFontSize(1.7),

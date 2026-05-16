@@ -64,6 +64,7 @@ const disabled_icon = require('../all_images/disabled.png')
 const maximize_icon = require('../../icons/Extra/maximize.png')
 const minimize_icon = require('../../icons/Extra/minimize.png')
 const consultation_icon = require('../../images/all_images/seo-chatting.png')
+const admin_icon = require('../../images/all_images/consulting.png')
 
 export const globalImages = {
     app_logo, image_1, bg_here, icon_new,
@@ -77,6 +78,6 @@ export const globalImages = {
     spiritual_6, edit_pencil, unselect, select, check_icon, check_icon_json,
     spiritual_7, like_json, trash, send_icon, theme_icon, disabled_icon,
     spiritual_8, arrow_icon, maximize_icon, minimize_icon,consultation_icon,
-    spiritual_9,
+    spiritual_9,admin_icon,
     spiritual_10,
 }

@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import Toast, { BaseToast } from 'react-native-toast-message';
 import { useTheme } from '../assets/themecontext/ThemeContext';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 
-// ✅ Toast show karne ka helper — seedha call karo kahi se bhi
 export const showToast = (type = 'info', title, message) => {
     Toast.show({
         type,
@@ -15,10 +14,9 @@ export const showToast = (type = 'info', title, message) => {
 };
 
 export const AppToast = () => {
+    const { theme: COLOURS, isDark } = useTheme();
 
-    const { theme: COLOURS } = useTheme();
-
-    const toastConfig = {
+    const toastConfig = useMemo(() => ({
         success: (props) => (
             <BaseToast
                 {...props}
@@ -85,7 +83,8 @@ export const AppToast = () => {
                 }}
             />
         ),
-    };
+    }), [COLOURS]); // COLOURS change hone par naya config banega
 
-    return <Toast config={toastConfig} />;
+    // key prop — isDark change hone par Toast force re-mount hoga
+    return <Toast key={isDark ? 'dark' : 'light'} config={toastConfig} />;
 };

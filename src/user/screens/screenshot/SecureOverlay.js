@@ -5,7 +5,7 @@ const SecureOverlay = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>
-        Content Protected 🔐
+        {''}
       </Text>
     </View>
   );

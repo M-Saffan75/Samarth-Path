@@ -20,6 +20,9 @@ const UserRoutes = {
     Home: 'Home',
     Main_Home: 'Main_Home',
 
+    // Consualtation
+    ConsultationScreen: 'Consultation_Screen',
+
     // Edit_Profile
     Edit_Profile: 'Edit_Profile',
     User_Profile: 'User_Profile',

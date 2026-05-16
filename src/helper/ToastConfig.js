@@ -14,7 +14,7 @@ export const ToastConfig = () => {
         {...props}
         style={{
           borderLeftColor: '#4CAF50',
-          backgroundColor: COLOURS.light_primary,
+          backgroundColor: COLOURS.red,
         }}
         text1Style={{
           fontSize: responsiveFontSize(1.6),
@@ -29,7 +29,7 @@ export const ToastConfig = () => {
         {...props}
         style={{
           borderLeftColor: '#F44336',
-          backgroundColor: COLOURS.light_primary,
+          backgroundColor: COLOURS.red,
         }}
         text1Style={{
           fontSize: responsiveFontSize(1.6),

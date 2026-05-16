@@ -19,8 +19,8 @@ import ImageCard from '../../../components/ImageCard';
 import { showToast } from '../../../components/AppToast';
 import { useLoader } from '../../../loading/LoaderContext';
 import { useFocusEffect } from '@react-navigation/native';
+import FloatingButton from '../../floatbutton/FloatingButton';
 import { getUserFCMToken } from '../../../notifications/FCM_Send';
-import FloatingActionButton from '../../floatbutton/FloatingActionButton';
 import { globalImages } from '../../../assets/images/images_file/All_Images';
 
 const Home = ({ navigation }) => {
@@ -159,46 +159,74 @@ const Home = ({ navigation }) => {
 
           {/*  */}
 
-          <View style={[styles.card_area, { backgroundColor: COLOURS.white, }]}>
-            {loading ? null : contentList.length > 0 ? (
-              <FlashList
-                refreshControl={
-                  <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                    colors={[COLOURS.primary]}      // Android
-                    tintColor={COLOURS.primary}     // iOS
-                    progressBackgroundColor={COLOURS.light_primary}
-                  />
-                }
-                data={contentList}
-                keyExtractor={(item) => item?.id?.toString() ?? Math.random().toString()}
-                showsVerticalScrollIndicator={false}
-                estimatedItemSize={responsiveWidth(100)}
-                onScrollBeginDrag={() => setActiveVideoId(null)}
-                removeClippedSubviews={true}
-                contentContainerStyle={{ paddingBottom: responsiveWidth(5) }}
-                renderItem={({ item }) => {
-                  if (item?.type === 'video') return <VideoCard navigation={navigation} item={item}
-                    activeVideoId={activeVideoId} setActiveVideoId={setActiveVideoId} />;
-                  if (item?.type === 'image') return <ImageCard navigation={navigation} item={item} />;
-                  if (item?.type === 'quiz') return <QuizCard item={item} navigation={navigation} />;
-                  return null;
-                }}
-              />
-            ) : (
-              <View style={styles.empty}>
-                <Pulse>
-                  <Text style={[styles.empty_icon, { color: COLOURS.primary, }]}>𝌮</Text>
-                </Pulse>
-                <Text style={[styles.empty_text, { color: COLOURS.primary, }]}>No content available for today!</Text>
-              </View>
-            )}
+          <View style={[styles.card_area, { flex: 1 }]}>
+
+            <FlashList
+              data={contentList}
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={onRefresh}
+                  colors={[COLOURS.primary]}
+                  tintColor={COLOURS.primary}
+                  progressBackgroundColor={COLOURS.light_primary}
+                />
+              }
+
+              keyExtractor={(item) =>
+                item?.id?.toString() ?? Math.random().toString()
+              }
+
+              showsVerticalScrollIndicator={false}
+              estimatedItemSize={responsiveWidth(100)}
+              onScrollBeginDrag={() => setActiveVideoId(null)}
+              removeClippedSubviews={true}
+
+              contentContainerStyle={{
+                flexGrow: 1,
+                paddingBottom: responsiveWidth(5),
+              }}
+
+              ListEmptyComponent={
+                <View style={styles.empty}>
+                  <Pulse>
+                    <Text style={[styles.empty_icon, { color: COLOURS.primary }]}>
+                      𝌮
+                    </Text>
+                  </Pulse>
+                  <Text style={[styles.empty_text, { color: COLOURS.primary }]}>
+                    No content available for today!
+                  </Text>
+                </View>
+              }
+
+              renderItem={({ item }) => {
+                if (item?.type === 'video')
+                  return (
+                    <VideoCard
+                      navigation={navigation}
+                      item={item}
+                      activeVideoId={activeVideoId}
+                      setActiveVideoId={setActiveVideoId}
+                      fullshow={false}
+                    />
+                  );
+                console.log('commentscount', item?.commentsCount)
+                if (item?.type === 'image')
+                  return <ImageCard navigation={navigation} item={item} />;
+
+                if (item?.type === 'quiz')
+                  return <QuizCard item={item} navigation={navigation} />;
+
+                return null;
+              }}
+            />
+
           </View>
 
-          <FloatingActionButton
-            image={globalImages.consultation_icon} // apni image ka naam
-          />
+          <FloatingButton
+            image={globalImages.consultation_icon}
+            navigation={navigation} />
 
           <View style={{ marginBottom: responsiveWidth(12) }} />
 

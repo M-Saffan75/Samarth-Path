@@ -35,9 +35,9 @@ import Guidance_Widget from '../screens/widget/Guidance_Widget';
 import Content_Detail from '../screens/detailscreen/Content_Detail';
 import AboutSamarthPath from '../screens/about_app/AboutSamarthPath';
 import Weekly_Winners from '../screens/weekly_winners/Weekly_Winners';
-
-import { ThemeProvider } from '../../assets/themecontext/ThemeContext';
 import { ContentProvider } from '../../user/context/ContentProvider';
+import { ThemeProvider } from '../../assets/themecontext/ThemeContext';
+import ConsultationScreen from '../../user/floatbutton/ConsultationScreen';
 
 const User_Navigator = ({ isConnected }) => {
 
@@ -84,6 +84,17 @@ const User_Navigator = ({ isConnected }) => {
                                 <Stack.Screen name={UserRoutes.Content_Detail} component={Content_Detail} />
                                 {/* Content Detail */}
 
+                                {/* ConsultationScreen */}
+                                <Stack.Screen
+                                    name={UserRoutes.ConsultationScreen}
+                                    component={ConsultationScreen}
+                                    options={{
+                                        presentation: 'containedModal',
+                                        animation: 'slide_from_bottom',
+                                        headerShown: false,
+                                    }}
+                                />
+                                {/* ConsultationScreen */}
 
                                 {/* user auth */}
                                 <Stack.Screen name={UserRoutes.Login} component={Login} />
@@ -113,7 +124,7 @@ const User_Navigator = ({ isConnected }) => {
                     </UserProvider>
                 </ContentProvider>
                 <AppToast />
-                <Toast config={ToastConfig} />
+                {/* <Toast config={ToastConfig} /> */}
             </ThemeProvider>
         </>
     );

@@ -15,7 +15,7 @@ const formatTime = (seconds) => {
     return `${m}:${s < 10 ? '0' : ''}${s}`
 }
 
-const VideoPlayer = ({ uri, videoId, activeVideoId, setActiveVideoId, style }) => {
+const VideoPlayer = ({ uri, videoId, activeVideoId, setActiveVideoId, style, fullshow }) => {
 
     const videoRef = useRef(null)
     const fullscreenVideoRef = useRef(null)
@@ -111,8 +111,8 @@ const VideoPlayer = ({ uri, videoId, activeVideoId, setActiveVideoId, style }) =
         <View style={[styles.controls, isFS && styles.controls_fs]} pointerEvents="box-none">
 
             {/* Top row: mute + minimize/maximize */}
-            <View style={styles.top_row}>
-                <TouchableOpacity onPress={toggleMute} style={styles.icon_btn}>
+            <View style={[styles.top_row, { marginTop: isFS ? responsiveWidth(1) : responsiveWidth(1) }]}>
+                <TouchableOpacity onPress={toggleMute} style={[styles.icon_btn, { backgroundColor: isFS ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)' }]}>
                     <Image
                         source={muted ? globalImages.mute : globalImages.volume}
                         style={styles.icon_img}
@@ -120,20 +120,22 @@ const VideoPlayer = ({ uri, videoId, activeVideoId, setActiveVideoId, style }) =
                     />
                 </TouchableOpacity>
 
-                {/* <TouchableOpacity
+                {fullshow ? <TouchableOpacity
                     onPress={isFS ? exitFullscreen : openFullscreen}
-                    style={styles.icon_btn}
+                    style={[styles.full_btn, { backgroundColor: isFS ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)' }]}
                 >
                     <Image
                         source={isFS ? globalImages.minimize_icon : globalImages.maximize_icon}
                         style={styles.icon_img}
                         tintColor={COLOURS.white}
                     />
-                </TouchableOpacity> */}
+                </TouchableOpacity> : ''}
+
             </View>
 
             {/* Center: play/pause */}
-            <TouchableOpacity onPress={togglePlay} style={styles.center_btn} activeOpacity={0.8}>
+            <TouchableOpacity onPress={togglePlay} activeOpacity={0.8}
+                style={[styles.center_btn, { backgroundColor: isFS ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)' }]}>
                 <Image
                     source={paused ? globalImages.play : globalImages.pause}
                     style={styles.icon_pause}
@@ -283,13 +285,27 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between', // mute left, maximize/minimize right
         alignItems: 'center',
+        marginHorizontal: responsiveWidth(2),
     },
+
     icon_btn: {
-        padding: responsiveWidth(1),
+        padding: responsiveWidth(2),
+        borderRadius: responsiveWidth(100)
     },
+
+    full_btn: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: responsiveWidth(1),
+        borderRadius: responsiveWidth(100),
+    },
+
     center_btn: {
         alignSelf: 'center',
+        padding: responsiveWidth(3),
+        borderRadius: responsiveWidth(100),
     },
+
     bottom_row: {
         flexDirection: 'row',
         alignItems: 'center',

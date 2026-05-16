@@ -271,7 +271,7 @@ const CommentSheet = ({ isOpen, onClose, postId, onCommentAdded, onCommentDelete
                 {/* Header */}
                 <View style={[styles.sheetHeader, { borderBottomColor: COLOURS.light_grey, }]}>
                     <Text style={[styles.sheetTitle, { color: COLOURS.black, }]}>Comments</Text>
-                    <Text style={[styles.commentCount, { color: COLOURS.grey, }]}>{comments.length}</Text>
+                    <Text style={[styles.commentCount, { color: COLOURS.grey, }]}>{comments?.length}</Text>
                 </View>
 
                 {/* List */}

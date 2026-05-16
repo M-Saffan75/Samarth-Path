@@ -32,6 +32,8 @@ const Profile = ({
     alignSelf,
     marginBottom,
     marginTop,
+    height,
+    width,
     edit,
     onPress,
     selectedImage,
@@ -97,7 +99,12 @@ const Profile = ({
 
                 <Image
                     source={{ uri: imageUri }}
-                    style={[styles.profile_here,{borderWidth:responsiveWidth(.4), borderColor: COLOURS.primary}]}
+                    style={[styles.profile_here, {
+                        borderWidth: responsiveWidth(.4),
+                        height: height || responsiveWidth(25),
+                        width: width || responsiveWidth(25),
+                        borderColor: COLOURS.primary
+                    }]}
                     resizeMode="cover"
                 />
 
@@ -172,13 +179,6 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontFamily: Fonts.Bold,
         letterSpacing: 1.5,
-
-        // textShadowColor: 'rgba(0,0,0,0.25)',
-        // textShadowOffset: {
-        //     width: 0,
-        //     height: 2,
-        // },
-        // textShadowRadius: 4,
     },
 
     edit_icon: {
@@ -203,20 +203,7 @@ const styles = StyleSheet.create({
     profile_here: {
         borderColor: 'rgba(255,255,255,0.15)',
         borderWidth: responsiveWidth(.4),
-
-        height: responsiveWidth(25),
-        width: responsiveWidth(25),
-
         borderRadius: responsiveWidth(100),
-
-        // shadowColor: '#000',
-        // shadowOffset: {
-        //     width: 0,
-        //     height: 5,
-        // },
-        // shadowOpacity: 0.25,
-        // shadowRadius: 8,
-        // elevation: 8,
     },
 
 });

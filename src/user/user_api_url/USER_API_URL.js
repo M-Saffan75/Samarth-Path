@@ -38,6 +38,12 @@ export const USER_API_URL = {
     // Archieve
     USER_ARCHIEVE: '/user/archive/by-date/',
 
+    // winner score
     WINNER_SCORE: '/user/winners/score',
-    WINNERS: '/user/winners'
+    WINNERS: '/user/winners',
+
+
+    // Consulant
+    CONSULTANT_MESSAGES: '/user/consultant',
+    SEND_CONSULTANT: '/user/consultant'
 }

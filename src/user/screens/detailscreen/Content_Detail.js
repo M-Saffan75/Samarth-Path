@@ -22,7 +22,7 @@ import { ScrollView, StatusBar, StyleSheet, View, Text, Image, TouchableOpacity 
 const Content_Detail = ({ route, }) => {
 
     const { item } = route?.params;
-    console.log('item?.commentsCount ><><><><,',item?.commentsCount )
+    console.log('item?.commentsCount ><><><><,', item?.commentsCount)
     const [activeVideoId, setActiveVideoId] = useState(null);
     const { theme: COLOURS, isDark } = useTheme();
     const { userData } = useUser();
@@ -32,11 +32,20 @@ const Content_Detail = ({ route, }) => {
     const [commentsLoaded, setCommentsLoaded] = useState(false);
 
     // ── Fetch comments for inline preview ──────────────────
+
+    // useEffect(() => {
+    //     setCommentsCount(item?.commentsCount);
+    // }, [item?.commentsCount]);
+
+
+
     const loadInlineComments = async () => {
+        // console.log('item?.commentsCount',item?.commentsCount)
         try {
             const res = await fetchComments(item?.id);
             if (res?.success) {
                 setComments(res?.data || []);
+                setCommentsCount(res?.data?.length || 0);
                 setCommentsLoaded(true);
             }
         } catch (e) {
@@ -45,16 +54,9 @@ const Content_Detail = ({ route, }) => {
     };
 
     // Sheet close hone pe inline refresh karo
-   
-
     useEffect(() => {
         loadInlineComments();
     });
-
-    useEffect(() => {
-        setCommentsCount(item?.commentsCount);
-    }, [item?.commentsCount]); 
-
 
     return (
         <>
@@ -65,11 +67,12 @@ const Content_Detail = ({ route, }) => {
 
             <SafeAreaView style={{ flex: 1, backgroundColor: COLOURS.light_primary }}>
                 <View style={[styles.container, { backgroundColor: COLOURS.white }]}>
-                    <ScrollView>
-                        <Header title={item?.title} />
+                    <Header title={item?.title} />
+                    <ScrollView showsVerticalScrollIndicator={false}>
+
                         <ZoomIn delay={600}>
                             {item?.video ? <VideoPlayer
-                                fullscreen={true}
+                                fullshow={true}
                                 uri={item.video}
                                 videoId={item.id}
                                 activeVideoId={activeVideoId}
@@ -123,11 +126,8 @@ const Content_Detail = ({ route, }) => {
                                 isLiked={item?.isLiked}
                                 count={item?.likesCount}
                             />
-                            <Reaction
-                                source={globalImages.comment}
-                                count={commentsCount}                          // ✅ state se
-                                onPress={() => setShowComments(true)}
-                            />
+                            <Reaction source={globalImages.comment} count={commentsCount} onPress={() => setShowComments(true)} />
+
                             <Reaction
                                 isBookmark
                                 contentId={item?.id}
@@ -161,6 +161,7 @@ const Content_Detail = ({ route, }) => {
                                     Write a comment...
                                 </Text>
                             </View>
+
                         </TouchableOpacity>
 
                         {/* ── Inline comments list ── */}
