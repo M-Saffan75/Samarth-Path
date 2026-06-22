@@ -34,3 +34,8 @@ export const DARK_COLOURS = {
     red: '#E74C3C',            // same
     transparent: 'transparent',
 };
+
+// Debug SHA-1:
+// 5E:8F:16:06:2E:A3:CD:2C:4A:0D:54:78:76:BA:A6:F3:8C:AB:F6:25
+// Release SHA-1:
+// E3:12:D9:5E:77:A7:DF:BC:61:AF:86:E2:FD:98:4B:D4:EE:38:DB:8A

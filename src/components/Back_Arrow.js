@@ -6,7 +6,7 @@ import { globalImages } from '../assets/images/images_file/All_Images';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions'
 import { Image, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
-const Back_Arrow = ({ label, show }) => {
+const Back_Arrow = ({ label, show, fontSize,backgroundColor }) => {
 
     const { theme: COLOURS, isDark } = useTheme();
     const navigation = useNavigation();
@@ -16,12 +16,12 @@ const Back_Arrow = ({ label, show }) => {
             <View style={styles.main_arrow_area}>
 
                 <View style={styles.arrow_area}>
-                    <TouchableOpacity activeOpacity={0.9} style={[styles.bg_arrow, { backgroundColor: COLOURS.white, elevation: responsiveWidth(1), borderColor: COLOURS.black, }]}
+                    <TouchableOpacity activeOpacity={0.9} style={[styles.bg_arrow, { backgroundColor: backgroundColor || COLOURS.white, elevation: responsiveWidth(1), borderColor: COLOURS.black, }]}
                         onPress={() => navigation.goBack()}>
                         <Image source={globalImages.back_arrow} style={styles.arrow_img} tintColor={COLOURS.grey} />
                     </TouchableOpacity>
                     {show !== false ? <View style={[styles.bg_arrow_text]}>
-                        <Text style={[styles.arrow_text, { color: COLOURS.black }]}>{label}</Text>
+                        <Text style={[styles.arrow_text, { color: COLOURS.black, fontSize: fontSize || responsiveFontSize(2.5) }]}>{label}</Text>
                     </View> :
                         ''
                     }
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     },
 
     bg_arrow: {
-        borderWidth:responsiveWidth(.1),
+        borderWidth: responsiveWidth(.1),
         borderRadius: responsiveWidth(2),
         width: responsiveWidth(12),
         alignItems: 'center',

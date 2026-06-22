@@ -1,10 +1,10 @@
 import Header from '../../../components/Header';
 import { Calendar } from 'react-native-calendars';
 import Collapsible from 'react-native-collapsible';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../../assets/themecontext/ThemeContext';
-import { View, Text, StyleSheet, StatusBar, ScrollView, FlatList, RefreshControl, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, StatusBar, ScrollView, FlatList, RefreshControl, ActivityIndicator, TouchableOpacity, Image } from 'react-native';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 import { globalImages } from '../../../assets/images/images_file/All_Images';
 import { fetchArchive } from '../mypath/mypathbackend/MyPathBackend';
@@ -14,6 +14,10 @@ import VideoCard from '../../../components/VideoCard';
 import QuizCard from '../../../components/QuizCard';
 import { Pulse } from '../../../components/Pulse';
 import LottieView from 'lottie-react-native';
+import { Fonts } from '../../../assets/fonts/Fonts';
+import { FadeUp } from '../../../components/FadeUp';
+import Button from '../../../components/Button';
+import UserRoutes from '../../user_routes/UserRoutes';
 
 const Archives = ({ navigation }) => {
 
@@ -26,12 +30,10 @@ const Archives = ({ navigation }) => {
     const [refreshing, setRefreshing] = useState(false);
     const [activeVideoId, setActiveVideoId] = useState(null);
     const [isCollapsed, setIsCollapsed] = useState(false)
-
-    useFocusEffect(
-        useCallback(() => {
-            getArchiveData(selectedDate);
-        }, [])
-    );
+    
+    useEffect(() => {
+        getArchiveData(selectedDate);
+    }, [selectedDate]);
 
 
     // ✅ date param added so it works for both focus & date-select calls
@@ -139,8 +141,90 @@ const Archives = ({ navigation }) => {
             onUnbookmark={(id) => setVideos(prev => prev.filter(v => v.id !== id))}
         />;
         if (item?.contentType === 'text') return <ImageCard navigation={navigation} item={item} />;
-        if (item?.contentType === 'quiz') return <QuizCard item={item} navigation={navigation} />;
+        // if (item?.contentType === 'quiz') return <QuizCard item={item} navigation={navigation} />;
+        if (item?.contentType === 'quiz')
+            return (
+                <FadeUp>
+                    <View style={[styles.quiz_card, { backgroundColor: COLOURS.light_primary, marginTop: responsiveWidth(3) }]}>
+                        <View style={styles.row_quiz}>
+                            <View style={[styles.quiz_bg, { backgroundColor: COLOURS.light_grey }]} >
+                                <Image source={globalImages.quiz_icon} style={styles.quiz_img} tintColor={COLOURS.primary} />
+                            </View>
+                            <Text style={[styles.title_quiz, { color: COLOURS.black }]}>Afternoon Quiz</Text>
+                        </View>
+                        <Text style={[styles.info_quiz, { color: COLOURS.black }]}>Test your understanding of mindfulness, Inner peace,
+                            and personal growth with a quick Quiz.</Text>
+
+                        <View style={styles.row_cards}>
+
+                            <View style={[styles.card_here]}>
+                                <View style={[styles.card_here_mini]}>
+                                    <View style={[styles.main_icon_bg, { backgroundColor: COLOURS.light_grey }]}>
+                                        <Image source={globalImages.clock_icon} style={styles.icon_bg} tintColor={COLOURS.primary} />
+                                    </View>
+                                    <Text style={[styles.icon_text, { color: COLOURS.black }]}>3 Minutes</Text>
+                                </View>
+                                <View style={{
+                                    borderRightWidth: responsiveWidth(.2), borderRightColor: COLOURS.grey,
+                                    height: responsiveWidth(12), top: responsiveWidth(1), left: responsiveWidth(3),
+                                }} />
+                            </View>
+
+                            <View style={[styles.card_here]}>
+                                <View style={[styles.card_here_mini]}>
+                                    <View style={[styles.main_icon_bg, { backgroundColor: COLOURS.light_grey }]}>
+                                        <Image source={globalImages.question_icon} style={styles.icon_bg} tintColor={COLOURS.primary} />
+                                    </View>
+                                    <Text style={[styles.icon_text, { color: COLOURS.black }]}>1 Question</Text>
+                                </View>
+                                <View style={{
+                                    borderRightWidth: responsiveWidth(.2), borderRightColor: COLOURS.grey,
+                                    height: responsiveWidth(12), top: responsiveWidth(1), left: responsiveWidth(3),
+                                }} />
+                            </View>
+
+                            <View style={[styles.card_here]}>
+                                <View style={[styles.card_here_mini]}>
+                                    <View style={[styles.main_icon_bg, { backgroundColor: COLOURS.light_grey }]}>
+                                        <Image source={globalImages.options_icon} style={styles.icon_bg} tintColor={COLOURS.primary} />
+                                    </View>
+                                    <Text style={[styles.icon_text, { color: COLOURS.black }]}>4 Options</Text>
+                                </View>
+                                <View style={{
+                                    borderRightWidth: responsiveWidth(.2), borderRightColor: COLOURS.grey,
+                                    height: responsiveWidth(12), top: responsiveWidth(1), left: responsiveWidth(3),
+                                }} />
+                            </View>
+
+                            <View style={[styles.card_here]}>
+                                <View style={[styles.card_here_mini]}>
+                                    <View style={[styles.main_icon_bg, { backgroundColor: COLOURS.light_grey }]}>
+                                        <Image source={globalImages.win_icon} style={styles.icon_bg} tintColor={COLOURS.primary} />
+                                    </View>
+                                    <Text style={[styles.icon_text, { color: COLOURS.black }]}>Instant Result</Text>
+                                </View>
+                            </View>
+                        </View>
+                        <View style={[styles.bottom_line, { backgroundColor: COLOURS.grey }]} navigation={navigation} />
+                        <Button label={'sart quiz  ➞'}
+                            onPress={() => navigation.navigate(UserRoutes.QuizCard, {
+                                item, onAttemptComplete: (attemptData) => updateQuizAttempt(item.id, attemptData)
+                            })}
+                            width={responsiveWidth(80)}
+                            paddingVertical={responsiveWidth(3)} alignSelf={'center'} />
+                    </View>
+                </FadeUp>
+            )
         return null;
+    };
+
+
+    const updateQuizAttempt = (itemId, attemptData) => {
+        setContentList(prev => prev.map(content =>
+            content.id === itemId
+                ? { ...content, quizAttempt: attemptData }
+                : content
+        ));
     };
 
     return (
@@ -257,6 +341,96 @@ const Archives = ({ navigation }) => {
 export default Archives;
 
 const styles = StyleSheet.create({
+
+    bottom_line: {
+        width: '94%',
+        left: responsiveWidth(2),
+        marginTop: responsiveWidth(3),
+        height: responsiveWidth(.1),
+    },
+
+    row_cards: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        marginTop: responsiveWidth(3),
+    },
+
+    main_icon_bg: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: responsiveWidth(8),
+        height: responsiveWidth(8),
+        borderRadius: responsiveWidth(100),
+    },
+
+    icon_bg: {
+        height: responsiveWidth(5),
+        width: responsiveWidth(5),
+    },
+
+    card_here: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginHorizontal: responsiveWidth(3),
+    },
+
+
+    card_here_mini: {
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+
+    icon_text: {
+        fontFamily: Fonts.Medium,
+        paddingTop: responsiveWidth(1),
+        fontSize: responsiveFontSize(1.4),
+    },
+
+    row_quiz: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+    },
+
+    quiz_card: {
+        borderRadius: responsiveWidth(4),
+        marginHorizontal: responsiveWidth(4),
+        paddingVertical: responsiveWidth(4),
+        paddingHorizontal: responsiveWidth(3),
+    },
+
+    info_quiz: {
+        // backgroundColor:'red'  ,
+        textTransform: 'none',
+        fontFamily: Fonts.Medium,
+        marginTop: responsiveWidth(2),
+        fontSize: responsiveFontSize(1.6),
+    },
+
+    title_quiz: {
+        width: responsiveWidth(50),
+        fontFamily: Fonts.Medium,
+        marginLeft: responsiveWidth(3),
+        fontSize: responsiveFontSize(2),
+    },
+
+    quiz_bg: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: responsiveWidth(10),
+        height: responsiveWidth(10),
+        borderRadius: responsiveWidth(100),
+    },
+
+    quiz_img: {
+        height: responsiveWidth(6),
+        width: responsiveWidth(6),
+    },
+
+    // 
+
     container: {
         height: '100%',
         width: '100%',

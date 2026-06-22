@@ -9,7 +9,7 @@ import { View, TouchableOpacity, StyleSheet, Text, Image, Modal, StatusBar } fro
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions'
 
 const formatTime = (seconds) => {
-    if (!seconds || isNaN(seconds)) return '0:00'
+    if (!seconds || isNaN(seconds) || !isFinite(seconds) || seconds < 0) return '0:00'
     const m = Math.floor(seconds / 60)
     const s = Math.floor(seconds % 60)
     return `${m}:${s < 10 ? '0' : ''}${s}`
@@ -17,6 +17,7 @@ const formatTime = (seconds) => {
 
 const VideoPlayer = ({ uri, videoId, activeVideoId, setActiveVideoId, style, fullshow }) => {
 
+    console.log('uri,', uri ? uri : 'no video uri')
     const videoRef = useRef(null)
     const fullscreenVideoRef = useRef(null)
     const paused = activeVideoId !== videoId
@@ -24,9 +25,15 @@ const VideoPlayer = ({ uri, videoId, activeVideoId, setActiveVideoId, style, ful
     const [muted, setMuted] = useState(false)
     const [duration, setDuration] = useState(0)
     const [currentTime, setCurrentTime] = useState(0)
-    const [seeking, setSeeking] = useState(false)
     const [showControls, setShowControls] = useState(true)
     const [isFullscreen, setIsFullscreen] = useState(false)
+
+    // ✅ Slider ke liye alag local value — video se independent
+    const [sliderValue, setSliderValue] = useState(0)
+    const isSeeking = useRef(false)
+
+    const currentTimeRef = useRef(0)
+    const durationRef = useRef(0)
     const hideTimeout = useRef(null)
 
     const resetHideTimer = () => {
@@ -36,9 +43,8 @@ const VideoPlayer = ({ uri, videoId, activeVideoId, setActiveVideoId, style, ful
     }
 
     useEffect(() => {
-        if (!paused) {
-            resetHideTimer()
-        } else {
+        if (!paused) resetHideTimer()
+        else {
             if (hideTimeout.current) clearTimeout(hideTimeout.current)
             setShowControls(true)
         }
@@ -48,7 +54,6 @@ const VideoPlayer = ({ uri, videoId, activeVideoId, setActiveVideoId, style, ful
     useEffect(() => {
         return () => {
             if (hideTimeout.current) clearTimeout(hideTimeout.current)
-            // fullscreen se bahar niklo agar screen unmount ho
             if (isFullscreen) exitFullscreen()
         }
     }, [])
@@ -63,29 +68,86 @@ const VideoPlayer = ({ uri, videoId, activeVideoId, setActiveVideoId, style, ful
         resetHideTimer()
     }
 
-    const onLoad = (data) => setDuration(data.duration)
+    const onLoad = (data) => {
+        const d = data?.duration
+        if (d && isFinite(d) && !isNaN(d) && d > 0 && d < 86400) {
+            setDuration(d)
+            durationRef.current = d
+        }
+    }
 
     const onProgress = (data) => {
-        if (!seeking) setCurrentTime(data.currentTime)
+        // ✅ Sirf tab update karo jab user drag nahi kar raha
+        if (!isSeeking.current) {
+            setCurrentTime(data.currentTime)
+            setSliderValue(data.currentTime)   // slider bhi sync
+            currentTimeRef.current = data.currentTime
+        }
+        if (durationRef.current === 0 && data.seekableDuration > 0) {
+            setDuration(data.seekableDuration)
+            durationRef.current = data.seekableDuration
+        }
+    }
+
+    const onFullscreenLoad = (data) => {
+        const d = data?.duration
+        if (d && isFinite(d) && !isNaN(d) && d > 0) {
+            setDuration(d)
+            durationRef.current = d
+        }
+        const seekTo = currentTimeRef.current
+        if (seekTo > 0) {
+            setTimeout(() => {
+                fullscreenVideoRef.current?.seek(seekTo)
+            }, 100)
+        }
+    }
+
+    const onFullscreenProgress = (data) => {
+        if (!isSeeking.current) {
+            setCurrentTime(data.currentTime)
+            setSliderValue(data.currentTime)
+            currentTimeRef.current = data.currentTime
+        }
+        if (durationRef.current === 0 && data.seekableDuration > 0) {
+            setDuration(data.seekableDuration)
+            durationRef.current = data.seekableDuration
+        }
     }
 
     const onEnd = () => {
         setActiveVideoId(null)
         setCurrentTime(0)
+        setSliderValue(0)
+        currentTimeRef.current = 0
         videoRef.current?.seek(0)
         fullscreenVideoRef.current?.seek(0)
     }
 
-    const onSliderChange = (value) => {
-        setSeeking(true)
-        setCurrentTime(value)
+    // ✅ Drag shuru — video progress update band, sirf slider move karo
+    const onSliderStart = () => {
+        isSeeking.current = true
         resetHideTimer()
     }
 
+    // ✅ Drag chal raha hai — sirf sliderValue update karo, currentTime nahi
+    const onSliderChange = (value) => {
+        setSliderValue(value)
+        resetHideTimer()
+    }
+
+    // ✅ Drag khatam — ab seek karo aur progress dobara shuru
     const onSliderComplete = (value) => {
+        console.log('seek to:', value, 'ref exists:', !!videoRef.current)
+        setSliderValue(value)
+        setCurrentTime(value)
+        currentTimeRef.current = value
         videoRef.current?.seek(value)
         fullscreenVideoRef.current?.seek(value)
-        setSeeking(false)
+        // Thoda delay — seek complete hone do pehle
+        setTimeout(() => {
+            isSeeking.current = false
+        }, 200)
         resetHideTimer()
     }
 
@@ -93,26 +155,26 @@ const VideoPlayer = ({ uri, videoId, activeVideoId, setActiveVideoId, style, ful
         setIsFullscreen(true)
         Orientation.lockToLandscape()
         resetHideTimer()
-        // video play karo fullscreen mein bhi
         if (paused) setActiveVideoId(videoId)
     }
 
     const exitFullscreen = () => {
+        const resumeAt = currentTimeRef.current
         setIsFullscreen(false)
         Orientation.lockToPortrait()
-        // sync position
-        if (fullscreenVideoRef.current) {
-            fullscreenVideoRef.current?.seek(currentTime)
-        }
+        setTimeout(() => {
+            videoRef.current?.seek(resumeAt)
+        }, 150)
     }
 
-    // ---- Shared Controls UI ----
     const renderControls = (isFS) => (
-        <View style={[styles.controls, isFS && styles.controls_fs]} pointerEvents="box-none">
+        <View style={[styles.controls, isFS && styles.controls_fs]}>
 
-            {/* Top row: mute + minimize/maximize */}
-            <View style={[styles.top_row, { marginTop: isFS ? responsiveWidth(1) : responsiveWidth(1) }]}>
-                <TouchableOpacity onPress={toggleMute} style={[styles.icon_btn, { backgroundColor: isFS ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)' }]}>
+            <View style={[styles.top_row, { marginTop: responsiveWidth(1) }]}>
+                <TouchableOpacity
+                    onPress={toggleMute}
+                    style={[styles.icon_btn, { backgroundColor: isFS ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)' }]}
+                >
                     <Image
                         source={muted ? globalImages.mute : globalImages.volume}
                         style={styles.icon_img}
@@ -120,22 +182,25 @@ const VideoPlayer = ({ uri, videoId, activeVideoId, setActiveVideoId, style, ful
                     />
                 </TouchableOpacity>
 
-                {fullshow ? <TouchableOpacity
-                    onPress={isFS ? exitFullscreen : openFullscreen}
-                    style={[styles.full_btn, { backgroundColor: isFS ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)' }]}
-                >
-                    <Image
-                        source={isFS ? globalImages.minimize_icon : globalImages.maximize_icon}
-                        style={styles.icon_img}
-                        tintColor={COLOURS.white}
-                    />
-                </TouchableOpacity> : ''}
-
+                {fullshow && (
+                    <TouchableOpacity
+                        onPress={isFS ? exitFullscreen : openFullscreen}
+                        style={[isFS ? styles.full_btn : styles.full_btn_big, { backgroundColor: isFS ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)' }]}
+                    >
+                        <Image
+                            source={isFS ? globalImages.minimize_icon : globalImages.maximize_icon}
+                            style={isFS ? styles.icon_img_big : styles.icon_img}
+                            tintColor={COLOURS.white}
+                        />
+                    </TouchableOpacity>
+                )}
             </View>
 
-            {/* Center: play/pause */}
-            <TouchableOpacity onPress={togglePlay} activeOpacity={0.8}
-                style={[styles.center_btn, { backgroundColor: isFS ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)' }]}>
+            <TouchableOpacity
+                onPress={togglePlay}
+                activeOpacity={0.8}
+                style={[styles.center_btn, { backgroundColor: isFS ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)' }]}
+            >
                 <Image
                     source={paused ? globalImages.play : globalImages.pause}
                     style={styles.icon_pause}
@@ -143,14 +208,15 @@ const VideoPlayer = ({ uri, videoId, activeVideoId, setActiveVideoId, style, ful
                 />
             </TouchableOpacity>
 
-            {/* Bottom: time + slider */}
             <View style={styles.bottom_row}>
                 <Text style={styles.time}>{formatTime(currentTime)}</Text>
                 <Slider
                     style={styles.slider}
                     minimumValue={0}
-                    maximumValue={duration || 1}
-                    value={currentTime}
+                    maximumValue={duration > 0 ? duration : 1}
+                    // ✅ sliderValue use karo — video progress se alag
+                    value={sliderValue}
+                    onSlidingStart={onSliderStart}
                     onValueChange={onSliderChange}
                     onSlidingComplete={onSliderComplete}
                     minimumTrackTintColor={COLOURS.primary}
@@ -165,13 +231,12 @@ const VideoPlayer = ({ uri, videoId, activeVideoId, setActiveVideoId, style, ful
 
     return (
         <>
-            {/* ---- Normal (inline) player ---- */}
             <View style={[styles.wrapper, style]}>
                 <Video
                     ref={videoRef}
                     source={{ uri }}
                     style={styles.video}
-                    paused={isFullscreen ? true : paused} // fullscreen open ho tw inline ruk jaye
+                    paused={isFullscreen ? true : paused}
                     muted={muted}
                     resizeMode="cover"
                     onLoad={onLoad}
@@ -181,11 +246,10 @@ const VideoPlayer = ({ uri, videoId, activeVideoId, setActiveVideoId, style, ful
                     playWhenInactive={false}
                     ignoreSilentSwitch="obey"
                     maxBitRate={2000000}
-                    progressUpdateInterval={500}
+                    progressUpdateInterval={300}
                     reportBandwidth={false}
                 />
 
-                {/* Tap to show/hide controls */}
                 <TouchableOpacity
                     style={StyleSheet.absoluteFillObject}
                     activeOpacity={1}
@@ -202,7 +266,6 @@ const VideoPlayer = ({ uri, videoId, activeVideoId, setActiveVideoId, style, ful
                 {showControls && renderControls(false)}
             </View>
 
-            {/* ---- Fullscreen Modal ---- */}
             <Modal
                 visible={isFullscreen}
                 animationType="fade"
@@ -219,22 +282,17 @@ const VideoPlayer = ({ uri, videoId, activeVideoId, setActiveVideoId, style, ful
                         paused={paused}
                         muted={muted}
                         resizeMode="contain"
-                        onLoad={(data) => {
-                            setDuration(data.duration)
-                            // inline ki current position se shuru karo
-                            fullscreenVideoRef.current?.seek(currentTime)
-                        }}
-                        onProgress={onProgress}
+                        onLoad={onFullscreenLoad}
+                        onProgress={onFullscreenProgress}
                         onEnd={onEnd}
                         playInBackground={false}
                         playWhenInactive={false}
                         ignoreSilentSwitch="obey"
                         maxBitRate={2000000}
-                        progressUpdateInterval={500}
+                        progressUpdateInterval={300}
                         reportBandwidth={false}
                     />
 
-                    {/* Tap to toggle controls in fullscreen */}
                     <TouchableOpacity
                         style={StyleSheet.absoluteFillObject}
                         activeOpacity={1}
@@ -283,20 +341,25 @@ const styles = StyleSheet.create({
     },
     top_row: {
         flexDirection: 'row',
-        justifyContent: 'space-between', // mute left, maximize/minimize right
+        justifyContent: 'space-between',
         alignItems: 'center',
         marginHorizontal: responsiveWidth(2),
     },
-
     icon_btn: {
         padding: responsiveWidth(2),
-        borderRadius: responsiveWidth(100)
+        borderRadius: responsiveWidth(100),
     },
-
     full_btn: {
         alignItems: 'center',
         justifyContent: 'center',
         padding: responsiveWidth(1),
+        borderRadius: responsiveWidth(100),
+    },
+
+    full_btn_big: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: responsiveWidth(2),
         borderRadius: responsiveWidth(100),
     },
 
@@ -305,7 +368,6 @@ const styles = StyleSheet.create({
         padding: responsiveWidth(3),
         borderRadius: responsiveWidth(100),
     },
-
     bottom_row: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -329,5 +391,9 @@ const styles = StyleSheet.create({
     icon_img: {
         height: responsiveWidth(4),
         width: responsiveWidth(4),
+    },
+    icon_img_big : {
+        height: responsiveWidth(6),
+        width: responsiveWidth(6),
     },
 })

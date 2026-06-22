@@ -11,6 +11,7 @@ export const USER_API_URL = {
     CHANGE_PASSWORD: '/user/auth/change-password',
     UPDATE_PROFILE: '/user/auth/update-profile',
     ME: '/user/auth/me',
+    LOGOUT:'/user/auth/logout',
 
     // Fcm-Token
     FCM_TOKEN: '/user/save-fcm-token',
@@ -45,5 +46,12 @@ export const USER_API_URL = {
 
     // Consulant
     CONSULTANT_MESSAGES: '/user/consultant',
-    SEND_CONSULTANT: '/user/consultant'
+    SEND_CONSULTANT: '/user/consultant',
+
+    // Subscription
+    CANCEL_SUBSCRIPTION: '/user/subscription/cancel-payment',
+
+    // Notifications
+    USER_NOTIFICATION: '/user/notifications',
+    NOTIFICAION_SETTING: '/user/auth/notification-settings'
 }

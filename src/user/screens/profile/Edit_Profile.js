@@ -7,10 +7,10 @@ import Input_Field from '../../../components/Input_Field';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { GenderPicker } from '../../../components/GenderPicker';
-import { StatusBar, StyleSheet, View, Text, } from 'react-native';
 import { useTheme } from '../../../assets/themecontext/ThemeContext';
 import { globalImages } from '../../../assets/images/images_file/All_Images';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
+import { StatusBar, StyleSheet, View, Text, ScrollView, KeyboardAvoidingView, Platform, Keyboard, } from 'react-native';
 
 import Button from '../../../components/Button';
 import { Pulse } from '../../../components/Pulse';
@@ -30,9 +30,11 @@ const Edit_Profile = ({ navigation }) => {
     const { theme: COLOURS, isDark } = useTheme();
 
     const { userData, updateUser } = useUser();
+    console.log('check', userData)
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
+    const [address, setAddress] = useState('');
     const [dob, setDob] = useState(userData?.dateOfBirth || '');
     const [gender, setGender] = useState(userData?.gender || '');
     const [selectedImage, setSelectedImage] = useState(null); // local picked image
@@ -56,6 +58,7 @@ const Edit_Profile = ({ navigation }) => {
             setName(userData.name || '');
             setEmail(userData.email || '');
             setPhone(userData.phone || '');
+            setAddress(userData.address || '');
             setGender(capitalizeFirst(userData?.gender) || 'Male');
             setDob(parseDate(userData?.dateOfBirth || userData?.dob));
         }
@@ -80,6 +83,7 @@ const Edit_Profile = ({ navigation }) => {
             name !== (userData?.name || '') ||
             gender !== (userData?.gender || '') ||
             dob !== (userData?.dateOfBirth || '') ||
+            address !== (userData?.address || '') ||
             selectedImage !== null
         );
     };
@@ -103,6 +107,7 @@ const Edit_Profile = ({ navigation }) => {
                 name,
                 gender: gender?.toLowerCase(),
                 dateOfBirth: dobString,
+                address,
                 selectedImage
             });
 
@@ -123,138 +128,181 @@ const Edit_Profile = ({ navigation }) => {
         }
     };
 
+    const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+    useEffect(() => {
+        const show = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
+        const hide = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
+        return () => {
+            show.remove();
+            hide.remove();
+        };
+    }, []);
+
 
     return (
         <>
-            <StatusBar
-                barStyle={isDark ? 'light-content' : 'dark-content'}
-                backgroundColor={COLOURS.light_primary}
-            />
             <SafeAreaView style={{ flex: 1, backgroundColor: COLOURS.light_primary }}>
-
+                {/* ← KeyboardAvoidingView hata do */}
                 <View style={[styles.container, { backgroundColor: COLOURS.white }]}>
+                    <ScrollView
+                        showsVerticalScrollIndicator={false}
+                        keyboardShouldPersistTaps={'handled'}
+                        contentContainerStyle={{
+                            paddingBottom: keyboardVisible ? responsiveWidth(40) : responsiveWidth(10)
+                        }}
 
-                    <Header title={'edit profile'} />
+                    >
 
-                    <FadeDown>
-                        <Profile
-                            alignSelf={'center'}
-                            marginTop={responsiveWidth(12)}
-                            edit={true}
-                            onPress={handlePickImage}
-                            selectedImage={selectedImage}
-                        />
-                    </FadeDown>
+                        <View style={[styles.container, { backgroundColor: COLOURS.white }]}>
+                            <ScrollView showsVerticalScrollIndicator={false}>
+                                <Header title={'edit profile'} />
 
-                    <FadeUp>
+                                <FadeDown>
+                                    <Profile
+                                        alignSelf={'center'}
+                                        marginTop={responsiveWidth(12)}
+                                        edit={true}
+                                        onPress={handlePickImage}
+                                        selectedImage={selectedImage}
+                                    />
+                                </FadeDown>
 
-                        <Title_Here title={userData?.name}
-                            color={COLOURS.black}
-                            textAlign={'center'}
-                            marginTop={responsiveWidth(2)}
-                            marginBottom={responsiveWidth(2)}
-                            fontSize={responsiveFontSize(2)}
-                        />
-                        <Title_Here title={userData?.phone}
-                            color={COLOURS.light_black}
-                            textAlign={'center'}
-                            marginTop={responsiveWidth(-2)}
-                            marginBottom={responsiveWidth(3)}
-                            fontSize={responsiveFontSize(1.8)}
-                        />
+                                <FadeUp>
 
-                        <Pulse>
-                            <Trial_Text backgroundColor={COLOURS.light_primary} alignSelf={'center'} />
-                        </Pulse>
+                                    <Title_Here title={userData?.name}
+                                        color={COLOURS.black}
+                                        textAlign={'center'}
+                                        marginTop={responsiveWidth(2)}
+                                        marginBottom={responsiveWidth(2)}
+                                        fontSize={responsiveFontSize(2)}
+                                    />
+                                    <Title_Here title={userData?.phone}
+                                        color={COLOURS.light_black}
+                                        textAlign={'center'}
+                                        marginTop={responsiveWidth(-2)}
+                                        marginBottom={responsiveWidth(3)}
+                                        fontSize={responsiveFontSize(1.8)}
+                                    />
 
-                    </FadeUp>
-                    <FadeIn delay={150}>
+                                    <Pulse>
+                                        <Trial_Text backgroundColor={COLOURS.light_primary} alignSelf={'center'} />
+                                    </Pulse>
 
-                        <Input_Field backgroundColor={COLOURS.light_primary} borderColor={COLOURS.transparent}
-                            borderWidth={responsiveWidth(.3)}
-                            Input_marginTop={responsiveWidth(6)}
-                            color={COLOURS.black}
-                            maxLength={20}
-                            Placeholder={'Your name'}
-                            first_inpt_Img={globalImages.user_filled}
-                            tintColor={COLOURS.grey}
-                            defaultValue={name}
-                            value={name}
-                            onChangeText={setName}
-                        />
-                    </FadeIn>
-                    <FadeIn delay={250}>
+                                </FadeUp>
+                                <FadeIn delay={150}>
+
+                                    <Input_Field backgroundColor={COLOURS.light_primary} borderColor={COLOURS.transparent}
+                                        borderWidth={responsiveWidth(.3)}
+                                        Input_marginTop={responsiveWidth(6)}
+                                        color={COLOURS.black}
+                                        maxLength={20}
+                                        Placeholder={'Your name'}
+                                        first_inpt_Img={globalImages.user_filled}
+                                        tintColor={COLOURS.grey}
+                                        defaultValue={name}
+                                        value={name}
+                                        onChangeText={setName}
+                                    />
+                                </FadeIn>
+                                <FadeIn delay={250}>
 
 
-                        <Input_Field backgroundColor={COLOURS.light_primary} borderColor={COLOURS.transparent}
-                            borderWidth={responsiveWidth(.3)}
-                            Input_marginTop={responsiveWidth(4)}
-                            color={COLOURS.black}
-                            maxLength={35}
-                            Placeholder={'Your email'}
-                            disabled={true}
-                            editable={false}
-                            defaultValue={email}
-                            third_height={responsiveWidth(4)}
-                            third_width={responsiveWidth(4)}
-                            first_inpt_Img={globalImages.envelope_filled}
-                            third_inpt_Img={globalImages.disabled_icon}
-                            left={responsiveWidth(-10)}
-                            tintColor={COLOURS.grey}
-                            value={email}
-                            onChangeText={setEmail}
-                        />
-                    </FadeIn>
-                    <FadeIn delay={350}>
+                                    <Input_Field backgroundColor={COLOURS.light_primary} borderColor={COLOURS.transparent}
+                                        borderWidth={responsiveWidth(.3)}
+                                        Input_marginTop={responsiveWidth(4)}
+                                        color={COLOURS.black}
+                                        maxLength={35}
+                                        Placeholder={'Your email'}
+                                        disabled={true}
+                                        editable={false}
+                                        defaultValue={email}
+                                        third_height={responsiveWidth(4)}
+                                        third_width={responsiveWidth(4)}
+                                        first_inpt_Img={globalImages.envelope_filled}
+                                        third_inpt_Img={globalImages.disabled_icon}
+                                        left={responsiveWidth(-10)}
+                                        tintColor={COLOURS.grey}
+                                        value={email}
+                                        onChangeText={setEmail}
+                                    />
+                                </FadeIn>
+                                <FadeIn delay={350}>
 
-                        <Input_Field backgroundColor={COLOURS.light_primary} borderColor={COLOURS.transparent}
-                            borderWidth={responsiveWidth(.3)}
-                            Input_marginTop={responsiveWidth(4)}
-                            color={COLOURS.black}
-                            keyboardType={'numeric'}
-                            disabled={true}
-                            Placeholder={'Your Phone'}
-                            third_height={responsiveWidth(4)}
-                            third_width={responsiveWidth(4)}
-                            maxLength={12}
-                            editable={false}
-                            defaultValue={phone}
-                            first_inpt_Img={globalImages.phone_filled}
-                            third_inpt_Img={globalImages.disabled_icon}
-                            left={responsiveWidth(-10)}
-                            tintColor={COLOURS.grey}
-                            value={phone}
-                            onChangeText={setPhone}
-                        />
+                                    <Input_Field backgroundColor={COLOURS.light_primary} borderColor={COLOURS.transparent}
+                                        borderWidth={responsiveWidth(.3)}
+                                        Input_marginTop={responsiveWidth(4)}
+                                        color={COLOURS.black}
+                                        keyboardType={'numeric'}
+                                        disabled={true}
+                                        Placeholder={'Your Phone'}
+                                        third_height={responsiveWidth(4)}
+                                        third_width={responsiveWidth(4)}
+                                        maxLength={40}
+                                        editable={false}
+                                        defaultValue={phone}
+                                        first_inpt_Img={globalImages.phone_filled}
+                                        third_inpt_Img={globalImages.disabled_icon}
+                                        left={responsiveWidth(-10)}
+                                        tintColor={COLOURS.grey}
+                                        value={phone}
+                                        onChangeText={setPhone}
+                                    />
 
-                    </FadeIn>
+                                </FadeIn>
+                                <View marginTop={responsiveWidth(3)}/>
+                                <FadeIn delay={350}>
+                                    <Input_Field backgroundColor={COLOURS.light_primary} borderColor={COLOURS.transparent}
+                                        borderWidth={1}
+                                        textAlignVertical={'top'}
+                                        multiline={true}
+                                        first_inpt_Img={globalImages.location_icon}
+                                        Input_width={responsiveWidth(85)}
+                                        Input_height={responsiveWidth(20)}
+                                        color={COLOURS.black}
+                                        defaultValue={address}
+                                        Placeholder={"Enter your full address to receive your prize at your doorstep..."}
+                                        Second_inpt_Img={false}
+                                        tintColor={COLOURS.grey}
+                                        width={responsiveWidth(4.5)}
+                                        height={responsiveWidth(4.5)}
+                                        value={address}
+                                        onChangeText={setAddress}
+                                    />
 
-                    <FadeIn delay={450}>
-                        <View style={styles.row_dob_gen}>
-                            <View style={styles.inpt_view}>
-                                <GenderPicker
-                                    value={gender}
-                                    onChange={(val) => setGender(val)}
-                                />
-                            </View>
+                                </FadeIn>
 
-                            <View style={styles.inpt_view}>
-                                <DOBPicker
-                                    value={dob}
-                                    onChange={(date) => setDob(date)}
-                                />
-                            </View>
+                                <FadeIn delay={450}>
+                                    <View style={styles.row_dob_gen}>
+                                        <View style={styles.inpt_view}>
+                                            <GenderPicker
+                                                value={gender}
+                                                onChange={(val) => setGender(val)}
+                                            />
+                                        </View>
+
+                                        <View style={styles.inpt_view}>
+                                            <DOBPicker
+                                                value={dob}
+                                                onChange={(date) => setDob(date)}
+                                            />
+                                        </View>
+                                    </View>
+                                </FadeIn>
+
+                                <FadeUp>
+                                    <Button label={loading ? 'update....' : 'update'} alignSelf={'center'}
+                                        marginTop={responsiveWidth(10)}
+                                        // marginBottom={responsiveWidth(40)}
+                                        onPress={handleUpdate} disabled={loading} />
+                                </FadeUp>
+
+
+                            </ScrollView>
                         </View>
-                    </FadeIn>
-
-                    <FadeUp>
-                        <Button label={loading ? 'update....' : 'update'} alignSelf={'center'}
-                            marginTop={responsiveWidth(20)} onPress={handleUpdate} disabled={loading} />
-                    </FadeUp>
-
-
+                    </ScrollView>
                 </View>
-            </SafeAreaView >
+            </SafeAreaView>
         </>
 
     )
@@ -279,8 +327,9 @@ const styles = StyleSheet.create({
     },
 
     container: {
-        height: '100%',
-        width: '100%',
+        // height: '100%',
+        // width: '100%',
+        flex: 1
     },
 
 })

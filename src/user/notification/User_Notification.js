@@ -1,17 +1,13 @@
 import React, { useState, useCallback } from 'react';
-import {
-    View, Text, FlatList, StyleSheet,
-    TouchableOpacity, StatusBar, ActivityIndicator,
-    RefreshControl,
-} from 'react-native';
+import { COLOURS } from '../../assets/theme/Theme';
+import { FadeDown } from '../../components/FadeDown';
+import Back_Arrow from '../../components/Back_Arrow';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../assets/themecontext/ThemeContext';
-import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 import { fetchNotifications } from '../screens/auth/auth_backend/Auth_Backend';
-import Back_Arrow from '../../components/Back_Arrow';
-import { FadeDown } from '../../components/FadeDown';
-import { COLOURS } from '../../assets/theme/Theme';
+import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, StatusBar, ActivityIndicator, RefreshControl } from 'react-native';
 
 // ── Icon & style config — newStatus ke hisaab se ──────────
 
@@ -132,6 +128,7 @@ const User_Notification = () => {
         try {
             isRefresh ? setRefreshing(true) : setLoading(true);
             const res = await fetchNotifications();
+            console.log('res<><><><><><',res)
             if (res?.success) {
                 setNotifications(res?.data?.data || []);
             } else {

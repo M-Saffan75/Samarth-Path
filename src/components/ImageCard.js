@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
 import Reaction from '../components/Reaction';
 import { Fonts } from '../assets/fonts/Fonts';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTheme } from '../assets/themecontext/ThemeContext';
 import { globalImages } from '../assets/images/images_file/All_Images'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -8,10 +8,10 @@ import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dim
 
 import { FadeDown } from './FadeDown';
 import CommentSheet from './CommentSheet';
+import DemoSheet from '../user/comment/DemoSheet'
 import UserRoutes from '../user/user_routes/UserRoutes';
 
 const ImageCard = ({ item, onPress, onUnbookmark, navigation }) => {
-
     const { theme: COLOURS } = useTheme();
     const [showComments, setShowComments] = useState(false);
 
@@ -23,110 +23,121 @@ const ImageCard = ({ item, onPress, onUnbookmark, navigation }) => {
 
 
     return (
-        <FadeDown>
-            {
-                item?.image ? (
-                    <TouchableOpacity activeOpacity={0.9}
-                        onPress={
-                            onPress
-                                ? () => onPress(item, onUnbookmark)
-                                : () => {
-                                    navigation.navigate(UserRoutes.Content_Detail, {
-                                        item,
-                                        onUnbookmark,
-                                    });
-                                }
-                        } style={{
-                            backgroundColor: COLOURS.light_primary, paddingHorizontal: responsiveWidth(2), paddingTop: responsiveWidth(4),
-                            paddingVertical: responsiveWidth(1), borderRadius: responsiveWidth(4), marginHorizontal: responsiveWidth(4),
-                            marginTop: responsiveWidth(3), paddingBottom: responsiveWidth(4),
-                        }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: responsiveWidth(2), }}>
+        <>
+            <FadeDown>
+                {
+                    item?.image ? (
+                        <TouchableOpacity activeOpacity={0.9}
+                            onPress={
+                                onPress
+                                    ? () => onPress(item, onUnbookmark)
+                                    : () => {
+                                        navigation.navigate(UserRoutes.Content_Detail, {
+                                            item,
+                                            onUnbookmark,
+                                        });
+                                    }
+                            } style={{
+                                backgroundColor: COLOURS.light_primary, paddingHorizontal: responsiveWidth(2), paddingTop: responsiveWidth(4),
+                                paddingVertical: responsiveWidth(1), borderRadius: responsiveWidth(4), marginHorizontal: responsiveWidth(4),
+                                marginTop: responsiveWidth(3), paddingBottom: responsiveWidth(4),
+                            }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: responsiveWidth(2), }}>
 
-                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <Image source={globalImages.app_logo}
-                                    style={{ height: responsiveWidth(6), width: responsiveWidth(6) }} tintColor={COLOURS.primary} />
-                                <Text style={{
-                                    paddingLeft: responsiveWidth(1),
-                                    textTransform: 'uppercase', fontFamily: 'Poppins-Medium',
-                                    top: responsiveWidth(.5), color: COLOURS.primary
-                                }}>{item?.schedule ?? 'MORNING TEXT'}</Text>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Image source={globalImages.app_logo}
+                                        style={{ height: responsiveWidth(6), width: responsiveWidth(6) }} tintColor={COLOURS.primary} />
+                                    <Text style={{
+                                        paddingLeft: responsiveWidth(1),
+                                        textTransform: 'uppercase', fontFamily: 'Poppins-Medium',
+                                        top: responsiveWidth(.5), color: COLOURS.primary
+                                    }}>{/* item?.schedule ??  */'MORNING TEXT'}</Text>
+                                </View>
+
+                                <View>
+                                    <Text style={{
+                                        paddingLeft: responsiveWidth(1),
+                                        textTransform: 'uppercase', fontFamily: 'Poppins-Medium',
+                                        top: responsiveWidth(.5), color: COLOURS.grey
+                                    }}>{/* item?.type */'TEXT'}</Text>
+                                </View>
+
                             </View>
 
                             <View>
-                                <Text style={{
-                                    paddingLeft: responsiveWidth(1),
-                                    textTransform: 'uppercase', fontFamily: 'Poppins-Medium',
-                                    top: responsiveWidth(.5), color: COLOURS.grey
-                                }}>{item?.type}</Text>
-                            </View>
 
-                        </View>
-
-                        <View>
-
-                            {/* <Image source={{ uri: item?.image }} style={{
+                                {/* <Image source={{ uri: item?.image }} style={{
                                 height: responsiveWidth(50), width: responsiveWidth(83),
                                 borderRadius: responsiveWidth(4), marginTop: responsiveWidth(5), alignSelf: 'center'
                             }} /> */}
 
-                            <Text numberOfLines={1} ellipsizeMode='tail' style={{
-                                paddingLeft: responsiveWidth(4), marginTop: responsiveWidth(3),
-                                textTransform: 'capitalize', fontFamily: 'Poppins-Medium',
-                                top: responsiveWidth(.5), color: COLOURS.black, fontSize: responsiveFontSize(2)
-                            }}>{item?.title}</Text>
+                                <Text numberOfLines={1} ellipsizeMode='tail' style={{
+                                    paddingLeft: responsiveWidth(4), marginTop: responsiveWidth(3),
+                                    textTransform: 'capitalize', fontFamily: 'Poppins-Medium',
+                                    top: responsiveWidth(.5), color: COLOURS.black, fontSize: responsiveFontSize(2)
+                                }}>{item?.title}</Text>
 
-                            <Text numberOfLines={7} ellipsizeMode='tail' style={{
-                                paddingLeft: responsiveWidth(4), marginTop: responsiveWidth(2),
-                                textTransform: 'capitalize', fontFamily: 'Poppins-Medium',
-                                top: responsiveWidth(.5), color: COLOURS.grey, fontSize: responsiveFontSize(1.7)
-                            }}>
-                                {item?.description}
-                            </Text>
+                                <Text numberOfLines={7} ellipsizeMode='tail' style={{
+                                    paddingLeft: responsiveWidth(4), marginTop: responsiveWidth(2),
+                                    textTransform: 'capitalize', fontFamily: 'Poppins-Medium',
+                                    top: responsiveWidth(.5), color: COLOURS.grey, fontSize: responsiveFontSize(1.7)
+                                }}>
+                                    {item?.description}
+                                </Text>
 
-                            <View style={{
-                                width: '91%', height: responsiveWidth(.2), backgroundColor: COLOURS.grey,
-                                marginTop: responsiveWidth(3), alignSelf: 'center'
-                            }} />
+                                <View style={{
+                                    width: '91%', height: responsiveWidth(.2), backgroundColor: COLOURS.grey,
+                                    marginTop: responsiveWidth(3), alignSelf: 'center'
+                                }} />
 
-                            <View style={{
-                                marginHorizontal: responsiveWidth(4), marginTop: responsiveWidth(2.5),
-                                flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start'
-                            }}>
-                                <Reaction
-                                    isHeart
-                                    contentId={item.id}
-                                    isLiked={item?.isLiked}
-                                    count={item.likesCount || 0}
-                                />
-                                <Reaction source={globalImages.comment} count={commentsCount} onPress={() => setShowComments(true)} />
+                                <View style={{
+                                    marginHorizontal: responsiveWidth(4), marginTop: responsiveWidth(2.5),
+                                    flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start'
+                                }}>
+                                    <Reaction
+                                        isHeart
+                                        contentId={item.id}
+                                        isLiked={item?.isLiked}
+                                        count={item.likesCount || 0}
+                                    />
+                                    <Reaction source={globalImages.comment} count={commentsCount}
+                                        onPress={() => setShowComments(true)}
+                                    />
 
-                                <Reaction
-                                    isBookmark
-                                    contentId={item.id}
-                                    initialBookmarked={item.isBookmarked}
-                                    onUnbookmark={() => onUnbookmark?.(item.id)}
-                                />
+                                    <Reaction
+                                        isBookmark
+                                        contentId={item.id}
+                                        initialBookmarked={item.isBookmarked}
+                                        onUnbookmark={() => onUnbookmark?.(item.id)}
+                                    />
+                                </View>
+
                             </View>
 
+                        </TouchableOpacity>
+
+                    ) : (
+                        <View style={[styles.fallback, { backgroundColor: COLOURS.light_primary, }]}>
+                            <Text style={[styles.fallback_text, { color: COLOURS.grey, }]}>🖼️ Image Post Coming Soon...</Text>
                         </View>
+                    )
+                }
 
-                    </TouchableOpacity>
+                <CommentSheet
+                    isOpen={showComments}
+                    onClose={() => setShowComments(false)}
+                    postId={item?.id}
+                    onCommentAdded={() => setCommentsCount(prev => prev + 1)}
+                    onCommentDeleted={() => setCommentsCount(prev => prev - 1)}
+                />
 
-                ) : (
-                    <View style={[styles.fallback, { backgroundColor: COLOURS.light_primary, }]}>
-                        <Text style={[styles.fallback_text, { color: COLOURS.grey, }]}>🖼️ Image Post Coming Soon...</Text>
-                    </View>
-                )
-            }
-            <CommentSheet
-                isOpen={showComments}
-                onClose={() => setShowComments(false)}
-                postId={item?.id}
-                onCommentAdded={() => setCommentsCount(prev => prev + 1)}
-                onCommentDeleted={() => setCommentsCount(prev => prev - 1)}
-            />
-        </FadeDown >
+
+
+                {/* <BottomSheet /> */}
+
+            </FadeDown>
+
+        </>
     )
 }
 

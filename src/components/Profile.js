@@ -35,8 +35,10 @@ const Profile = ({
     height,
     width,
     edit,
+    fontSize,
     onPress,
     selectedImage,
+    Ease,
 }) => {
 
     const { userData } = useUser();
@@ -68,73 +70,41 @@ const Profile = ({
             ]).start();
 
             setTimeout(() => {
-
-                setGradientIndex((prev) =>
-                    prev === gradients.length - 1
-                        ? 0
-                        : prev + 1
-                );
-
+                setGradientIndex((prev) => prev === gradients.length - 1 ? 0 : prev + 1);
             }, 600);
-
         }, 2500);
 
         return () => clearInterval(interval);
 
     }, []);
 
-    const firstLetter = userData?.name
-        ? userData.name.charAt(0).toUpperCase()
-        : '?';
-
-    const imageUri =
-        selectedImage?.uri ||
-        userData?.profilePicture ||
-        null;
-
+    const firstLetter = userData?.name ? userData.name.charAt(0).toUpperCase() : '?';
+    const imageUri = selectedImage?.uri || userData?.profilePicture || null;
+    const flatColors = gradients.flat();
+    const randomColor = useRef(flatColors[Math.floor(Math.random() * flatColors.length)]).current;
+    
     return (
         <View style={{ alignSelf, marginBottom, marginTop }}>
 
             {imageUri ? (
-
-                <Image
-                    source={{ uri: imageUri }}
-                    style={[styles.profile_here, {
-                        borderWidth: responsiveWidth(.4),
-                        height: height || responsiveWidth(25),
-                        width: width || responsiveWidth(25),
-                        borderColor: COLOURS.primary
-                    }]}
-                    resizeMode="cover"
-                />
-
-            ) : (
-
-                <Animated.View
-                    style={{
-                        opacity: fadeAnim,
-                    }}
-                >
-
-                    <LinearGradient
-                        colors={gradients[gradientIndex]}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={[
-                            styles.profile_here,
-                            styles.letter_container,
-                        ]}
-                    >
-
+                <Image source={{ uri: imageUri }} style={[styles.profile_here, { borderWidth: responsiveWidth(.4), height: height || responsiveWidth(25), width: width || responsiveWidth(25), borderColor: COLOURS.primary }]} resizeMode="cover" />
+            ) : !Ease ? (
+                <Animated.View style={{ opacity: fadeAnim }}>
+                    <LinearGradient colors={gradients[gradientIndex]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[styles.profile_here, styles.letter_container, { height: height || responsiveWidth(25), width: width || responsiveWidth(25) }]}>
                         <View style={styles.glossy_effect} />
-
-                        <Text style={styles.letter}>
-                            {firstLetter}
-                        </Text>
-
+                        <Text style={[styles.letter, { fontSize: fontSize || responsiveFontSize(2.5) }]}>{firstLetter}</Text>
                     </LinearGradient>
-
                 </Animated.View>
+            ) : (
+                <View style={{
+                    backgroundColor: randomColor, borderRadius: 999,
+                    height: height || responsiveWidth(25), width: width || responsiveWidth(25),
+                    alignItems: 'center', justifyContent: 'center'
+                }}>
+                    <Text style={[styles.letter, { fontSize: fontSize || responsiveFontSize(2.5) }]}>
+                        {firstLetter}
+                    </Text>
+                </View>
             )}
 
             {edit === true && (
@@ -175,10 +145,14 @@ const styles = StyleSheet.create({
     },
 
     letter: {
-        fontSize: responsiveFontSize(4),
+        fontSize: responsiveFontSize(2.5),
         color: '#fff',
+        top: responsiveWidth(.3),
         fontFamily: Fonts.Bold,
         letterSpacing: 1.5,
+        alignItems: 'center',
+        justifyContent: 'center',
+        textAlignVertical: 'center',
     },
 
     edit_icon: {

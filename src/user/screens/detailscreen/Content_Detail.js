@@ -17,6 +17,7 @@ import { globalImages } from '../../../assets/images/images_file/All_Images';
 import { avatarColors, getInitials, timeAgo } from '../../../components/TimeAgo';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 import { ScrollView, StatusBar, StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
+import Back_Arrow from '../../../components/Back_Arrow';
 
 
 const Content_Detail = ({ route, }) => {
@@ -67,7 +68,8 @@ const Content_Detail = ({ route, }) => {
 
             <SafeAreaView style={{ flex: 1, backgroundColor: COLOURS.light_primary }}>
                 <View style={[styles.container, { backgroundColor: COLOURS.white }]}>
-                    <Header title={item?.title} />
+                    {/* <Header title={item?.title} /> */}
+                    <Back_Arrow label={item?.title} fontSize={responsiveFontSize(2)}/>
                     <ScrollView showsVerticalScrollIndicator={false}>
 
                         <ZoomIn delay={600}>

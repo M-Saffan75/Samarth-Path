@@ -74,10 +74,18 @@ const Verify_Email = ({ navigation, route }) => {
             updateUser(user)
             await AsyncStorage.setItem('token', data?.data?.token);
             showSuccess(data?.message || 'OTP verified!');
-            navigation.reset({
-                index: 0,
-                routes: [{ name: UserRoutes.Bottom_Navigation }],
-            });
+            console.log('data?.data?.user?.isSubscribed',data?.data?.user?.isSubscribed)
+            if (data?.data?.user?.isSubscribed === false) {
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: UserRoutes.PayWall}],
+                });
+            } else {
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: UserRoutes.Bottom_Navigation }],
+                });
+            }
         } catch (error) {
             console.log('error.code', error.code)
             if (error.code === 410) {

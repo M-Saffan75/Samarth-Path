@@ -17,11 +17,12 @@ import { useTheme } from '../../../assets/themecontext/ThemeContext';
 import { useLoader } from '../../../loading/LoaderContext';
 import { showError, showSuccess } from '../../../helper/Helper';
 import { registerUser, resendOtp } from '../../../user/screens/auth/auth_backend/Auth_Backend';
-import { FadeDown } from '../../../components/FadeDown';
+
 import { FadeUp } from '../../../components/FadeUp';
-import { FadeRight } from '../../../components/FadeRight';
-import { FadeLeft } from '../../../components/FadeLeft';
 import { FadeIn } from '../../../components/FadeIn';
+import { FadeLeft } from '../../../components/FadeLeft';
+import { FadeDown } from '../../../components/FadeDown';
+import { FadeRight } from '../../../components/FadeRight';
 
 const Register = ({ navigation }) => {
 
@@ -31,6 +32,7 @@ const Register = ({ navigation }) => {
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
+    const [address, setAddress] = useState('');
 
     const [password, setPassword] = useState('');
     const [formattedPhone, setFormattedPhone] = useState('+91');
@@ -90,6 +92,10 @@ const Register = ({ navigation }) => {
             showError('Passwords do not match');
             return;
         }
+        if (!address.trim()) {
+            showError('Address is required');
+            return;
+        }
 
         handleApiCall();
     };
@@ -97,7 +103,7 @@ const Register = ({ navigation }) => {
     const handleApiCall = async () => {
         try {
             setLoading(true);
-            const data = await registerUser({ name, phone: formattedPhone, email, password });
+            const data = await registerUser({ name, phone: formattedPhone, email, password, address });
             navigation.replace(UserRoutes.Verify_Email, {
                 phone: data?.data?.phone,
             });
@@ -243,6 +249,27 @@ const Register = ({ navigation }) => {
                                         height={responsiveWidth(4.5)}
                                         value={confirmPassword}
                                         onChangeText={setConfirmPassword}
+                                    />
+                                </FadeIn>
+                                <FadeLeft>
+                                    <Title_Here title={'Your address'} color={COLOURS.black} marginTop={responsiveWidth(1)} />
+                                </FadeLeft>
+                                <FadeIn delay={500}>
+                                    <Input_Field backgroundColor={COLOURS.transparent} borderColor={COLOURS.light_black}
+                                        borderWidth={1}
+                                        textAlignVertical={'top'}
+                                        multiline={true}
+                                        Input_width={responsiveWidth(85)}
+                                        Input_height={responsiveWidth(20)}
+                                        color={COLOURS.black}
+                                        Placeholder={"Enter your full address to receive your prize at your doorstep..."}
+                                        first_inpt_Img={false}
+                                        Second_inpt_Img={false}
+                                        tintColor={COLOURS.grey}
+                                        width={responsiveWidth(4.5)}
+                                        height={responsiveWidth(4.5)}
+                                        value={address}
+                                        onChangeText={setAddress}
                                     />
                                 </FadeIn>
 

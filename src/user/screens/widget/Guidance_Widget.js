@@ -69,6 +69,18 @@ const Guidance_Widget = ({ navigation }) => {
                     contentContainerStyle={styles.scroll_content}
                 >
 
+                    <FadeUp>
+                        {/* Description */}
+                        <View style={styles.section}>
+                            {/* <Text style={[styles.section_label, { color: COLOURS.primary, }]}>WHAT IS SAMARTH PATH?</Text> */}
+                            <Text style={[styles.desc_text, { color: COLOURS.grey, }]}>
+                                “Welcome to Finding your Path with Samarth Path. You get 3 free messages every month with your premium access pass. Ask for the guidance you need we will try to find the path that brings you peace and growth.”
+                            </Text>
+                        </View>
+
+                    </FadeUp>
+
+                    <View style={styles.divider} />
                     {/* ── Daily Content ── */}
                     <SectionHead label="DAILY CONTENT" />
 
@@ -221,7 +233,7 @@ const Guidance_Widget = ({ navigation }) => {
                             </Text>
                         </InstructionCard>
                     </FadeUp>
-                    
+
                     <Pulse>
                         <View style={styles.note_box}>
                             <Text style={styles.note_icon}>🔒</Text>
@@ -436,4 +448,30 @@ const styles = StyleSheet.create({
     bottom_space: {
         height: responsiveWidth(8),
     },
+
+    desc_text: {
+        fontFamily: 'Poppins-Regular',
+        fontSize: responsiveFontSize(1.6),
+
+        lineHeight: responsiveFontSize(2.8),
+    },
+
+    section: {
+        paddingHorizontal: responsiveWidth(1),
+        paddingBottom: responsiveWidth(5),
+    },
+    section_label: {
+        fontFamily: 'Poppins-Medium',
+        fontSize: responsiveFontSize(1.2),
+
+        letterSpacing: 1.2,
+        marginBottom: responsiveWidth(2.5),
+    },
+    divider: {
+        height: 1,
+        backgroundColor: 'rgba(200,169,110,0.3)',
+        marginHorizontal: responsiveWidth(1),
+        marginBottom: responsiveWidth(5),
+    },
+
 });

@@ -1,19 +1,20 @@
 import { useState, useEffect } from 'react';
 import {
     View, Text, StyleSheet, ScrollView,
-    TouchableOpacity, StatusBar
+    TouchableOpacity, StatusBar,
+    Image
 } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
-import { COLOURS } from '../../../assets/theme/Theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../../assets/themecontext/ThemeContext';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 
 
+import { Pulse } from '../../../components/Pulse';
+import { FadeUp } from '../../../components/FadeUp';
 import Back_Arrow from '../../../components/Back_Arrow';
 import { FadeDown } from '../../../components/FadeDown';
-import { FadeUp } from '../../../components/FadeUp';
-import { Pulse } from '../../../components/Pulse';
+import { globalImages } from '../../../assets/images/images_file/All_Images';
 
 const AboutSamarthPath = () => {
 
@@ -69,7 +70,8 @@ const AboutSamarthPath = () => {
                         <View style={styles.hero}>
                             <View style={[styles.logo_ring, { backgroundColor: COLOURS.white, }]}>
                                 <View style={[styles.logo_inner, { backgroundColor: COLOURS.primary, }]}>
-                                    <Text style={[styles.logo_text, { color: COLOURS.white, }]}>SP</Text>
+                                    {/* <Text style={[styles.logo_text, { color: COLOURS.white, }]}>SP</Text> */}
+                                    <Image source={globalImages.app_logo} style={{height:responsiveWidth(15),width:responsiveWidth(15)}}/>
                                 </View>
                             </View>
                             <Text style={[styles.app_name, { color: COLOURS.black, }]}>Samarth Path</Text>

@@ -10,7 +10,8 @@ import { globalImages } from '../assets/images/images_file/All_Images';
 const Input_Field = ({
     Placeholder, Second_inpt_Img, first_inpt_Img, textAlignVertical, display, borderWidth, borderColor, height, width, color,
     secureTextEntry, tintColor, onChangeText, keyboardType, maxLength, third_inpt_Img, left, backgroundColor, marginTop, Input_marginTop,
-    numberOfLines, pointerEvents, defaultValue, textTransform, editable, multiline, onValueChange, borderRadius, onPress, third_width, third_height }) => {
+    numberOfLines, pointerEvents, defaultValue, textTransform, editable, multiline, onValueChange, borderRadius, onPress, third_width,
+    third_height,}) => {
 
     const [isPasswordVisible, setPasswordVisible] = useState(secureTextEntry);
 
@@ -60,7 +61,7 @@ const Input_Field = ({
                         </TouchableOpacity>
                         : ''}
                 </View>
-            </View>
+            </View >
         </>
     )
 }

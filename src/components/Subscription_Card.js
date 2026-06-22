@@ -1,11 +1,14 @@
 import React from 'react';
 import { Fonts } from '../assets/fonts/Fonts';
-import { COLOURS } from '../assets/theme/Theme';
+import { useTheme } from '../assets/themecontext/ThemeContext';
 import { StatusBar, StyleSheet, Text, View } from 'react-native';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 
 
 const Subscription_Card = ({ Price, Trial_Days }) => {
+
+    const { theme: COLOURS, isDark } = useTheme();
+
     return (
         <>
             <View style={{

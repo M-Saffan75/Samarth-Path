@@ -64,7 +64,7 @@ const MessageBubble = ({ msg }) => {
             </View>
             {isUser && (
                 <View style={{ marginLeft: responsiveWidth(2) }}>
-                    <Profile height={responsiveWidth(8)} width={responsiveWidth(8)} />
+                    <Profile height={responsiveWidth(8)} width={responsiveWidth(8)} Ease={true} />
                 </View>
             )}
         </View>
@@ -117,6 +117,7 @@ const ConsultationScreen = ({ navigation }) => {
     }, [messages]);
 
     const handleSend = async () => {
+
         const text = inputText.trim();
         if (!text || sending) return;
 
@@ -132,6 +133,8 @@ const ConsultationScreen = ({ navigation }) => {
 
         try {
             const res = await sendConsultantMessage(text);
+            console.log('sending...')
+            return
             if (res?.success) {
                 setMessages(prev => prev.map(m => m._id === tempId ? { ...res.data } : m));
             } else if (res?.code === 400) {
@@ -188,10 +191,11 @@ const ConsultationScreen = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <Bounce>
                                     <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                                        <Profile height={responsiveWidth(13)} width={responsiveWidth(13)} />
+                                        <Profile height={responsiveWidth(13)} width={responsiveWidth(13)} Ease={true} />
                                         <View style={{ marginLeft: responsiveWidth(2), marginTop: responsiveWidth(1.5) }}>
                                             <Title_Here title={userData?.name} marginLeft={0} marginRight={0} marginTop={0} fontSize={responsiveFontSize(1.6)} />
-                                            <Title_Here title={userData?.email} marginLeft={0} marginRight={0} marginTop={0} fontSize={responsiveFontSize(1.5)} color={COLOURS.black} />
+                                            <Title_Here title={userData?.email} marginLeft={0} marginRight={0} marginTop={0} textTransform={'lowercase'}
+                                                fontSize={responsiveFontSize(1.5)} color={COLOURS.black} />
                                         </View>
                                     </View>
                                 </Bounce>
@@ -250,7 +254,7 @@ const ConsultationScreen = ({ navigation }) => {
 
                             {/* Input */}
                             <View style={[styles.input_row, { borderTopColor: COLOURS.light_primary }]}>
-                                <Profile height={responsiveWidth(9)} width={responsiveWidth(9)} />
+                                <Profile height={responsiveWidth(9)} width={responsiveWidth(9)} Ease={true} />
                                 <TextInput
                                     placeholder="Write your message..."
                                     placeholderTextColor={COLOURS.grey}

@@ -9,7 +9,7 @@ const ThemeContext = createContext();
 const THEME_KEY = 'app_theme'; // 'light' | 'dark' | 'system'
 
 export const ThemeProvider = ({ children }) => {
-    const [themeMode, setThemeMode] = useState('system');
+    const [themeMode, setThemeMode] = useState('light');
     const [systemTheme, setSystemTheme] = useState(Appearance.getColorScheme());
 
     // System theme change listener
@@ -25,6 +25,7 @@ export const ThemeProvider = ({ children }) => {
         const load = async () => {
             const saved = await AsyncStorage.getItem(THEME_KEY);
             if (saved) setThemeMode(saved);
+            else { await AsyncStorage.setItem(THEME_KEY, 'light'); }
         };
         load();
     }, []);
@@ -38,8 +39,8 @@ export const ThemeProvider = ({ children }) => {
     // Active theme decide karo
     const isDark =
         themeMode === 'dark' ? true :
-        themeMode === 'light' ? false :
-        systemTheme === 'dark'; // system
+            themeMode === 'light' ? false :
+                systemTheme === 'dark' // system
 
     const theme = isDark ? DARK_COLOURS : COLOURS;
 

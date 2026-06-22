@@ -6,6 +6,7 @@ import {
     StyleSheet,
     ScrollView,
     ActivityIndicator,
+    TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Fonts } from '../../../assets/fonts/Fonts';
@@ -17,6 +18,12 @@ import Title_Here from '../../../components/Title_Here'; // already built compon
 import { useTheme } from '../../../assets/themecontext/ThemeContext';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 import { fetchWeeklyWinners, fetchWeeklyScore } from './weeklybackend/WeeklyBackend'; // <-- separate api file
+import { Pulse } from '../../../components/Pulse';
+
+// ─── Constants ──────────────────────────────────────────────────────────────
+
+const DAILY_NOTE = 'Updates as users attempt quizzes. Final winner announced today.';
+const WEEKLY_NOTE = 'Updates as users attempt quizzes. Final winner announced on Monday.';
 
 // ─── Avatar colors cycling ─────────────────────────────────────────────────
 
@@ -36,6 +43,14 @@ const getMedalEmoji = (rank) => {
     if (rank === 2) return '🥈';
     if (rank === 3) return '🥉';
     return null;
+};
+
+const formatDateTag = (dateStr) => {
+    try {
+        return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    } catch {
+        return dateStr;
+    }
 };
 
 // ─── ScoreBar ──────────────────────────────────────────────────────────────
@@ -82,20 +97,21 @@ const ScoreBar = ({ scoreData }) => {
 
 // ─── WinnerRow ─────────────────────────────────────────────────────────────
 
-const WinnerRow = ({ item, index, isLast }) => {
+const WinnerRow = ({ item, index, isLast, showTrophy, scoreTotal = 7, hideScore = false }) => {
     const { theme: COLOURS } = useTheme();
     const rank = item.rank ?? index + 1;
     const medal = getMedalEmoji(rank);
     const color = avatarColors[index % avatarColors.length];
 
-    // Profile: show image if profilePicture exists, else first letter of name
     const firstLetter = item.userName ? item.userName.charAt(0).toUpperCase() : '?';
     const hasImage = item.profilePicture && item.profilePicture.trim() !== '';
+
+    const scoreValue = item.score ?? item.correctAnswers;
+    const subLabel = scoreValue !== undefined ? `${scoreValue} correct answers` : item.email;
 
     return (
         <FadeUp>
             <View style={[styles.winnerRow, isLast && { borderBottomWidth: 0 }]}>
-                {/* Rank */}
                 <View style={styles.rankBox}>
                     {medal ? (
                         <Text style={styles.medalEmoji}>{medal}</Text>
@@ -104,7 +120,6 @@ const WinnerRow = ({ item, index, isLast }) => {
                     )}
                 </View>
 
-                {/* Avatar */}
                 {hasImage ? (
                     <Image
                         source={{ uri: item.profilePicture }}
@@ -116,14 +131,26 @@ const WinnerRow = ({ item, index, isLast }) => {
                     </View>
                 )}
 
-                {/* Name + sub */}
                 <View style={{ flex: 1 }}>
-                    <Text style={[styles.winnerName, { color: COLOURS.black }]}>{item.userName}</Text>
-                    <Text style={[styles.winnerSub, { color: COLOURS.grey }]}>{item.score} correct answers</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: responsiveWidth(1.5) }}>
+                        <Text style={[styles.winnerName, { color: COLOURS.black }]}>{item.userName || item.name}</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Text style={[styles.winnerSub, { color: COLOURS.grey }]} numberOfLines={1}>{subLabel}</Text>
+                        {showTrophy &&
+                            <Pulse>
+                                <Text style={{ fontSize: responsiveFontSize(2) }}>
+                                    🏆
+                                </Text>
+                            </Pulse>
+                        }
+                    </View>
                 </View>
 
-                {/* Score */}
-                <Text style={[styles.winnerScore, { color: COLOURS.primary }]}>{item.score}{'/7'}</Text>
+                {!hideScore && scoreValue !== undefined && (
+                    <Text style={[styles.winnerScore, { color: COLOURS.primary }]}>{scoreValue}{`/${scoreTotal}`}</Text>
+                )}
+
             </View>
         </FadeUp>
     );
@@ -131,44 +158,60 @@ const WinnerRow = ({ item, index, isLast }) => {
 
 // ─── Leaderboard Card ──────────────────────────────────────────────────────
 
-// ─── Leaderboard Card ──────────────────────────────────────────────────────
-
-const LeaderboardCard = ({ title, weekData }) => {
+const LeaderboardCard = ({ title, weekData, show, fallbackMessage = 'No top 3 yet.', topTrophy = false, scoreTotal = 7, hideTopScore = false }) => {
     const { theme: COLOURS } = useTheme();
 
     if (!weekData) return null;
 
-    const { week, year, top3, allParticipants } = weekData;
+    const { week, year, date, top3, allParticipants, winner } = weekData;
+
+    // currentWeek -> week is a flat number (25), year is flat (2026).
+    // weekly/weeklyWinner -> week is an object { weekNumber, year, start, end }.
+    const weekNum = typeof week === 'object' ? week?.weekNumber : week;
+    const weekYear = typeof week === 'object' ? week?.year : year;
+
+    const tagLabel = weekNum && weekYear
+        ? `Week ${weekNum}, ${weekYear}`
+        : date
+            ? formatDateTag(date)
+            : '';
+
+    // currentWeek/last10Days send a top3 array.
+    // daily/weekly winner endpoints send a single `winner` object (or null) -> wrap as a 1-item list.
+    const topList = top3 ?? (winner ? [{ ...winner, rank: 1 }] : []);
 
     return (
         <>
-            {/* ── Top 3 Card ── */}
-            <FadeIn delay={300}>
+            {/* ── Top Card ── */}
+            {show !== false ? (<FadeIn delay={300}>
                 <View style={[styles.card, { marginTop: responsiveWidth(3), borderColor: COLOURS.grey }]}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Title_Here title={title} marginTop={0}/>
+                        <Title_Here title={title} marginTop={0} />
                         <View style={[styles.cardHeader, { borderBottomColor: COLOURS.light_grey }]}>
                             <View style={[styles.weekTag, { borderColor: COLOURS.grey, backgroundColor: COLOURS.light_primary }]}>
                                 <Text style={[styles.weekTagText, { color: COLOURS.grey }]}>
-                                    Week {week}, {year}
+                                    {tagLabel}
                                 </Text>
                             </View>
                         </View>
                     </View>
-                    {top3.length > 0 ? (
-                        top3.map((item, index) => (
+                    {topList?.length > 0 ? (
+                        topList.map((item, index) => (
                             <WinnerRow
-                                key={`top3-${item.userId}-${index}`}
+                                key={`top-${item.userId}-${index}`}
                                 item={item}
                                 index={index}
-                                isLast={index === top3.length - 1}
+                                isLast={index === topList.length - 1}
+                                showTrophy={topTrophy}
+                                scoreTotal={scoreTotal}
+                                hideScore={hideTopScore}
                             />
                         ))
                     ) : (
-                        <Text style={[styles.emptyText, { color: COLOURS.grey, paddingHorizontal: responsiveWidth(4), paddingBottom: responsiveWidth(3) }]}>No top 3 yet.</Text>
+                        <Text style={[styles.emptyText, { color: COLOURS.grey, paddingHorizontal: responsiveWidth(4), paddingBottom: responsiveWidth(3) }]}>{fallbackMessage}</Text>
                     )}
                 </View>
-            </FadeIn>
+            </FadeIn>) : ''}
 
             {/* ── All Participants Card ── */}
             <FadeIn delay={450}>
@@ -177,17 +220,18 @@ const LeaderboardCard = ({ title, weekData }) => {
                         <Text style={[styles.leaderboardTitle, { color: COLOURS.black }]}>All Participants</Text>
                         <View style={[styles.weekTag, { borderColor: COLOURS.grey, backgroundColor: COLOURS.light_primary }]}>
                             <Text style={[styles.weekTagText, { color: COLOURS.grey }]}>
-                                Week {week}, {year}
+                                {tagLabel}
                             </Text>
                         </View>
                     </View>
-                    {allParticipants.length > 0 ? (
-                        allParticipants.map((item, index) => (
+                    {allParticipants?.length > 0 ? (
+                        allParticipants?.map((item, index) => (
                             <WinnerRow
                                 key={`all-${item.userId}-${index}`}
                                 item={item}
                                 index={index}
-                                isLast={index === allParticipants.length - 1}
+                                isLast={index === allParticipants?.length - 1}
+                                scoreTotal={scoreTotal}
                             />
                         ))
                     ) : (
@@ -207,16 +251,39 @@ const Weekly_Winners = () => {
     const [scoreData, setScoreData] = useState(null);
     const [winnersData, setWinnersData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [selectedTab, setSelectedTab] = useState('all'); // 'all' | 'daily' | 'dailyWinner' | 'weekly' | 'weeklyWinner' | 'last10'
 
     useEffect(() => {
-        loadData();
+        loadData('all');
     }, []);
 
-    const loadData = async () => {
+    const loadData = async (tab) => {
         setLoading(true);
+
+        let winnersCall;
+        switch (tab) {
+            case 'last10':
+                winnersCall = fetchWeeklyWinners({ days: 10 });
+                break;
+            case 'daily':
+                winnersCall = fetchWeeklyWinners({ daily: true });
+                break;
+            case 'dailyWinner':
+                winnersCall = fetchWeeklyWinners({ daily: true, winner: true });
+                break;
+            case 'weekly':
+                winnersCall = fetchWeeklyWinners({ weekly: true });
+                break;
+            case 'weeklyWinner':
+                winnersCall = fetchWeeklyWinners({ weekly: true, winner: true });
+                break;
+            default:
+                winnersCall = fetchWeeklyWinners(); // 'all'
+        }
+
         const [scoreRes, winnersRes] = await Promise.all([
             fetchWeeklyScore(),
-            fetchWeeklyWinners(),
+            winnersCall,
         ]);
 
         if (scoreRes.success) setScoreData(scoreRes.data);
@@ -224,10 +291,16 @@ const Weekly_Winners = () => {
         setLoading(false);
     };
 
+    const handleTabChange = (tab) => {
+        setSelectedTab(tab);
+        loadData(tab);
+    };
+
     return (
         <SafeAreaView style={[styles.safeArea, { backgroundColor: COLOURS.light_primary }]}>
-            <Back_Arrow label={'weekly winners'} />
+            <Back_Arrow label={'Past winners'} />
 
+            <ScoreBar scoreData={scoreData} />
             {loading ? (
                 <View style={styles.loaderContainer}>
                     <ActivityIndicator size="large" color={COLOURS.primary} />
@@ -239,21 +312,133 @@ const Weekly_Winners = () => {
                     contentContainerStyle={{ paddingBottom: responsiveWidth(8) }}
                 >
                     {/* Score Bar */}
-                    <ScoreBar scoreData={scoreData} />
+                    <ScrollView showsHorizontalScrollIndicator={false} horizontal>
+                        <View style={styles.row_filters}>
+                            <TouchableOpacity activeOpacity={0.8} onPress={() => handleTabChange('all')}
+                                style={[styles.row_status, {
+                                    width: responsiveWidth(12),
+                                    borderColor: selectedTab === 'all' ? COLOURS.primary : COLOURS.grey,
+                                    backgroundColor: selectedTab === 'all' ? COLOURS.primary : 'transparent',
+                                }]}>
+                                <Text style={[styles.text_here, { color: selectedTab === 'all' ? COLOURS.white : COLOURS.black }]}>
+                                    All
+                                </Text>
+                            </TouchableOpacity>
 
-                    {/* Current Week Leaderboard */}
-                    <LeaderboardCard
-                        title="This week"
-                        weekData={winnersData?.currentWeek}
-                    />
+                            <TouchableOpacity activeOpacity={0.8} onPress={() => handleTabChange('daily')}
+                                style={[styles.row_status, {
+                                    width: responsiveWidth(15),
+                                    marginLeft: responsiveWidth(3),
+                                    borderColor: selectedTab === 'daily' ? COLOURS.primary : COLOURS.grey,
+                                    backgroundColor: selectedTab === 'daily' ? COLOURS.primary : 'transparent',
+                                }]}>
+                                <Text style={[styles.text_here, { color: selectedTab === 'daily' ? COLOURS.white : COLOURS.black }]}>
+                                    Daily
+                                </Text>
+                            </TouchableOpacity>
 
-                    {/* Last Week Leaderboard */}
-                    <LeaderboardCard
-                        title="Last week"
-                        weekData={winnersData?.lastWeek}
-                    />
+                            <TouchableOpacity activeOpacity={0.8} onPress={() => handleTabChange('dailyWinner')}
+                                style={[styles.row_status, {
+                                    width: responsiveWidth(24),
+                                    marginLeft: responsiveWidth(3),
+                                    borderColor: selectedTab === 'dailyWinner' ? COLOURS.primary : COLOURS.grey,
+                                    backgroundColor: selectedTab === 'dailyWinner' ? COLOURS.primary : 'transparent',
+                                }]}>
+                                <Text style={[styles.text_here, { color: selectedTab === 'dailyWinner' ? COLOURS.white : COLOURS.black }]}>
+                                    Daily winner
+                                </Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity activeOpacity={0.8} onPress={() => handleTabChange('weekly')}
+                                style={[styles.row_status, {
+                                    width: responsiveWidth(18),
+                                    marginLeft: responsiveWidth(3),
+                                    borderColor: selectedTab === 'weekly' ? COLOURS.primary : COLOURS.grey,
+                                    backgroundColor: selectedTab === 'weekly' ? COLOURS.primary : 'transparent',
+                                }]}>
+                                <Text style={[styles.text_here, { color: selectedTab === 'weekly' ? COLOURS.white : COLOURS.black }]}>
+                                    weekly
+                                </Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity activeOpacity={0.8} onPress={() => handleTabChange('weeklyWinner')}
+                                style={[styles.row_status, {
+                                    width: responsiveWidth(28),
+                                    marginLeft: responsiveWidth(3),
+                                    borderColor: selectedTab === 'weeklyWinner' ? COLOURS.primary : COLOURS.grey,
+                                    backgroundColor: selectedTab === 'weeklyWinner' ? COLOURS.primary : 'transparent',
+                                }]}>
+                                <Text style={[styles.text_here, { color: selectedTab === 'weeklyWinner' ? COLOURS.white : COLOURS.black }]}>
+                                    Weekly winner
+                                </Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity activeOpacity={0.8} onPress={() => handleTabChange('last10')} style={[styles.row_status, {
+                                marginLeft: responsiveWidth(3),
+                                width: responsiveWidth(24),
+                                borderColor: selectedTab === 'last10' ? COLOURS.primary : COLOURS.grey,
+                                backgroundColor: selectedTab === 'last10' ? COLOURS.primary : 'transparent',
+                            }]}>
+                                <Text style={[styles.text_here, { color: selectedTab === 'last10' ? COLOURS.white : COLOURS.black }]}>
+                                    Past 10 Days
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    </ScrollView>
+
+                    {/* Leaderboard */}
+                    {selectedTab === 'all' ? (
+                        <>
+                            <LeaderboardCard
+                                title="This week"
+                                weekData={winnersData?.currentWeek}
+                            />
+                            <LeaderboardCard
+                                title="Last 10 Days"
+                                weekData={winnersData?.last10Days}
+                            />
+                        </>
+                    ) : selectedTab === 'daily' ? (
+                        <LeaderboardCard
+                            title="Today"
+                            weekData={winnersData?.daily}
+                            show={false}
+                            scoreTotal={1}
+                        />
+                    ) : selectedTab === 'dailyWinner' ? (
+                        <LeaderboardCard
+                            title="Today's Winner"
+                            weekData={winnersData?.daily}
+                            fallbackMessage={DAILY_NOTE}
+                            topTrophy
+                            scoreTotal={1}
+                            hideTopScore
+                        />
+
+                    ) : selectedTab === 'weekly' ? (
+                        <LeaderboardCard
+                            title="Weekly Participants"
+                            weekData={winnersData?.weekly}
+                            show={false}
+                        />
+                    ) : selectedTab === 'weeklyWinner' ? (
+                        <LeaderboardCard
+                            title="Weekly Winner"
+                            weekData={winnersData?.weekly}
+                            fallbackMessage={WEEKLY_NOTE}
+                            topTrophy
+                            hideTopScore
+                        />
+                    ) : (
+                        <LeaderboardCard
+                            title="Last 10 Days"
+                            weekData={winnersData?.last10Days}
+                            show={false}
+                        />
+                    )}
                 </ScrollView>
-            )}
+            )
+            }
         </SafeAreaView>
     );
 };
@@ -263,6 +448,33 @@ export default Weekly_Winners;
 // ─── Styles ────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
+
+    loaderContainer: {
+        marginTop: responsiveWidth(5),
+    },
+
+    row_filters: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        marginTop: responsiveWidth(5),
+        marginLeft: responsiveWidth(5),
+        marginRight: responsiveWidth(3),
+    },
+
+    row_status: {
+        borderWidth: responsiveWidth(.4),
+        height: responsiveWidth(7),
+        width: responsiveWidth(15),
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: responsiveWidth(2),
+    },
+
+    text_here: {
+        textAlign: 'center',
+        fontSize: responsiveFontSize(1.5),
+    },
 
     safeArea: {
         flex: 1,

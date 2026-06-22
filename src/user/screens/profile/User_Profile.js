@@ -12,12 +12,13 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { ThemeOverlay } from '../../../components/ThemeOverlay';
 import { globalImages } from '../../../assets/images/images_file/All_Images';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
-import { Animated, Image, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { Animated, Image, Platform, ScrollView, Share, StatusBar, StyleSheet, Text, View } from 'react-native';
 
-import { showError } from '../../../helper/Helper';
-import { Pulse } from '../../../components/Pulse';
 import Profile from '../../../components/Profile';
+import { Pulse } from '../../../components/Pulse';
+import { showError } from '../../../helper/Helper';
 import { useUser } from '../auth/user_context/UserContext';
+import { logoutUser } from '../auth/auth_backend/Auth_Backend';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../../../assets/themecontext/ThemeContext';
 
@@ -26,10 +27,14 @@ const User_Profile = ({ navigation }) => {
     const { userData } = useUser();
     const [showTheme, setShowTheme] = useState(false);
 
-
     const handleLogout = async () => {
         try {
+            const res = await logoutUser();
+            console.log(res)
             await AsyncStorage.removeItem('token');
+            const allKeys = await AsyncStorage.getAllKeys();
+            const quizKeys = allKeys.filter(key => key.startsWith('quiz_timer_'));
+            await AsyncStorage.multiRemove(quizKeys);
             navigation.reset({
                 index: 0,
                 routes: [{ name: UserRoutes.OnBoard }],
@@ -38,8 +43,18 @@ const User_Profile = ({ navigation }) => {
             showError('Something went wrong. Try again!');
         }
     };
-
     const { theme: COLOURS, isDark } = useTheme();
+
+    const shareApp = async () => {
+        const appLink =
+            Platform.OS === 'android'
+                ? 'https://play.google.com/store/apps/details?id=com.samarth'
+                : 'https://apps.apple.com/app/id123456789';
+
+        await Share.share({
+            message: `Download our Samarth Path:\n${appLink}`,
+        });
+    };
 
     return (
         <>
@@ -63,7 +78,7 @@ const User_Profile = ({ navigation }) => {
                     }]}>
 
                         <Pulse>
-                            <Profile alignSelf={'center'} />
+                            <Profile alignSelf={'center'} fontSize={responsiveFontSize(3)} />
                         </Pulse>
 
                         <FadeIn delay={150}>
@@ -107,12 +122,16 @@ const User_Profile = ({ navigation }) => {
 
                         <FadeDown>
                             <View style={[styles.box_profile_new, { backgroundColor: COLOURS.light_primary }]}>
+
                                 <Profile_Row label={'edit profile'} source={globalImages.user_filled}
                                     onPress={() => navigation.navigate(UserRoutes.Edit_Profile)} />
-                                {/* <Profile_Row label={'my path'} source={globalImages.access_icon} />
-                                <Profile_Row label={'archives'} source={globalImages.archive_icon} /> */}
-                                <Profile_Row label={'guidance'} bordernone={false} paddingBottom={responsiveWidth(.1)}
-                                    source={globalImages.signpost_icon} onPress={() => navigation.navigate(UserRoutes.Guidance_Widget)} />
+
+                                <Profile_Row label={'guidance'} source={globalImages.guidnace_icon}
+                                    onPress={() => navigation.navigate(UserRoutes.Guidance_Widget)} />
+
+                                <Profile_Row label={'subscription'} bordernone={false} paddingBottom={responsiveWidth(.1)}
+                                    source={globalImages.about_icon} onPress={() => navigation.navigate(UserRoutes.Subscription)} />
+                                    
                             </View>
                         </FadeDown>
 
@@ -132,13 +151,18 @@ const User_Profile = ({ navigation }) => {
                             <View style={[styles.box_profile_new, { backgroundColor: COLOURS.light_primary }]}>
                                 <Profile_Row label={'notifications'} source={globalImages.calender_icon}
                                     onPress={() => navigation.navigate(UserRoutes.User_Notification)} />
+                                <Profile_Row label={'notification preference'} source={globalImages.bell_icon}
+                                    onPress={() => navigation.navigate(UserRoutes.Notification_Preference)} />
                                 <Profile_Row label={'about samarth path'} source={globalImages.about_icon}
                                     onPress={() => navigation.navigate(UserRoutes.AboutSamarthPath)} />
                                 <Profile_Row label={'change password'} source={globalImages.lock_icon}
                                     onPress={() => navigation.navigate(UserRoutes.Change_Password)} />
-                                <Profile_Row label={'Appearance'} bordernone={false} paddingBottom={responsiveWidth(.1)}
-                                    source={globalImages.theme_icon} onPress={() => setShowTheme(true)} />
-
+                                <Profile_Row label={'Appearance'} source={globalImages.theme_icon}
+                                    onPress={() => setShowTheme(true)} />
+                                <Profile_Row label={'share app'} source={globalImages.share_icon}
+                                    onPress={shareApp}
+                                    bordernone={false}
+                                    paddingBottom={responsiveWidth(.1)} />
                             </View>
                         </FadeUp>
 

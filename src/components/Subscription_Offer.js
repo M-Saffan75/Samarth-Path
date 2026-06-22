@@ -1,11 +1,14 @@
 import React from 'react'
 import { Fonts } from '../assets/fonts/Fonts';
-import { COLOURS } from '../assets/theme/Theme';
 import { StyleSheet, Text, View, Image, } from 'react-native'
+import { useTheme } from '../assets/themecontext/ThemeContext';
 import { globalImages } from '../assets/images/images_file/All_Images';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 
 const Subscription_Offer = ({ detail, source }) => {
+
+    const { theme: COLOURS, isDark } = useTheme();
+
     return (
         <>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: responsiveWidth(4), marginBottom: responsiveWidth(3.5) }}>

@@ -16,12 +16,21 @@ const UserRoutes = {
     // PayWall
     PayWall: 'PayWall',
 
+    // NewScreen
+    NewSheet: 'NewSheet',
+
     // Home
     Home: 'Home',
     Main_Home: 'Main_Home',
 
     // Consualtation
     ConsultationScreen: 'Consultation_Screen',
+
+    // QuizCard
+    QuizCard: 'QuizCard',
+
+    // CommentScreen
+    CommentScreen: 'CommentScreen',
 
     // Edit_Profile
     Edit_Profile: 'Edit_Profile',
@@ -41,6 +50,7 @@ const UserRoutes = {
 
     // User_Notification
     User_Notification: 'User_Notification',
+    Notification_Preference: 'Notification_Preference',
 
     // AboutSamarthPath
     AboutSamarthPath: 'AboutSamarthPath',
@@ -53,6 +63,9 @@ const UserRoutes = {
 
     // Content_Detail
     Content_Detail: 'Content_Detail',
+
+    // User_Subscription
+    Subscription: 'User_Subscription',
 
     // Bottom_Navigation
     Bottom_Navigation: 'Bottom_Navigation',

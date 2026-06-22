@@ -21,9 +21,9 @@ const User_Main = () => {
     }, []);
 
     return (
-        <View style={{ flex: 1 }}>
-            <User_Navigator isConnected={isConnected} />
-        </View>
+            <View style={{ flex: 1 }}>
+                <User_Navigator isConnected={isConnected} />
+            </View>
     );
 };
 

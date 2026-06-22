@@ -12,6 +12,9 @@ import { StyleSheet, Image, View, StatusBar, Animated } from 'react-native';
 
 
 import { useUser } from '../screens/auth/user_context/UserContext';
+import { FadeDown } from '../../components/FadeDown';
+import { FadeIn } from '../../components/FadeIn';
+import { FadeUp } from '../../components/FadeUp';
 
 
 const Splash = () => {
@@ -23,10 +26,11 @@ const Splash = () => {
   const checkToken = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
-      console.log('token',token)
+      console.log('token', token)
       if (token) {
         const user = await getUserMe(token)
         updateUser(user)
+        console.log('user', user)
         navigation.reset({
           index: 0,
           routes: [{ name: UserRoutes.Bottom_Navigation }],
@@ -70,6 +74,9 @@ const Splash = () => {
           <Animated.View style={{ opacity: fadeAnim }}>
             <Title_Here title={'samarth path'} color={COLOURS.white}
               fontSize={responsiveFontSize(2.5)} textAlign={'center'} />
+            <FadeUp delay={500}>
+              <Title_Here title={'You showed up today!'} fontSize={responsiveFontSize(2)} color={'#fff'}/>
+            </FadeUp>
           </Animated.View>
         </View>
       </SafeAreaView>

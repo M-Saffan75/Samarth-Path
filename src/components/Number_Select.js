@@ -76,7 +76,7 @@ const Number_Select = ({ value, onChangeText, onChangeFormatted, placeholder }) 
             </View>
 
             {/* Country Picker Modal */}
-            <Modal visible={modalVisible} animationType='fade' transparent>
+            <Modal visible={modalVisible} animationType='fade' transparent onRequestClose={() => setModalVisible(false)}>
                 <View style={styles.modalOverlay}>
                     <View style={[styles.modalBox, { backgroundColor: COLOURS.white, }]}>
 

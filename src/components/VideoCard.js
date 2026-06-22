@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import VideoPlayer from './VideoPlayer';
 import Reaction from './Reaction';
 import { FadeUp } from './FadeUp';
+import VideoPlayer from './VideoPlayer';
 import { Fonts } from '../assets/fonts/Fonts';
 import CommentSheet from '../components/CommentSheet';
+import UserRoutes from '../user/user_routes/UserRoutes';
 import { useTheme } from '../assets/themecontext/ThemeContext';
 import { globalImages } from '../assets/images/images_file/All_Images'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
-import UserRoutes from '../user/user_routes/UserRoutes';
 
 
 
@@ -59,7 +59,7 @@ const VideoCard = ({ item, activeVideoId, setActiveVideoId, onPress, onUnbookmar
                             paddingLeft: responsiveWidth(1),
                             textTransform: 'uppercase', fontFamily: 'Poppins-Medium',
                             top: responsiveWidth(.5), color: COLOURS.primary
-                        }}>{item.schedule}</Text>
+                        }}>{'evening video'}</Text>
                     </View>
 
                     <View>
@@ -95,7 +95,7 @@ const VideoCard = ({ item, activeVideoId, setActiveVideoId, onPress, onUnbookmar
                         paddingLeft: responsiveWidth(4), marginTop: responsiveWidth(3),
                         textTransform: 'capitalize', fontFamily: 'Poppins-Medium',
                         top: responsiveWidth(.5), color: COLOURS.black, fontSize: responsiveFontSize(2)
-                    }}>{item.title}</Text>
+                    }}>{item?.title}</Text>
 
                     <Text numberOfLines={5} ellipsizeMode='tail' style={{
                         paddingLeft: responsiveWidth(4), marginTop: responsiveWidth(2),

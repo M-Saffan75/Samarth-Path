@@ -5,7 +5,7 @@ import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dim
 import { Fonts } from '../assets/fonts/Fonts';
 import { useTheme } from '../assets/themecontext/ThemeContext';
 
-const ExplanationModal = ({ visible, explanation, onClose, title }) => {
+const ExplanationModal = ({ visible, explanation, onClose, title ,onPress}) => {
 
     const { theme: COLOURS } = useTheme();
 
@@ -38,7 +38,8 @@ const ExplanationModal = ({ visible, explanation, onClose, title }) => {
                         {explanation}
                     </Text>
                     <TouchableOpacity
-                        onPress={onClose}
+                    activeOpacity={0.8}
+                        onPress={onPress}
                         style={{
                             marginTop: responsiveWidth(4), backgroundColor: COLOURS.primary,
                             borderRadius: responsiveWidth(20), padding: responsiveWidth(2.5),

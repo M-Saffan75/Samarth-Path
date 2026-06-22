@@ -37,6 +37,8 @@ const Login = ({ navigation }) => {
     const [rateLimitMessage, setRateLimitMessage] = useState('');
 
     const handleLogin = () => {
+        // navigation.navigate(UserRoutes.NewSheet)
+        // return
         // Name
         if (!phone.trim() || phone.length < 10) {
             showError('Please enter a valid phone number');

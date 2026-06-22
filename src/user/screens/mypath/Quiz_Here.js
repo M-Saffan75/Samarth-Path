@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import Title_Here from '../../../components/Title_Here';
-import { Image, StyleSheet, View, Text, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
-import { globalImages } from '../../../assets/images/images_file/All_Images';
-import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 import { FlashList } from '@shopify/flash-list';
 import Reaction from '../../../components/Reaction';
 import { Fonts } from '../../../assets/fonts/Fonts';
+import { FadeUp } from '../../../components/FadeUp';
+import Title_Here from '../../../components/Title_Here';
+import { Image, StyleSheet, View, Text,  RefreshControl } from 'react-native';
+import { globalImages } from '../../../assets/images/images_file/All_Images';
+import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
+import { useLoader } from '../../../loading/LoaderContext';
 import CommentSheet from '../../../components/CommentSheet';
 import { fetchBookmarks } from './mypathbackend/MyPathBackend';
-import { useLoader } from '../../../loading/LoaderContext';
-import { FadeUp } from '../../../components/FadeUp';
 import { useTheme } from '../../../assets/themecontext/ThemeContext';
 
 
@@ -35,7 +35,7 @@ const QuizItem = ({ item, onUnbookmark }) => {
           <Text style={{
             paddingLeft: responsiveWidth(1), textTransform: 'uppercase',
             fontFamily: Fonts.Medium, top: responsiveWidth(.5), color: COLOURS.primary
-          }}>{item.schedule}</Text>
+          }}>{/* item.schedule */ 'afternoon quiz'}</Text>
         </View>
         <Text style={{
           textTransform: 'uppercase', fontFamily: Fonts.Medium,

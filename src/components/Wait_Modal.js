@@ -1,7 +1,11 @@
-import { Modal, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
+import { Modal, StyleSheet, Text, View } from 'react-native'
+import { useTheme } from '../assets/themecontext/ThemeContext';
 
 const Wait_Modal = ({ visible, message, onClose }) => {
+
+    const { theme: COLOURS, isDark } = useTheme();
+
     const [seconds, setSeconds] = useState(60);
 
     useEffect(() => {
@@ -28,7 +32,7 @@ const Wait_Modal = ({ visible, message, onClose }) => {
         };
     }, [visible]); // ✅ onClose dependency mat dena
 
-    
+
     return (
         <Modal
             visible={visible}
@@ -36,10 +40,10 @@ const Wait_Modal = ({ visible, message, onClose }) => {
             animationType="fade"
         >
             <View style={styles.overlay}>
-                <View style={styles.box}>
-                    <Text style={styles.title}>Please Wait</Text>
-                    <Text style={styles.message}>{message}</Text>
-                    <Text style={styles.timer}>Closing in {seconds}s</Text>
+                <View style={[styles.box, { backgroundColor: COLOURS.white }]}>
+                    <Text style={[styles.title, { color: COLOURS.black }]}>Please Wait</Text>
+                    <Text style={[styles.message, { color: COLOURS.black }]}>{message}</Text>
+                    <Text style={[styles.timer, { color: COLOURS.black }]}>Closing in {seconds}s</Text>
                 </View>
             </View>
         </Modal>

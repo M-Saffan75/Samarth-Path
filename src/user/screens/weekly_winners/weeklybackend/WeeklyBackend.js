@@ -3,11 +3,23 @@ import { USER_API_URL } from '../../../user_api_url/USER_API_URL';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // ─── Fetch Weekly Winners (Current + Last Week) ────────────────────────────
+export const fetchWeeklyWinners = async (options = {}) => {
+    // backward compatible: fetchWeeklyWinners('10') ya fetchWeeklyWinners(10) bhi chalega
+    const opts = typeof options === 'object' && options !== null ? options : { days: options };
+    const { days = null, daily = false, weekly = false, winner = false } = opts;
 
-export const fetchWeeklyWinners = async () => {
     try {
         const token = await AsyncStorage.getItem('token');
-        const response = await fetch(`${BASE_URL}${USER_API_URL.WINNERS}`, {
+
+        const queryParts = [];
+        if (daily) queryParts.push('daily=true');
+        if (weekly) queryParts.push('weekly=true');
+        if (winner) queryParts.push('winner');
+        if (days) queryParts.push(`days=${days}`);
+
+        const url = `${BASE_URL}${USER_API_URL.WINNERS}${queryParts.length ? `?${queryParts.join('&')}` : ''}`;
+
+        const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
