@@ -38,6 +38,7 @@ const Verify_Email = ({ navigation, route }) => {
     const [rateLimitMessage, setRateLimitMessage] = useState('');
 
     const { phone } = route?.params;
+    console.log('verifyemail.....',phone)
     useEffect(() => {
         setModalPhone(phone);
     }, [phone]);

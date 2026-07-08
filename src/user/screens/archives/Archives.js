@@ -206,7 +206,7 @@ const Archives = ({ navigation }) => {
                             </View>
                         </View>
                         <View style={[styles.bottom_line, { backgroundColor: COLOURS.grey }]} navigation={navigation} />
-                        <Button label={'sart quiz  ➞'}
+                        <Button label={'start quiz  ➞'}
                             onPress={() => navigation.navigate(UserRoutes.QuizCard, {
                                 item, onAttemptComplete: (attemptData) => updateQuizAttempt(item.id, attemptData)
                             })}

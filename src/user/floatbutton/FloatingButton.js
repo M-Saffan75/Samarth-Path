@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
     },
     fab_image: {
-        width: responsiveWidth(6),
-        height: responsiveWidth(6),
+        width: responsiveWidth(8),
+        height: responsiveWidth(8),
     },
 })

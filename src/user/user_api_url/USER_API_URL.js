@@ -11,7 +11,7 @@ export const USER_API_URL = {
     CHANGE_PASSWORD: '/user/auth/change-password',
     UPDATE_PROFILE: '/user/auth/update-profile',
     ME: '/user/auth/me',
-    LOGOUT:'/user/auth/logout',
+    LOGOUT: '/user/auth/logout',
 
     // Fcm-Token
     FCM_TOKEN: '/user/save-fcm-token',
@@ -21,6 +21,7 @@ export const USER_API_URL = {
 
     // Quiz 
     QUIZ_ATTEMPT: '/user/content/quiz/submit',
+    PRIZE: '/user/winners/prizes',
 
     // Like
     LIKE: '/user/content/like',

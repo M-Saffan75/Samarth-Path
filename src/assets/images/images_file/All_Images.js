@@ -4,7 +4,7 @@ const image_1 = require('../all_images/image-1.png')
 const icon_new = require('../all_images/icon_new.png')
 const archive_icon = require('../all_images/archive.png')
 const signpost_icon = require('../all_images/signpost.png')
-const calender_icon = require('../all_images/calendar.png')
+const calender_icon = require('../all_images/calender.png')
 const profile = require('../all_images/profile.jpg')
 const about_icon = require('../all_images/about.png')
 const access_icon = require('../all_images/access-control.png')
@@ -42,6 +42,7 @@ const save_filled = require('../../icons/Filled/bookmark.png')
 const bell_icon = require('../../icons/Filled/bell-slash.png')
 const location_icon = require('../../icons/Filled/thumbtack.png')
 const clock_icon = require('../../icons/Bold/clock.png')
+const arrow_right = require('../../icons/Bold/arrow-right.png')
 
 const eye_slash = require('../../icons/Bold/eye-slash.png')
 const eye = require('../../icons/Bold/eye.png')
@@ -75,6 +76,8 @@ const quiz_icon = require('../../images/all_images/quiz.png')
 const options_icon = require('../../images/all_images/levels.png')
 const question_icon = require('../../images/all_images/question.png')
 const win_icon = require('../../images/all_images/medicine-award.png')
+const winner_icon = require('../../images/all_images/winner.png')
+const conversation_icon = require('../../images/all_images/conversation.png')
 
 export const globalImages = {
     app_logo, image_1, bg_here, icon_new,
@@ -85,9 +88,9 @@ export const globalImages = {
     spiritual_1, spiritual_2, heart_filled, heart, comment_filled, comment,
     save_icon, save_filled, spiritual_3, spiritual_4, spiritual_5, eye_slash,
     eye, pswd_key, pause, play, volume, mute, lock_icon, cross_icon, guidnace_icon,
-    spiritual_6, edit_pencil, unselect, select, check_icon, check_icon_json,
+    spiritual_6, edit_pencil, unselect, select, check_icon, check_icon_json,winner_icon,
     spiritual_7, like_json, trash, send_icon, theme_icon, disabled_icon, bell_icon,
     spiritual_8, arrow_icon, maximize_icon, minimize_icon, consultation_icon,
     spiritual_9, admin_icon, red_cross,location_icon,quiz_icon,options_icon,
-    spiritual_10,clock_icon,question_icon,win_icon,
+    spiritual_10,clock_icon,question_icon,win_icon,conversation_icon,arrow_right,
 }

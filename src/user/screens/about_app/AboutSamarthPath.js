@@ -15,8 +15,9 @@ import { FadeUp } from '../../../components/FadeUp';
 import Back_Arrow from '../../../components/Back_Arrow';
 import { FadeDown } from '../../../components/FadeDown';
 import { globalImages } from '../../../assets/images/images_file/All_Images';
+import UserRoutes from '../../user_routes/UserRoutes';
 
-const AboutSamarthPath = () => {
+const AboutSamarthPath = ({ navigation }) => {
 
     const { theme: COLOURS, isDark } = useTheme();
     const [appVersion, setAppVersion] = useState('...')
@@ -71,7 +72,7 @@ const AboutSamarthPath = () => {
                             <View style={[styles.logo_ring, { backgroundColor: COLOURS.white, }]}>
                                 <View style={[styles.logo_inner, { backgroundColor: COLOURS.primary, }]}>
                                     {/* <Text style={[styles.logo_text, { color: COLOURS.white, }]}>SP</Text> */}
-                                    <Image source={globalImages.app_logo} style={{height:responsiveWidth(15),width:responsiveWidth(15)}}/>
+                                    <Image source={globalImages.app_logo} style={{ height: responsiveWidth(15), width: responsiveWidth(15) }} />
                                 </View>
                             </View>
                             <Text style={[styles.app_name, { color: COLOURS.black, }]}>Samarth Path</Text>
@@ -135,14 +136,15 @@ const AboutSamarthPath = () => {
                     <Pulse>
                         <View style={[styles.price_banner, { backgroundColor: COLOURS.light_grey, }]}>
                             <View>
-                                <Text style={[styles.price_label,{color:COLOURS.grey}]}>Subscription</Text>
+                                <Text style={[styles.price_label, { color: COLOURS.grey }]}>Subscription</Text>
                                 <View style={styles.price_row}>
                                     <Text style={[styles.price_amount, { color: COLOURS.primary, }]}>₹199</Text>
                                     <Text style={[styles.price_period, { color: COLOURS.grey }]}> / month</Text>
                                 </View>
                                 <Text style={[styles.price_sub, { color: COLOURS.grey }]}>Free trial available on signup</Text>
                             </View>
-                            <TouchableOpacity style={[styles.price_cta, { backgroundColor: COLOURS.primary, }]} activeOpacity={0.85}>
+                            <TouchableOpacity style={[styles.price_cta, { backgroundColor: COLOURS.primary, }]}
+                                activeOpacity={0.85} onPress={() => navigation.navigate(UserRoutes.Subscription)}>
                                 <Text style={[styles.price_cta_text, { color: COLOURS.black, }]}>Subscribe</Text>
                             </TouchableOpacity>
                         </View>

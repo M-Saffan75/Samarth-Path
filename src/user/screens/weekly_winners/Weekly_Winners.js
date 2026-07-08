@@ -8,17 +8,22 @@ import {
     ActivityIndicator,
     TouchableOpacity,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Fonts } from '../../../assets/fonts/Fonts';
 import { FadeUp } from '../../../components/FadeUp';
 import { FadeIn } from '../../../components/FadeIn';
+import { Pulse } from '../../../components/Pulse';
+import { IMG_URL } from '../../../api_url/BASE_URL';
 import { FadeDown } from '../../../components/FadeDown';
 import Back_Arrow from '../../../components/Back_Arrow';
 import Title_Here from '../../../components/Title_Here'; // already built component
+import Prize_Modal from '../../../components/Prize_Modal';
+import Winner_Prize_Modal from '../../../components/Winner_Prize_Modal';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../../assets/themecontext/ThemeContext';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
-import { fetchWeeklyWinners, fetchWeeklyScore } from './weeklybackend/WeeklyBackend'; // <-- separate api file
-import { Pulse } from '../../../components/Pulse';
+import { fetchWeeklyWinners, fetchWeeklyScore } from './weeklybackend/WeeklyBackend';
+import Button from '../../../components/Button';
+
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
@@ -97,13 +102,14 @@ const ScoreBar = ({ scoreData }) => {
 
 // ─── WinnerRow ─────────────────────────────────────────────────────────────
 
-const WinnerRow = ({ item, index, isLast, showTrophy, scoreTotal = 7, hideScore = false }) => {
+const WinnerRow = ({ item, index, isLast, showTrophy, scoreTotal = 7, hideScore = false, onPress, onPrizePress }) => {
     const { theme: COLOURS } = useTheme();
     const rank = item.rank ?? index + 1;
     const medal = getMedalEmoji(rank);
     const color = avatarColors[index % avatarColors.length];
 
-    const firstLetter = item.userName ? item.userName.charAt(0).toUpperCase() : '?';
+    const displayName = item.userName || item.name || '';
+    const firstLetter = displayName ? displayName.charAt(0).toUpperCase() : '?';
     const hasImage = item.profilePicture && item.profilePicture.trim() !== '';
 
     const scoreValue = item.score ?? item.correctAnswers;
@@ -122,7 +128,7 @@ const WinnerRow = ({ item, index, isLast, showTrophy, scoreTotal = 7, hideScore 
 
                 {hasImage ? (
                     <Image
-                        source={{ uri: item.profilePicture }}
+                        source={{ uri: `${IMG_URL}${item.profilePicture}` }}
                         style={[styles.avatar, { borderRadius: responsiveWidth(5) }]}
                     />
                 ) : (
@@ -138,27 +144,49 @@ const WinnerRow = ({ item, index, isLast, showTrophy, scoreTotal = 7, hideScore 
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Text style={[styles.winnerSub, { color: COLOURS.grey }]} numberOfLines={1}>{subLabel}</Text>
                         {showTrophy &&
-                            <Pulse>
-                                <Text style={{ fontSize: responsiveFontSize(2) }}>
-                                    🏆
-                                </Text>
-                            </Pulse>
+                            <TouchableOpacity
+                                activeOpacity={0.8}
+                                onPress={() => onPress?.(item.prize)}
+                                style={[styles.row_btn, { backgroundColor: COLOURS.primary }]}
+                            >
+                                {item?.prize?.imageUrl ? (
+                                    <Image source={{ uri: item.prize.imageUrl }} 
+                                    style={{ height: responsiveWidth(5), width: responsiveWidth(5) }} resizeMode="cover" />
+                                ) : (
+                                    <Text style={{ fontSize: responsiveFontSize(1.6) }}>🏆</Text>
+                                )}
+                                <Text style={[styles.text_here_prize, { color: '#fff' }]}>winner</Text>
+                            </TouchableOpacity>
                         }
                     </View>
                 </View>
 
                 {!hideScore && scoreValue !== undefined && (
-                    <Text style={[styles.winnerScore, { color: COLOURS.primary }]}>{scoreValue}{`/${scoreTotal}`}</Text>
+                    <View style={{ alignItems: 'center', gap: responsiveWidth(0.8), flexDirection: 'row' }}>
+                        {item?.prize?.imageUrl && (
+                            <Pulse>
+                                <TouchableOpacity activeOpacity={0.8} onPress={() => onPrizePress?.(item.prize)}>
+                                    <Image
+                                        source={{ uri: item.prize.imageUrl }}
+                                        style={{ height: responsiveWidth(6), width: responsiveWidth(6), right: responsiveWidth(2) }}
+                                        resizeMode="cover"
+                                    />
+                                </TouchableOpacity>
+                            </Pulse>
+                        )}
+                        <Text style={[styles.winnerScore, { color: COLOURS.primary }]}>{scoreValue}{`/${scoreTotal}`}</Text>
+                    </View>
                 )}
 
             </View>
-        </FadeUp>
+        </FadeUp >
     );
 };
 
 // ─── Leaderboard Card ──────────────────────────────────────────────────────
 
-const LeaderboardCard = ({ title, weekData, show, fallbackMessage = 'No top 3 yet.', topTrophy = false, scoreTotal = 7, hideTopScore = false }) => {
+const LeaderboardCard = ({ title, weekData, show, fallbackMessage = 'No top 3 yet.',
+    topTrophy = false, scoreTotal = 7, hideTopScore = false, onPress, onPrizePress }) => {
     const { theme: COLOURS } = useTheme();
 
     if (!weekData) return null;
@@ -205,10 +233,14 @@ const LeaderboardCard = ({ title, weekData, show, fallbackMessage = 'No top 3 ye
                                 showTrophy={topTrophy}
                                 scoreTotal={scoreTotal}
                                 hideScore={hideTopScore}
+                                onPress={onPress}
                             />
                         ))
                     ) : (
-                        <Text style={[styles.emptyText, { color: COLOURS.grey, paddingHorizontal: responsiveWidth(4), paddingBottom: responsiveWidth(3) }]}>{fallbackMessage}</Text>
+                        <Text style={[styles.emptyText, {
+                            color: COLOURS.grey,
+                            paddingHorizontal: responsiveWidth(4), paddingBottom: responsiveWidth(3)
+                        }]}>{fallbackMessage}</Text>
                     )}
                 </View>
             </FadeIn>) : ''}
@@ -220,7 +252,7 @@ const LeaderboardCard = ({ title, weekData, show, fallbackMessage = 'No top 3 ye
                         <Text style={[styles.leaderboardTitle, { color: COLOURS.black }]}>All Participants</Text>
                         <View style={[styles.weekTag, { borderColor: COLOURS.grey, backgroundColor: COLOURS.light_primary }]}>
                             <Text style={[styles.weekTagText, { color: COLOURS.grey }]}>
-                                {tagLabel}
+                                {tagLabel || 'Past 10 Days'}
                             </Text>
                         </View>
                     </View>
@@ -232,10 +264,14 @@ const LeaderboardCard = ({ title, weekData, show, fallbackMessage = 'No top 3 ye
                                 index={index}
                                 isLast={index === allParticipants?.length - 1}
                                 scoreTotal={scoreTotal}
+                                onPrizePress={onPrizePress}
                             />
                         ))
                     ) : (
-                        <Text style={[styles.emptyText, { color: COLOURS.grey, paddingHorizontal: responsiveWidth(4), paddingBottom: responsiveWidth(3) }]}>No participants yet.</Text>
+                        <Text style={[styles.emptyText, {
+                            color: COLOURS.grey, paddingHorizontal: responsiveWidth(4),
+                            paddingBottom: responsiveWidth(3)
+                        }]}>No participants yet. Try the Last 10 Days tab to see recent activity.</Text>
                     )}
                 </View>
             </FadeIn>
@@ -251,11 +287,14 @@ const Weekly_Winners = () => {
     const [scoreData, setScoreData] = useState(null);
     const [winnersData, setWinnersData] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [selectedTab, setSelectedTab] = useState('all'); // 'all' | 'daily' | 'dailyWinner' | 'weekly' | 'weeklyWinner' | 'last10'
+    const [selectedTab, setSelectedTab] = useState('all');
+    const [winnerPrize, setWinnerPrize] = useState({ visible: false, prize: null });
+    const [itemPrize, setItemPrize] = useState({ visible: false, prize: null });
 
-    useEffect(() => {
-        loadData('all');
-    }, []);
+    useEffect(() => { loadData('all'); }, []);
+
+    const handleWinnerPress = (prize) => setWinnerPrize({ visible: true, prize });
+    const handleItemPrizePress = (prize) => setItemPrize({ visible: true, prize });
 
     const loadData = async (tab) => {
         setLoading(true);
@@ -297,7 +336,7 @@ const Weekly_Winners = () => {
     };
 
     return (
-        <SafeAreaView style={[styles.safeArea, { backgroundColor: COLOURS.light_primary }]}>
+        <SafeAreaView style={[styles.safeArea, { backgroundColor: COLOURS.white }]}>
             <Back_Arrow label={'Past winners'} />
 
             <ScoreBar scoreData={scoreData} />
@@ -357,7 +396,7 @@ const Weekly_Winners = () => {
                                     backgroundColor: selectedTab === 'weekly' ? COLOURS.primary : 'transparent',
                                 }]}>
                                 <Text style={[styles.text_here, { color: selectedTab === 'weekly' ? COLOURS.white : COLOURS.black }]}>
-                                    weekly
+                                    Weekly
                                 </Text>
                             </TouchableOpacity>
 
@@ -392,10 +431,12 @@ const Weekly_Winners = () => {
                             <LeaderboardCard
                                 title="This week"
                                 weekData={winnersData?.currentWeek}
+                                onPrizePress={handleItemPrizePress}
                             />
                             <LeaderboardCard
                                 title="Last 10 Days"
                                 weekData={winnersData?.last10Days}
+                                onPrizePress={handleItemPrizePress}
                             />
                         </>
                     ) : selectedTab === 'daily' ? (
@@ -404,6 +445,7 @@ const Weekly_Winners = () => {
                             weekData={winnersData?.daily}
                             show={false}
                             scoreTotal={1}
+                            onPrizePress={handleItemPrizePress}
                         />
                     ) : selectedTab === 'dailyWinner' ? (
                         <LeaderboardCard
@@ -413,6 +455,8 @@ const Weekly_Winners = () => {
                             topTrophy
                             scoreTotal={1}
                             hideTopScore
+                            onPress={handleWinnerPress}
+                            onPrizePress={handleItemPrizePress}
                         />
 
                     ) : selectedTab === 'weekly' ? (
@@ -420,6 +464,7 @@ const Weekly_Winners = () => {
                             title="Weekly Participants"
                             weekData={winnersData?.weekly}
                             show={false}
+                            onPrizePress={handleItemPrizePress}
                         />
                     ) : selectedTab === 'weeklyWinner' ? (
                         <LeaderboardCard
@@ -428,17 +473,31 @@ const Weekly_Winners = () => {
                             fallbackMessage={WEEKLY_NOTE}
                             topTrophy
                             hideTopScore
+                            onPress={handleWinnerPress}
+                            onPrizePress={handleItemPrizePress}
                         />
                     ) : (
                         <LeaderboardCard
                             title="Last 10 Days"
                             weekData={winnersData?.last10Days}
                             show={false}
+                            onPrizePress={handleItemPrizePress}
                         />
                     )}
                 </ScrollView>
             )
             }
+            <Winner_Prize_Modal
+                visible={winnerPrize.visible}
+                onClose={() => setWinnerPrize({ visible: false, prize: null })}
+                prize={winnerPrize.prize}
+            />
+            <Prize_Modal
+                visible={itemPrize.visible}
+                onClose={() => setItemPrize({ visible: false, prize: null })}
+                prize={itemPrize.prize}
+                label="PRIZE"
+            />
         </SafeAreaView>
     );
 };
@@ -448,6 +507,19 @@ export default Weekly_Winners;
 // ─── Styles ────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
+
+    text_here_prize: {
+        fontFamily: 'Poppins-Medium',
+        fontSize: responsiveFontSize(1.4),
+    },
+    row_btn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: responsiveWidth(1),
+        borderRadius: responsiveWidth(2),
+        paddingHorizontal: responsiveWidth(1.5),
+
+    },
 
     loaderContainer: {
         marginTop: responsiveWidth(5),

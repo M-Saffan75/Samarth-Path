@@ -18,7 +18,7 @@ export const fetchWeeklyWinners = async (options = {}) => {
         if (days) queryParts.push(`days=${days}`);
 
         const url = `${BASE_URL}${USER_API_URL.WINNERS}${queryParts.length ? `?${queryParts.join('&')}` : ''}`;
-
+        console.log(url)
         const response = await fetch(url, {
             method: 'GET',
             headers: {
@@ -33,6 +33,30 @@ export const fetchWeeklyWinners = async (options = {}) => {
         return { success: false, data: null };
     } catch (error) {
         console.error('fetchWeeklyWinners error:', error);
+        return { success: false, data: null };
+    }
+};
+
+// ─── Fetch Prize ──────────────────────────────────────────────────────────
+
+export const fetchPrize = async () => {
+    try {
+        const token = await AsyncStorage.getItem('token');
+        const response = await fetch(`${BASE_URL}${USER_API_URL.PRIZE}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        const json = await response.json();
+        if (json.success) {
+            const prizeItem = Array.isArray(json.data) ? json.data[0] : json.data;
+            return { success: true, data: prizeItem };
+        }
+        return { success: false, data: null };
+    } catch (error) {
+        console.error('fetchPrize error:', error);
         return { success: false, data: null };
     }
 };

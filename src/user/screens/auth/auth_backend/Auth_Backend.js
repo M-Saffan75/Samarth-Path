@@ -14,11 +14,11 @@ export const registerUser = async ({ name, phone, email, password, address }) =>
     });
 
     const data = await response.json();
-    // console.log('data', data)
-    if (!response.ok) {
+    console.log('Api Response : ', data)
+    if (!response.ok || !data.success) {
         const error = new Error(data.message || 'Registration failed');
-        error.code = data.code; // ✅ phir code set karo
-        throw error; // ✅ phir throw karo
+        error.code = data.code;
+        throw error;
     }
 
     return data;
@@ -36,7 +36,6 @@ export const resendOtp = async ({ phone }) => {
     });
 
     const data = await response.json();
-
     if (!response.ok) {
         const error = new Error(data.message || 'Resend OTP failed');
         error.code = data.code;
@@ -57,6 +56,7 @@ export const verifyOtp = async ({ phone, otp }) => {
     });
 
     const data = await response.json();
+    console.log('verifyemailsssss',data)
 
     if (response.status === 410) { // ✅ OTP expired
         const error = new Error(data.message);

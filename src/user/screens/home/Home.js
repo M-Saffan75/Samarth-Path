@@ -36,6 +36,7 @@ const Home = ({ navigation }) => {
   const [contentList, setContentList] = useState([]);
   const [message, setMessage] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+  const [quizprize, setQuizPrize] = useState('');
   const { loading, setLoading } = useLoader();
 
   useEffect(() => {
@@ -47,6 +48,9 @@ const Home = ({ navigation }) => {
     try {
       if (!isRefresh) setLoading(true);
       const res = await fetchTodayContent();
+      console.log('res', res)
+      setQuizPrize(res?.data[0]?.quizContent || res?.data[1]?.quizContent || res?.data[2]?.quizContent)
+      // console.log('res', res?.data[0]?.quizContent || res?.data[1]?.quizContent || res?.data[2]?.quizContent)
       setMessage(res?.message);
       if (res.success && res.data.length > 0) {
         const items = res?.data;
@@ -134,6 +138,7 @@ const Home = ({ navigation }) => {
   const refreshCounts = async () => {
     try {
       const res = await fetchTodayContent();
+      // console.log(res)
       if (res?.success && res?.data?.length > 0) {
         setContentList(prev => {
           if (!prev.length) return prev; // nothing to update yet
@@ -302,9 +307,10 @@ const Home = ({ navigation }) => {
                           </View>
                         </View>
                         <View style={[styles.bottom_line, { backgroundColor: COLOURS.grey }]} navigation={navigation} />
-                        <Button label={'sart quiz  ➞'}
+                        <Button label={'start quiz  ➞'}
                           onPress={() => navigation.navigate(UserRoutes.QuizCard, {
-                            item, onAttemptComplete: (attemptData) => updateQuizAttempt(item.id, attemptData)
+                            item, onAttemptComplete: (attemptData) => updateQuizAttempt(item.id, attemptData),
+                            quizprize
                           })}
                           width={responsiveWidth(80)}
                           paddingVertical={responsiveWidth(3)} alignSelf={'center'} />
@@ -318,7 +324,7 @@ const Home = ({ navigation }) => {
           </View>
 
           <FloatingButton
-            image={globalImages.consultation_icon}
+            image={globalImages.conversation_icon}
             navigation={navigation} />
 
           <View style={{ marginBottom: responsiveWidth(12) }} />

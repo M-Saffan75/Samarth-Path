@@ -127,7 +127,9 @@ const User_Profile = ({ navigation }) => {
                                     onPress={() => navigation.navigate(UserRoutes.Edit_Profile)} />
 
                                 <Profile_Row label={'guidance'} source={globalImages.guidnace_icon}
-                                    onPress={() => navigation.navigate(UserRoutes.Guidance_Widget)} />
+                                    onPress={() => navigation.navigate(UserRoutes.Guidance_Widget)}
+                                    // onPress={() => navigation.navigate(UserRoutes.Weekly_Winners)}
+                                     />
 
                                 <Profile_Row label={'subscription'} bordernone={false} paddingBottom={responsiveWidth(.1)}
                                     source={globalImages.about_icon} onPress={() => navigation.navigate(UserRoutes.Subscription)} />

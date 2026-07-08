@@ -101,21 +101,26 @@ const Register = ({ navigation }) => {
     };
 
     const handleApiCall = async () => {
+        console.log('first')
         try {
             setLoading(true);
             const data = await registerUser({ name, phone: formattedPhone, email, password, address });
+            console.log('Register data' , data)
+            console.log('Register otp' , data?.phone,)
+            // return
             navigation.replace(UserRoutes.Verify_Email, {
-                phone: data?.data?.phone,
+                phone: formattedPhone,
             });
             showSuccess(data?.message || 'Registration successful');
         } catch (error) {
-            if (error.code === 408) {
+            // return
+            if (error.code === 408 && !error.success === false) {
                 try {
                     setLoading(true);
                     const resendData = await resendOtp({ phone: formattedPhone, });
                     showSuccess(resendData?.message || 'OTP sent successfully');
                     navigation.replace(UserRoutes.Verify_Email, {
-                        phone: data?.data?.phone,
+                        phone: formattedPhone,
                     });
                 } catch (resendError) {
                     if (resendError.code === 429) {

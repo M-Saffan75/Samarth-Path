@@ -39,6 +39,7 @@ const Profile = ({
     onPress,
     selectedImage,
     Ease,
+    onpressName,
 }) => {
 
     const { userData } = useUser();
@@ -82,7 +83,7 @@ const Profile = ({
     const imageUri = selectedImage?.uri || userData?.profilePicture || null;
     const flatColors = gradients.flat();
     const randomColor = useRef(flatColors[Math.floor(Math.random() * flatColors.length)]).current;
-    
+
     return (
         <View style={{ alignSelf, marginBottom, marginTop }}>
 
@@ -96,15 +97,17 @@ const Profile = ({
                     </LinearGradient>
                 </Animated.View>
             ) : (
-                <View style={{
-                    backgroundColor: randomColor, borderRadius: 999,
-                    height: height || responsiveWidth(25), width: width || responsiveWidth(25),
-                    alignItems: 'center', justifyContent: 'center'
-                }}>
-                    <Text style={[styles.letter, { fontSize: fontSize || responsiveFontSize(2.5) }]}>
-                        {firstLetter}
-                    </Text>
-                </View>
+                <TouchableOpacity onPress={onpressName} activeOpacity={0.7}>
+                    <View style={{
+                        backgroundColor: randomColor, borderRadius: 999,
+                        height: height || responsiveWidth(25), width: width || responsiveWidth(25),
+                        alignItems: 'center', justifyContent: 'center'
+                    }}>
+                        <Text style={[styles.letter, { fontSize: fontSize || responsiveFontSize(2.5) }]}>
+                            {firstLetter}
+                        </Text>
+                    </View>
+                </TouchableOpacity>
             )}
 
             {edit === true && (

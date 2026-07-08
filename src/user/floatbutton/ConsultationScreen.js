@@ -7,25 +7,33 @@ import {
     Platform,
     RefreshControl
 } from 'react-native';
-import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
+import Button from '../../components/Button';
+import Profile from '../../components/Profile';
+import UserRoutes from '../user_routes/UserRoutes';
+import Title_Here from '../../components/Title_Here';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import ExplanationModal from '../../components/ExplanationModal';
 import { useTheme } from '../../assets/themecontext/ThemeContext';
 import { useUser } from '../screens/auth/user_context/UserContext';
 import { globalImages } from '../../assets/images/images_file/All_Images';
-import Profile from '../../components/Profile';
-import Title_Here from '../../components/Title_Here';
+import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 import {
     fetchConsultantMessages,
     sendConsultantMessage,
     formatChatTime,
     formatOptimisticTime,
 } from './consultationbackend/CounsultationBackend';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import ExplanationModal from '../../components/ExplanationModal';
-import Button from '../../components/Button';
+
 import { Bounce } from '../../components/Bounce';
-import { FadeLeft } from '../../components/FadeLeft';
-import { FadeRight } from '../../components/FadeRight';
 import { FadeIn } from '../../components/FadeIn';
+import { FadeRight } from '../../components/FadeRight';
+
+const WELCOME_MESSAGE = {
+    _id: 'welcome_default',
+    sender: 'admin',
+    message: "Welcome to Finding your Path with Samarth Path. You get 3 free messages every month with your premium access pass. Ask for the guidance you need we will try to find the path that brings you peace and growth.",
+    createdAt: new Date().toISOString(),
+};
 
 const MessageBubble = ({ msg }) => {
 
@@ -133,8 +141,8 @@ const ConsultationScreen = ({ navigation }) => {
 
         try {
             const res = await sendConsultantMessage(text);
-            console.log('sending...')
-            return
+            // console.log('sending...')
+            // return
             if (res?.success) {
                 setMessages(prev => prev.map(m => m._id === tempId ? { ...res.data } : m));
             } else if (res?.code === 400) {
@@ -191,7 +199,9 @@ const ConsultationScreen = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <Bounce>
                                     <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                                        <Profile height={responsiveWidth(13)} width={responsiveWidth(13)} Ease={true} />
+                                        <Profile height={responsiveWidth(13)} width={responsiveWidth(13)} Ease={true}
+                                            onpressName={() => navigation.navigate(UserRoutes.Edit_Profile)}
+                                        />
                                         <View style={{ marginLeft: responsiveWidth(2), marginTop: responsiveWidth(1.5) }}>
                                             <Title_Here title={userData?.name} marginLeft={0} marginRight={0} marginTop={0} fontSize={responsiveFontSize(1.6)} />
                                             <Title_Here title={userData?.email} marginLeft={0} marginRight={0} marginTop={0} textTransform={'lowercase'}
@@ -218,7 +228,7 @@ const ConsultationScreen = ({ navigation }) => {
                             {/* Messages */}
                             {fetching ? (
                                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                                    <ActivityIndicator size="small" color={COLOURS.primary} />
+                                    <ActivityIndicator size="large" color={COLOURS.primary} />
                                 </View>
                             ) : (
                                 <ScrollView
@@ -238,23 +248,20 @@ const ConsultationScreen = ({ navigation }) => {
                                         />
                                     }
                                 >
-                                    {messages.length === 0 ? (
-                                        <FadeIn>
-                                            <Text style={[styles.empty_chat, { color: COLOURS.grey }]}>
-                                                No messages yet. Say hello! 👋
-                                            </Text>
-                                        </FadeIn>
-                                    ) : (
-                                        messages.map(item => (
-                                            <MessageBubble key={item._id?.toString()} msg={item} COLOURS={COLOURS} />
-                                        ))
-                                    )}
+                                    <FadeIn>
+                                        <MessageBubble msg={WELCOME_MESSAGE} />
+                                    </FadeIn>
+                                    {messages.map(item => (
+                                        <MessageBubble key={item._id?.toString()} msg={item} COLOURS={COLOURS} />
+                                    ))}
                                 </ScrollView>
                             )}
 
                             {/* Input */}
                             <View style={[styles.input_row, { borderTopColor: COLOURS.light_primary }]}>
-                                <Profile height={responsiveWidth(9)} width={responsiveWidth(9)} Ease={true} />
+                                <Profile height={responsiveWidth(9)} width={responsiveWidth(9)} Ease={true}
+                                    onpressName={() => navigation.navigate(UserRoutes.Edit_Profile)}
+                                />
                                 <TextInput
                                     placeholder="Write your message..."
                                     placeholderTextColor={COLOURS.grey}

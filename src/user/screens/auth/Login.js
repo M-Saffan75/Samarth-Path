@@ -53,9 +53,11 @@ const Login = ({ navigation }) => {
     };
 
     const handleApiCall = async () => {
+        console.log(formattedPhone, password )
         try {
             setLoading(true);
             const data = await loginUser({ phone: formattedPhone, password });
+            // return
             const user = await getUserMe(data?.data?.token);
             updateUser(user);
             await AsyncStorage.setItem('token', data?.data?.token);
