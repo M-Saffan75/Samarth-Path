@@ -11,7 +11,7 @@ const Trial_Text = ({ backgroundColor, width, alignSelf }) => {
 
     const { theme: COLOURS } = useTheme();
     const { userData } = useUser();
-    console.log('userData', userData)
+    // console.log('userData', userData)
 
     return (
         <View style={{
@@ -23,7 +23,7 @@ const Trial_Text = ({ backgroundColor, width, alignSelf }) => {
             <Text style={{
                 fontFamily: Fonts.Medium, color: COLOURS.primary, top: responsiveWidth(.4),
                 fontSize: responsiveFontSize(1.8), textTransform: 'capitalize', textAlign: 'center'
-            }}>{userData?.subscription === null || userData?.isSubscribed === 'false' ? 'Trial : 3 days remaining' : 'Premium : 1 month Access'}</Text>
+            }}>{userData?.subscription === null || userData?.isSubscribed === false ? 'Trial : 3 days remaining' : 'Premium : 1 month Access'}</Text>
         </View>
     )
 }

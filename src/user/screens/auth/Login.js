@@ -53,19 +53,32 @@ const Login = ({ navigation }) => {
     };
 
     const handleApiCall = async () => {
-        console.log(formattedPhone, password )
+        // console.log(formattedPhone, password )
+        
         try {
             setLoading(true);
             const data = await loginUser({ phone: formattedPhone, password });
             // return
+            console.log('user',data)
             const user = await getUserMe(data?.data?.token);
+            // return
             updateUser(user);
             await AsyncStorage.setItem('token', data?.data?.token);
-            showSuccess(data?.message || 'Login successful');
+            if (!user.isSubscribed) {
+                navigation.reset({
+                    index: 1,
+                    routes: [
+                        { name: UserRoutes.Bottom_Navigation },
+                        { name: UserRoutes.PayWall },j
+                    ],
+                });
+                return;
+            }
             navigation.reset({
                 index: 0,
                 routes: [{ name: UserRoutes.Bottom_Navigation }],
             });
+            showSuccess(data?.message || 'Login successful');
         } catch (error) {
             console.log('LOGIN ERROR:', error);
             setLoading(false);

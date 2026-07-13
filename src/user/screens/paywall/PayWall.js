@@ -10,20 +10,28 @@ import Subscription_Offer from '../../../components/Subscription_Offer';
 import { StatusBar, Image, StyleSheet, Text, View } from 'react-native';
 import { globalImages } from '../../../assets/images/images_file/All_Images';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
+
 import { Pulse } from '../../../components/Pulse';
 import { FadeIn } from '../../../components/FadeIn';
 import { FadeUp } from '../../../components/FadeUp';
-import { FadeLeft } from '../../../components/FadeLeft';
 import { Bounce } from '../../../components/Bounce';
+import { FadeLeft } from '../../../components/FadeLeft';
+import { useUser } from '../auth/user_context/UserContext';
 
 const PayWall = ({ navigation }) => {
 
     const { theme: COLOURS, isDark } = useTheme();
+    const { userData } = useUser();
+
+    console.log('userData', userData)
 
     const handleSubscription = () => {
         navigation.reset({
-            index: 0,
-            routes: [{ name: UserRoutes.Bottom_Navigation }],
+            index: 1,
+            routes: [
+                { name: UserRoutes.Bottom_Navigation },
+                { name: UserRoutes.Subscription },
+            ],
         });
     }
 
@@ -99,7 +107,7 @@ const PayWall = ({ navigation }) => {
                     {/*  */}
                     <FadeIn>
                         <View style={styles.btn_area}>
-                            <Button label={'start 3 day trial'} onPress={handleSubscription}
+                            <Button label={'start 3 day trial or buy subscription'} onPress={handleSubscription}
                             />
                         </View>
                     </FadeIn>

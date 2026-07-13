@@ -15,6 +15,8 @@ import { FlashList } from '@shopify/flash-list';
 import Button from '../../../components/Button';
 import { Pulse } from '../../../components/Pulse';
 import QuizCard from '../../../components/QuizCard';
+import { Fonts } from '../../../assets/fonts/Fonts';
+import { FadeUp } from '../../../components/FadeUp';
 import VideoCard from '../../../components/VideoCard';
 import UserRoutes from '../../user_routes/UserRoutes';
 import ImageCard from '../../../components/ImageCard';
@@ -25,8 +27,6 @@ import { useUser } from '../auth/user_context/UserContext';
 import FloatingButton from '../../floatbutton/FloatingButton';
 import { getUserFCMToken } from '../../../notifications/FCM_Send';
 import { globalImages } from '../../../assets/images/images_file/All_Images';
-import { Fonts } from '../../../assets/fonts/Fonts';
-import { FadeUp } from '../../../components/FadeUp';
 
 const Home = ({ navigation }) => {
 

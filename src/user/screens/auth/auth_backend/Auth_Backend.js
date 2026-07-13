@@ -73,6 +73,7 @@ export const verifyOtp = async ({ phone, otp }) => {
 
 
 export const loginUser = async ({ phone, password }) => {
+    console.log('login api res :',phone, password)
     const response = await fetch(`${BASE_URL}${USER_API_URL.LOGIN}`, {
         method: 'POST',
         headers: {

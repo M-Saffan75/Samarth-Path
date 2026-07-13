@@ -128,7 +128,7 @@ const WinnerRow = ({ item, index, isLast, showTrophy, scoreTotal = 7, hideScore 
 
                 {hasImage ? (
                     <Image
-                        source={{ uri: `${IMG_URL}${item.profilePicture}` }}
+                        source={{ uri: item?.profilePicture }}
                         style={[styles.avatar, { borderRadius: responsiveWidth(5) }]}
                     />
                 ) : (

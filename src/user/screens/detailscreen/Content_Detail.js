@@ -69,7 +69,7 @@ const Content_Detail = ({ route, }) => {
             <SafeAreaView style={{ flex: 1, backgroundColor: COLOURS.light_primary }}>
                 <View style={[styles.container, { backgroundColor: COLOURS.white }]}>
                     {/* <Header title={item?.title} /> */}
-                    <Back_Arrow label={item?.title} fontSize={responsiveFontSize(2)}/>
+                    <Back_Arrow label={item?.title} fontSize={responsiveFontSize(2)} />
                     <ScrollView showsVerticalScrollIndicator={false}>
 
                         <ZoomIn delay={600}>
@@ -88,10 +88,19 @@ const Content_Detail = ({ route, }) => {
                                     overflow: 'hidden',
                                 }}
                             /> :
-                                <Image source={{ uri: item?.image }} style={{
-                                    height: responsiveWidth(60), width: responsiveWidth(90),
-                                    borderRadius: responsiveWidth(4), marginTop: responsiveWidth(5), alignSelf: 'center'
-                                }} />
+                                <View style={{
+                                    borderRadius: responsiveWidth(4),
+                                    alignSelf: 'center',
+                                    marginTop: responsiveWidth(5),
+                                    height: responsiveWidth(61), width: responsiveWidth(92),
+                                    borderWidth: responsiveWidth(.2), borderColor: COLOURS.black,
+                                }}>
+                                    <Image source={{ uri: item?.image }} style={{
+                                        height: responsiveWidth(60), width: responsiveWidth(90),
+                                        borderRadius: responsiveWidth(4),
+                                        alignSelf: 'center'
+                                    }} />
+                                </View>
                             }
                         </ZoomIn>
                         <FadeLeft>

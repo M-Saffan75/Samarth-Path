@@ -5,9 +5,12 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLOURS } from '../../../assets/theme/Theme';
+import { useTheme } from '../../../assets/themecontext/ThemeContext';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 
 const Suspended = ({ navigation }) => {
+
+    const { theme: COLOURS, isDark } = useTheme();
 
     const handleCloseApp = () => {
         BackHandler.exitApp();
@@ -35,57 +38,57 @@ const Suspended = ({ navigation }) => {
 
     return (
         <>
-            <StatusBar barStyle={'dark-content'} backgroundColor={COLOURS.light_primary} />
-            <SafeAreaView style={styles.container}>
+            <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={COLOURS.light_primary} />
+            <SafeAreaView style={[styles.container, { backgroundColor: COLOURS.light_primary, }]}>
 
                 {/* Decor circles — same as Network screen */}
-                <View style={styles.circle_lg} />
-                <View style={styles.circle_sm} />
+                <View style={[styles.circle_lg, { backgroundColor: COLOURS.primary, }]} />
+                <View style={[styles.circle_sm, { backgroundColor: COLOURS.primary, }]} />
 
                 <View style={styles.content}>
 
                     {/* Icon Area */}
                     <View style={styles.icon_wrapper}>
-                        <View style={styles.icon_ring_outer}>
-                            <View style={styles.icon_ring_inner}>
+                        <View style={[styles.icon_ring_outer, { backgroundColor: COLOURS.primary, }]}>
+                            <View style={[styles.icon_ring_inner, { backgroundColor: COLOURS.primary, }]}>
                                 {/* Lock / Ban icon using views */}
                                 <View style={styles.ban_icon}>
-                                    <View style={styles.ban_circle} />
-                                    <View style={styles.ban_slash} />
+                                    <View style={[styles.ban_circle, { borderColor: COLOURS.white, }]} />
+                                    <View style={[styles.ban_slash, { backgroundColor: COLOURS.white, }]} />
                                 </View>
                             </View>
                         </View>
                     </View>
 
                     {/* Badge */}
-                    <View style={styles.badge}>
-                        <Text style={styles.badge_text}>Account Suspended</Text>
+                    <View style={[styles.badge, { backgroundColor: COLOURS.primary, }]}>
+                        <Text style={[styles.badge_text, { color: COLOURS.white, }]}>Account Suspended</Text>
                     </View>
 
                     {/* Text */}
-                    <Text style={styles.title}>Your Account{'\n'}Has Been Suspended</Text>
-                    <Text style={styles.subtitle}>
+                    <Text style={[styles.title, { color: COLOURS.black, }]}>Your Account{'\n'}Has Been Suspended</Text>
+                    <Text style={[styles.subtitle, { color: COLOURS.grey, }]}>
                         Your access has been temporarily restricted.{'\n'}
-                        Please contact support for more details.
+                        {/* Please contact support for more details. */}
                     </Text>
 
                     {/* Buttons */}
                     <View style={styles.btn_area}>
 
-                        <TouchableOpacity
-                            style={styles.btn_primary}
+                        {/* <TouchableOpacity
+                            style={[styles.btn_primary, { backgroundColor: COLOURS.primary, }]}
                             onPress={handleContactSupport}
                             activeOpacity={0.85}
                         >
-                            <Text style={styles.btn_primary_text}>Contact Support</Text>
-                        </TouchableOpacity>
+                            <Text style={[styles.btn_primary_text, { color: COLOURS.white, }]}>Contact Support</Text>
+                        </TouchableOpacity> */}
 
                         <TouchableOpacity
-                            style={styles.btn_outline}
+                            style={[styles.btn_outline, { borderColor: COLOURS.primary, }]}
                             onPress={handleCloseApp}
                             activeOpacity={0.85}
                         >
-                            <Text style={styles.btn_outline_text}>Close App</Text>
+                            <Text style={[styles.btn_outline_text, { color: COLOURS.primary, }]}>Close App</Text>
                         </TouchableOpacity>
 
                     </View>
@@ -103,7 +106,7 @@ const styles = StyleSheet.create({
 
     container: {
         flex: 1,
-        backgroundColor: COLOURS.light_primary,
+
     },
 
     // Decor — same style as Network screen
@@ -114,7 +117,7 @@ const styles = StyleSheet.create({
         width: responsiveWidth(70),
         height: responsiveWidth(70),
         borderRadius: responsiveWidth(35),
-        backgroundColor: COLOURS.primary,
+
         opacity: 0.08,
     },
     circle_sm: {
@@ -124,7 +127,7 @@ const styles = StyleSheet.create({
         width: responsiveWidth(50),
         height: responsiveWidth(50),
         borderRadius: responsiveWidth(25),
-        backgroundColor: COLOURS.primary,
+
         opacity: 0.06,
     },
 
@@ -143,7 +146,7 @@ const styles = StyleSheet.create({
         width: responsiveWidth(40),
         height: responsiveWidth(40),
         borderRadius: responsiveWidth(20),
-        backgroundColor: COLOURS.primary,
+
         opacity: 0.12,
         alignItems: 'center',
         justifyContent: 'center',
@@ -152,7 +155,7 @@ const styles = StyleSheet.create({
         width: responsiveWidth(28),
         height: responsiveWidth(28),
         borderRadius: responsiveWidth(14),
-        backgroundColor: COLOURS.primary,
+
         opacity: 0.9,
         alignItems: 'center',
         justifyContent: 'center',
@@ -171,13 +174,13 @@ const styles = StyleSheet.create({
         height: responsiveWidth(9),
         borderRadius: responsiveWidth(4.5),
         borderWidth: responsiveWidth(0.9),
-        borderColor: COLOURS.white,
+
         position: 'absolute',
     },
     ban_slash: {
         width: responsiveWidth(0.8),
         height: responsiveWidth(11),
-        backgroundColor: COLOURS.white,
+
         borderRadius: responsiveWidth(1),
         transform: [{ rotate: '45deg' }],
         position: 'absolute',
@@ -185,7 +188,7 @@ const styles = StyleSheet.create({
 
     // Badge
     badge: {
-        backgroundColor: COLOURS.primary,
+
         opacity: 0.85,
         paddingHorizontal: responsiveWidth(4),
         paddingVertical: responsiveWidth(1.2),
@@ -195,7 +198,7 @@ const styles = StyleSheet.create({
     badge_text: {
         fontFamily: 'Poppins-SemiBold',
         fontSize: responsiveFontSize(1.4),
-        color: COLOURS.white,
+
         letterSpacing: 0.5,
     },
 
@@ -203,7 +206,7 @@ const styles = StyleSheet.create({
     title: {
         fontFamily: 'Poppins-Bold',
         fontSize: responsiveFontSize(3.2),
-        color: COLOURS.black,
+
         textAlign: 'center',
         lineHeight: responsiveFontSize(4.5),
         marginBottom: responsiveWidth(3),
@@ -211,7 +214,7 @@ const styles = StyleSheet.create({
     subtitle: {
         fontFamily: 'Poppins-Regular',
         fontSize: responsiveFontSize(1.7),
-        color: COLOURS.grey,
+
         textAlign: 'center',
         lineHeight: responsiveFontSize(3),
         marginBottom: responsiveWidth(10),
@@ -223,7 +226,7 @@ const styles = StyleSheet.create({
         gap: responsiveWidth(3),
     },
     btn_primary: {
-        backgroundColor: COLOURS.primary,
+
         paddingVertical: responsiveWidth(4),
         borderRadius: responsiveWidth(4),
         alignItems: 'center',
@@ -231,18 +234,18 @@ const styles = StyleSheet.create({
     btn_primary_text: {
         fontFamily: 'Poppins-Bold',
         fontSize: responsiveFontSize(1.9),
-        color: COLOURS.white,
+
     },
     btn_outline: {
         paddingVertical: responsiveWidth(4),
         borderRadius: responsiveWidth(4),
         alignItems: 'center',
         borderWidth: responsiveWidth(0.3),
-        borderColor: COLOURS.primary,
+
     },
     btn_outline_text: {
         fontFamily: 'Poppins-SemiBold',
         fontSize: responsiveFontSize(1.9),
-        color: COLOURS.primary,
+
     },
 });

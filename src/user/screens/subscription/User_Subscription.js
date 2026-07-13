@@ -29,7 +29,7 @@ const FEATURES = [
 const User_Subscription = ({ navigation }) => {
 
   const { userData, updateUser } = useUser();
-  console.log('userData',userData)
+  console.log('userData', userData)
 
   const { theme: COLOURS, isDark } = useTheme();
   const [loading, setLoading] = useState(false);
@@ -60,6 +60,9 @@ const User_Subscription = ({ navigation }) => {
       const options = buildRazorpayOptions(orderData);
       const paymentData = await RazorpayCheckout.open(options);
       await verifySubscriptionPayment({ token, paymentData });
+      navigation.replace(UserRoutes.Bottom_Navigation, {
+        screen: UserRoutes.User_Profile,
+      })
       showSuccess('Success', 'Payment Successful 🎉');
     } catch (error) {
       console.log(error);
