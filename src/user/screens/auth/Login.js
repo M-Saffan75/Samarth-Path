@@ -54,12 +54,12 @@ const Login = ({ navigation }) => {
 
     const handleApiCall = async () => {
         // console.log(formattedPhone, password )
-        
+
         try {
             setLoading(true);
             const data = await loginUser({ phone: formattedPhone, password });
             // return
-            console.log('user',data)
+            console.log('user', data)
             const user = await getUserMe(data?.data?.token);
             // return
             updateUser(user);
@@ -69,7 +69,7 @@ const Login = ({ navigation }) => {
                     index: 1,
                     routes: [
                         { name: UserRoutes.Bottom_Navigation },
-                        { name: UserRoutes.PayWall },j
+                        { name: UserRoutes.PayWall },
                     ],
                 });
                 return;
@@ -95,12 +95,15 @@ const Login = ({ navigation }) => {
                 navigation.navigate(UserRoutes.Suspended);
                 return;
             }
-
+            
             if (error.code === 403 && (
                 error.message?.includes('Trial period expired') ||
                 error.message?.includes('Subscription expired')
             )) {
-                navigation.navigate(UserRoutes.PayWall);
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: UserRoutes.PayWall }],
+                });
                 return;
             }
 

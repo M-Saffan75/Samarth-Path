@@ -21,20 +21,24 @@ import { useUser } from '../auth/user_context/UserContext';
 import { logoutUser } from '../auth/auth_backend/Auth_Backend';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '../../../assets/themecontext/ThemeContext';
+import { useLoader } from '../../../loading/LoaderContext';
 
 const User_Profile = ({ navigation }) => {
 
     const { userData } = useUser();
+    const { setLoading } = useLoader();
     const [showTheme, setShowTheme] = useState(false);
 
     const handleLogout = async () => {
         try {
+            setLoading(true)
             const res = await logoutUser();
             console.log(res)
             await AsyncStorage.removeItem('token');
             const allKeys = await AsyncStorage.getAllKeys();
             const quizKeys = allKeys.filter(key => key.startsWith('quiz_timer_'));
             await AsyncStorage.multiRemove(quizKeys);
+            setLoading(false)
             navigation.reset({
                 index: 0,
                 routes: [{ name: UserRoutes.OnBoard }],
@@ -128,12 +132,12 @@ const User_Profile = ({ navigation }) => {
 
                                 <Profile_Row label={'guidance'} source={globalImages.guidnace_icon}
                                     onPress={() => navigation.navigate(UserRoutes.Guidance_Widget)}
-                                    // onPress={() => navigation.navigate(UserRoutes.Weekly_Winners)}
-                                     />
+                                // onPress={() => navigation.navigate(UserRoutes.Weekly_Winners)}
+                                />
 
                                 <Profile_Row label={'subscription'} bordernone={false} paddingBottom={responsiveWidth(.1)}
                                     source={globalImages.about_icon} onPress={() => navigation.navigate(UserRoutes.Subscription)} />
-                                    
+
                             </View>
                         </FadeDown>
 

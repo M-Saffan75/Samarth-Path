@@ -30,11 +30,11 @@ const Splash = () => {
       if (token) {
         const user = await getUserMe(token)
         updateUser(user)
-        console.log('user', user)
-        navigation.reset({
-          index: 0,
-          routes: [{ name: UserRoutes.Bottom_Navigation }],
-        });
+        if (user.isSubscribed) {
+          navigation.reset({ index: 0, routes: [{ name: UserRoutes.Bottom_Navigation }] });
+        } else {
+          navigation.reset({ index: 0, routes: [{ name: UserRoutes.PayWall }] });
+        }
       } else {
         navigation.reset({
           index: 0,

@@ -1,4 +1,5 @@
 import React from 'react';
+import RazorpayCheckout from 'react-native-razorpay';
 import Button from '../../../components/Button';
 import App_Logo from '../../../components/App_Logo';
 import UserRoutes from '../../user_routes/UserRoutes';
@@ -7,9 +8,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../../assets/themecontext/ThemeContext';
 import Subscription_Card from '../../../components/Subscription_Card';
 import Subscription_Offer from '../../../components/Subscription_Offer';
-import { StatusBar, Image, StyleSheet, Text, View } from 'react-native';
+import { StatusBar, StyleSheet, View } from 'react-native';
 import { globalImages } from '../../../assets/images/images_file/All_Images';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
+import { createSubscriptionOrder, verifySubscriptionPayment, buildRazorpayOptions } from '../subscription/subscription_backend/Subs_Backend';
+import { showError, showSuccess } from '../../../helper/Helper';
+import { getUserMe } from '../auth/auth_backend/Auth_Backend';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { Pulse } from '../../../components/Pulse';
 import { FadeIn } from '../../../components/FadeIn';
@@ -17,13 +22,40 @@ import { FadeUp } from '../../../components/FadeUp';
 import { Bounce } from '../../../components/Bounce';
 import { FadeLeft } from '../../../components/FadeLeft';
 import { useUser } from '../auth/user_context/UserContext';
+import { useLoader } from '../../../loading/LoaderContext';
 
 const PayWall = ({ navigation }) => {
 
     const { theme: COLOURS, isDark } = useTheme();
-    const { userData } = useUser();
+    const { userData, updateUser } = useUser();
+    const { setLoading } = useLoader();
 
-    console.log('userData', userData)
+    const isTrialExpired = userData?.subscription?.status === 'expired';
+    const price = isTrialExpired ? '₹199' : '₹5';
+    const cardLabel = isTrialExpired ? '30-day subscription' : '3-days trial';
+    const btnLabel = isTrialExpired ? 'buy subscription — ₹199/month' : 'start 3-day trial — ₹5';
+
+    const handleTrialPayment = async () => {
+        try {
+            setLoading(true);
+            const { token, orderData } = await createSubscriptionOrder();
+            const options = buildRazorpayOptions(orderData);
+            options.description = '3-Day Trial — ₹5';
+            const paymentData = await RazorpayCheckout.open(options);
+            await verifySubscriptionPayment({ token, paymentData });
+            const freshToken = await AsyncStorage.getItem('token');
+            const freshUser = await getUserMe(freshToken);
+            updateUser(freshUser);
+            showSuccess('Trial activated! Welcome to Samarth Path.');
+            navigation.reset({ index: 0, routes: [{ name: UserRoutes.Bottom_Navigation }] });
+        } catch (error) {
+            if (error?.code !== 'PAYMENT_CANCELLED') {
+                showError(error?.message || 'Payment failed. Please try again.');
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleSubscription = () => {
         navigation.reset({
@@ -33,7 +65,9 @@ const PayWall = ({ navigation }) => {
                 { name: UserRoutes.Subscription },
             ],
         });
-    }
+    };
+
+    const handlePress = isTrialExpired ? handleSubscription : handleTrialPayment;
 
     return (
         <>
@@ -45,11 +79,9 @@ const PayWall = ({ navigation }) => {
 
                 <View style={[styles.container, { backgroundColor: COLOURS.white }]}>
 
-                    <View style={[styles.logo_bg, { backgroundColor: COLOURS.light_grey, }]}>
+                    <View style={[styles.logo_bg, { backgroundColor: COLOURS.light_grey }]}>
                         <App_Logo source={globalImages.app_logo} resizeMode={'cover'} height={responsiveWidth(12)} width={responsiveWidth(12)} tintColor={COLOURS.primary} />
                     </View>
-
-                    {/*  */}
 
                     <FadeIn>
                         <Title_Here title={'begin your spiritual journey'}
@@ -62,7 +94,10 @@ const PayWall = ({ navigation }) => {
                     </FadeIn>
 
                     <FadeUp>
-                        <Title_Here title={'start with a 3-day trial to experience the full power of samarth path'}
+                        <Title_Here
+                            title={isTrialExpired
+                                ? 'your trial has ended — continue your journey with a full subscription'
+                                : 'start with a 3-day trial to experience the full power of samarth path'}
                             color={COLOURS.light_black}
                             textAlign={'center'}
                             fontFamily={'Poppins-Regular'}
@@ -72,13 +107,9 @@ const PayWall = ({ navigation }) => {
                         />
                     </FadeUp>
 
-                    {/*  */}
-
                     <Pulse>
-                        <Subscription_Card Price={'₹' + '200'} Trial_Days={'3-days trial'} />
+                        <Subscription_Card Price={price} Trial_Days={cardLabel} />
                     </Pulse>
-
-                    {/*  */}
 
                     <FadeIn>
                         <Title_Here title={'what you will get'}
@@ -90,7 +121,6 @@ const PayWall = ({ navigation }) => {
                         />
                     </FadeIn>
 
-                    {/*  */}
                     <FadeLeft>
                         <Subscription_Offer detail={'full access to daily content'} source={globalImages.access_icon} />
                     </FadeLeft>
@@ -104,18 +134,14 @@ const PayWall = ({ navigation }) => {
                         <Subscription_Offer detail={'daily wisdom notifications'} source={globalImages.calender_icon} />
                     </FadeLeft>
 
-                    {/*  */}
                     <FadeIn>
                         <View style={styles.btn_area}>
-                            <Button label={'start 3 day trial or buy subscription'} onPress={handleSubscription}
-                            />
+                            <Button label={btnLabel} onPress={handlePress} />
                         </View>
                     </FadeIn>
 
-                    {/*  */}
-
                     <Bounce>
-                        <Title_Here title={'by starting the trial, you agree to our terms of services.'}
+                        <Title_Here title={'by continuing, you agree to our terms of services.'}
                             color={COLOURS.light_black}
                             textAlign={'center'}
                             fontFamily={'Poppins-Regular'}
@@ -127,16 +153,14 @@ const PayWall = ({ navigation }) => {
 
                 </View>
 
-            </SafeAreaView >
-
+            </SafeAreaView>
         </>
-    )
-}
+    );
+};
 
-export default PayWall
+export default PayWall;
 
 const styles = StyleSheet.create({
-
     logo_bg: {
         alignSelf: 'center',
         alignItems: 'center',
@@ -145,17 +169,13 @@ const styles = StyleSheet.create({
         height: responsiveWidth(20),
         marginTop: responsiveWidth(5),
         borderRadius: responsiveWidth(4),
-
     },
-
     btn_area: {
         alignItems: 'center',
         marginTop: responsiveWidth(2),
     },
-
     container: {
         height: '100%',
         width: '100%',
     },
-
-})
+});

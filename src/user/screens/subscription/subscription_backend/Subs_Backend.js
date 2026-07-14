@@ -8,7 +8,7 @@ export const createSubscriptionOrder = async () => {
     try {
         const token = await AsyncStorage.getItem('token');
         const orderRes = await fetch(
-            `${BASE_URL}/api/user/subscription/create-order`,
+            `${BASE_URL}/user/subscription/create-order`,
             {
                 method: 'POST',
                 headers: {
@@ -42,7 +42,7 @@ export const verifySubscriptionPayment = async ({ token, paymentData, }) => {
     console.log('token, paymentData<><><><><><>', token, paymentData,)
     try {
         const verifyRes = await fetch(
-            `${BASE_URL}/api/user/subscription/verify-payment`,
+            `${BASE_URL}/user/subscription/verify-payment`,
             {
                 method: 'POST',
                 headers: {
@@ -80,15 +80,12 @@ export const buildRazorpayOptions = (orderData) => {
         amount: orderData.data.amount,
         order_id: orderData.data.orderId,
         name: 'Samarth Path',
-
         prefill: {
             email: 'user@example.com',
-            contact: '9999999999',
+            contact: '9191919191',
             name: 'User Name',
         },
-        theme: {
-            color: '#000',
-        },
+        theme: { color: '#000' },
     };
 };
 

@@ -36,19 +36,23 @@ const User_Subscription = ({ navigation }) => {
   const [message, setMessage] = useState('');
   const [showModal, setShowModal] = useState(false)
   const [cancelModal, setCancelModal] = useState(false)
-  const expiryDate = new Date(userData?.subscription?.expiryDate);
+  const isTrial = userData?.isTrial;
+  const totalDays = isTrial ? 3 : 30;
+  const endDate = isTrial
+    ? new Date(userData?.subscription?.trialEndDate)
+    : new Date(userData?.subscription?.expiryDate);
   const today = new Date();
-  const daysLeft = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+  const daysLeft = Math.max(0, Math.ceil((endDate - today) / (1000 * 60 * 60 * 24)));
   const isExpired = daysLeft <= 0;
-  const cancelled = userData?.subscription?.status
+  const cancelled = userData?.subscription?.status;
 
-  const formattedExpiry = expiryDate.toLocaleDateString('en-IN', {
+  const formattedExpiry = endDate.toLocaleDateString('en-IN', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
   });
 
-  const progressPercent = Math.max(0, Math.min(100, (daysLeft / 30) * 100));
+  const progressPercent = Math.max(0, Math.min(100, (daysLeft / totalDays) * 100));
 
 
 
@@ -63,7 +67,9 @@ const User_Subscription = ({ navigation }) => {
       navigation.replace(UserRoutes.Bottom_Navigation, {
         screen: UserRoutes.User_Profile,
       })
-      showSuccess('Success', 'Payment Successful 🎉');
+      showSuccess('Payment Successful 🎉');
+      const user = await getUserMe(token);
+      updateUser(user);
     } catch (error) {
       console.log(error);
       showError('Error', error.message);
@@ -86,7 +92,7 @@ const User_Subscription = ({ navigation }) => {
       setShowModal(true)
     } catch (error) {
       console.log(error);
-      showError('Error', error.message);
+      showError(error.message);
       setCancelModal(false)
     } finally {
       setLoading(false);
@@ -200,7 +206,7 @@ const User_Subscription = ({ navigation }) => {
                         <View style={[styles.priceBadge, { backgroundColor: COLOURS.primary ?? '#E07B39' }]}>
                           <Text style={styles.priceSymbol}>₹</Text>
                           <Text style={styles.priceAmount}>{userData?.subscription?.price}</Text>
-                          <Text style={styles.pricePer}>/mo</Text>
+                          <Text style={styles.pricePer}>{userData?.isTrial ? '/days' : '/mo'}</Text>
                         </View>
                       </View>
 
@@ -245,10 +251,11 @@ const User_Subscription = ({ navigation }) => {
                       </View>
                     </View>
 
-                    <Button label={'cancel subscription ⛔'} onPress={() => setCancelModal(true)}
+                    {!userData?.isTrial ? (<Button label={'cancel subscription ⛔'}
+                      onPress={() => setCancelModal(true)}
                       alignSelf={'center'} backgroundColor={'#e5383522'}
                       borderColor={COLOURS.red} borderWidth={responsiveWidth(.4)}
-                      color={COLOURS.black} borderRadius={responsiveWidth(100)} />
+                      color={COLOURS.black} borderRadius={responsiveWidth(100)} />) : ''}
                   </>
                 )}
                 <Text style={styles.secureText}>🔒 Secured by Razorpay</Text>
