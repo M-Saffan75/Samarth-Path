@@ -10,6 +10,8 @@ export const USER_API_URL = {
     NEW_PASSWORD: '/user/auth/set-new-password',
     CHANGE_PASSWORD: '/user/auth/change-password',
     UPDATE_PROFILE: '/user/auth/update-profile',
+    UPDATE_EMAIL: '/user/auth/verify-email-update',
+    UPDATE_PHONE: '/user/auth/verify-phone-update',
     ME: '/user/auth/me',
     LOGOUT: '/user/auth/logout',
 
@@ -50,7 +52,7 @@ export const USER_API_URL = {
     SEND_CONSULTANT: '/user/consultant',
 
     // Subscription
-    CANCEL_SUBSCRIPTION: '/user/subscription/cancel-payment',
+    CANCEL_SUBSCRIPTION: '/user/subscription/recurring/cancel',
 
     // Notifications
     USER_NOTIFICATION: '/user/notifications',

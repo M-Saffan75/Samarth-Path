@@ -56,7 +56,7 @@ export const verifyOtp = async ({ phone, otp }) => {
     });
 
     const data = await response.json();
-    console.log('verifyemailsssss',data)
+    console.log('verifyemailsssss', data)
 
     if (response.status === 410) { // ✅ OTP expired
         const error = new Error(data.message);
@@ -73,7 +73,7 @@ export const verifyOtp = async ({ phone, otp }) => {
 
 
 export const loginUser = async ({ phone, password }) => {
-    console.log('login api res :',phone, password)
+    console.log('login api res :', phone, password)
     const response = await fetch(`${BASE_URL}${USER_API_URL.LOGIN}`, {
         method: 'POST',
         headers: {
@@ -197,11 +197,15 @@ export const getUserMe = async (token) => {
 
 // updateProfile function
 
-export const updateProfile = async ({ name, gender, dateOfBirth, address, selectedImage }) => {
-    const token = await AsyncStorage.getItem('token');
+export const updateProfile = async ({ name, email, phone, gender, dateOfBirth, address, selectedImage }) => {
 
+    console.log(name, email, phone, gender, dateOfBirth, address, selectedImage)
+
+    const token = await AsyncStorage.getItem('token');
     const parts = [
         { name: 'name', data: name },
+        { name: 'email', data: email },
+        { name: 'phone', data: phone },
         { name: 'gender', data: gender },
         { name: 'dateOfBirth', data: dateOfBirth },
         { name: 'address', data: address },
@@ -227,9 +231,55 @@ export const updateProfile = async ({ name, gender, dateOfBirth, address, select
     );
 
     const json = JSON.parse(res.data);
-    console.log('Raw response:', JSON.stringify(json));
+    // console.log('Raw response:', JSON.stringify(json));
     return { ...json, statusCode: res.respInfo?.status };
 };
+
+
+export const verifyEmailOtp = async (token, otp) => {
+    const response = await fetch(`${BASE_URL}${USER_API_URL.UPDATE_EMAIL}`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ otp }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        const error = new Error(data.message || 'OTP verification failed');
+        error.status = response.status;
+        throw error;
+    }
+
+    return { data: data.data, status: response.status };
+};
+
+
+export const verifyPhoneOtp = async (token, otp) => {
+    const response = await fetch(`${BASE_URL}${USER_API_URL.UPDATE_PHONE}`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ otp }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        const error = new Error(data.message || 'OTP verification failed');
+        error.status = response.status;
+        throw error;
+    }
+
+    return { data: data.data, status: response.status };
+};
+
+
 
 export const logoutUser = async () => {
     const authToken = await AsyncStorage.getItem('token');

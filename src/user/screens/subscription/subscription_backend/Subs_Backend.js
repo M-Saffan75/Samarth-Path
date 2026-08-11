@@ -2,13 +2,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BASE_URL } from '../../../../api_url/BASE_URL';
 import { USER_API_URL } from '../../../user_api_url/USER_API_URL';
 
-const NGROK_URL = 'https://synopsis-creative-crumpled.ngrok-free.dev'
 
 export const createSubscriptionOrder = async () => {
     try {
         const token = await AsyncStorage.getItem('token');
         const orderRes = await fetch(
-            `${BASE_URL}/user/subscription/create-order`,
+            `${BASE_URL}/user/subscription/recurring/create`,
             {
                 method: 'POST',
                 headers: {
@@ -23,9 +22,9 @@ export const createSubscriptionOrder = async () => {
             }
         );
 
-        console.log('Response Status:', orderRes.status);
+        // console.log('Response Status:', orderRes.status);
         const orderData = await orderRes.json();
-        console.log('Order Data:', orderData);
+        // console.log('Order Data:', orderData);
 
         if (!orderData.success || !orderData.data) {
             throw new Error(orderData.message || 'Order create failed');
@@ -38,11 +37,24 @@ export const createSubscriptionOrder = async () => {
     }
 };
 
-export const verifySubscriptionPayment = async ({ token, paymentData, }) => {
-    console.log('token, paymentData<><><><><><>', token, paymentData,)
+export const verifySubscriptionPayment = async ({ token, paymentData, subsID }) => {
+    const {
+        razorpay_payment_id,
+        razorpay_subscription_id,
+        razorpay_signature,
+    } = paymentData;
+
+    console.log('Verify Payload >>>', {
+        token,
+        razorpay_payment_id,
+        razorpay_subscription_id,
+        razorpay_signature,
+        subsID,
+    });
+
     try {
         const verifyRes = await fetch(
-            `${BASE_URL}/user/subscription/verify-payment`,
+            `${BASE_URL}/user/subscription/recurring/verify`,
             {
                 method: 'POST',
                 headers: {
@@ -50,9 +62,10 @@ export const verifySubscriptionPayment = async ({ token, paymentData, }) => {
                     Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
-                    razorpay_payment_id: paymentData.razorpay_payment_id,
-                    razorpay_order_id: paymentData.razorpay_order_id,
-                    razorpay_signature: paymentData.razorpay_signature,
+                    razorpay_payment_id,
+                    razorpay_subscription_id,
+                    razorpay_signature,
+                    subsID, // backend se mile hue subscription_id bhi bhej rahe (cross-check ke liye)
                 }),
             }
         );
@@ -72,20 +85,24 @@ export const verifySubscriptionPayment = async ({ token, paymentData, }) => {
     }
 };
 
-export const buildRazorpayOptions = (orderData) => {
+export const buildRazorpayOptions = (orderData, name, email, phone) => {
     return {
         description: 'Subscription Payment',
         currency: 'INR',
-        key: 'rzp_test_SwLX9wqJpVXeDX',
+        key: orderData.data.key,
         amount: orderData.data.amount,
         order_id: orderData.data.orderId,
+        subscription_id: orderData.data.razorpaySubscriptionId, // yahi zaroori hai
         name: 'Samarth Path',
         prefill: {
-            email: 'user@example.com',
-            contact: '9191919191',
-            name: 'User Name',
+            email: email,
+            contact: phone,
+            name: name,
         },
         theme: { color: '#000' },
+        method: {
+            emi: true,
+        },
     };
 };
 

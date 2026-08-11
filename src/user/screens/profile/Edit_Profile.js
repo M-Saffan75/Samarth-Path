@@ -17,27 +17,32 @@ import { Pulse } from '../../../components/Pulse';
 import { FadeIn } from '../../../components/FadeIn';
 import { Fonts } from '../../../assets/fonts/Fonts';
 import { FadeUp } from '../../../components/FadeUp';
+import Modal_OTP from '../../../components/Modal_OTP';
 import Title_Here from '../../../components/Title_Here';
 import { FadeDown } from '../../../components/FadeDown';
 import Trial_Text from '../../../components/Trial_Text';
 import { useUser } from '../auth/user_context/UserContext';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { showError, showSuccess } from '../../../helper/Helper';
-import { getUserMe, updateProfile } from '../auth/auth_backend/Auth_Backend';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getUserMe, updateProfile, verifyEmailOtp, verifyPhoneOtp } from '../auth/auth_backend/Auth_Backend';
+import UserRoutes from '../../user_routes/UserRoutes';
 
 const Edit_Profile = ({ navigation }) => {
 
     const { theme: COLOURS, isDark } = useTheme();
 
     const { userData, updateUser } = useUser();
-    console.log('check', userData)
+    // console.log('check', userData)
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
     const [address, setAddress] = useState('');
+    const [otpModalVisible, setOtpModalVisible] = useState(false);
     const [dob, setDob] = useState(userData?.dateOfBirth || '');
     const [gender, setGender] = useState(userData?.gender || '');
-    const [selectedImage, setSelectedImage] = useState(null); // local picked image
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [otpLoading, setOtpLoading] = useState(false);
+    const [otpType, setOtpType] = useState(null);
     const [loading, setLoading] = useState(false);
 
     const parseDate = (dateStr) => {
@@ -84,6 +89,8 @@ const Edit_Profile = ({ navigation }) => {
             gender !== (userData?.gender || '') ||
             dob !== (userData?.dateOfBirth || '') ||
             address !== (userData?.address || '') ||
+            phone !== (userData?.phone || '') ||
+            email !== (userData?.email || '') ||
             selectedImage !== null
         );
     };
@@ -93,37 +100,82 @@ const Edit_Profile = ({ navigation }) => {
         const token = await AsyncStorage.getItem('token');
 
         if (!hasChanged()) {
-            console.log('first')
             showError('Nothing changed.');
             return;
         }
         setLoading(true);
         try {
             const dobString = dob instanceof Date
-                ? dob.toISOString().split('T')[0]  // "2003-01-21"
+                ? dob.toISOString().split('T')[0]
                 : dob || '';
 
             const json = await updateProfile({
                 name,
+                email,
+                phone,
                 gender: gender?.toLowerCase(),
                 dateOfBirth: dobString,
                 address,
                 selectedImage
             });
-
-            if (json.success) {
-                showSuccess(json.message || 'Profile updated!');
-                console.log(json?.sucess)
+            console.log('jsoncheck', json)
+            if (json?.data?.emailVerificationPending) {
+                setOtpType('email');
+                setOtpModalVisible(true);
+            } else if (json?.data?.phoneVerificationPending) {
+                setOtpType('phone');
+                setOtpModalVisible(true);
+            } else if (json?.data?.message) {
+                showSuccess(json.data?.message || 'Profile updated!');
                 const user = await getUserMe(token);
                 updateUser(user);
-                navigation.goBack();
-            } else {
-                showError(json.message || 'Update failed');
+                navigation.replace(UserRoutes.Bottom_Navigation, {
+                    screen: UserRoutes.User_Profile,
+                });
+            } else if (json.status === false || json.code === 400) {
+                showError(json?.message || 'updated error');
+            }
+            else {
+                showSuccess(json?.message || 'profile update');
+                const user = await getUserMe(token);
+                updateUser(user);
+                navigation.replace(UserRoutes.Bottom_Navigation, {
+                    screen: UserRoutes.User_Profile,
+                });
             }
         } catch (e) {
             console.log('Update error:', e);
             showError('Something went wrong');
         } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleOtpSubmit = async (otpCode) => {
+        if (otpCode.length < 4) {
+            showError('Please enter 4 digit OTP');
+            return;
+        }
+        try {
+            setLoading(true);
+            setOtpLoading(true);
+            const token = await AsyncStorage.getItem('token');
+
+            const { data } = otpType === 'email'
+                ? await verifyEmailOtp(token, otpCode)
+                : await verifyPhoneOtp(token, otpCode);
+
+            setOtpModalVisible(false);
+            setOtpType(null);
+
+            const user = await getUserMe(token);
+            updateUser(user);
+            showSuccess(data?.message || `${otpType === 'email' ? 'Email' : 'Phone'} verified successfully!`);
+            navigation.goBack();
+        } catch (e) {
+            showError(e.message || 'Invalid OTP');
+        } finally {
+            setOtpLoading(false);
             setLoading(false);
         }
     };
@@ -215,12 +267,10 @@ const Edit_Profile = ({ navigation }) => {
                                         maxLength={35}
                                         Placeholder={'Your email'}
                                         disabled={true}
-                                        editable={false}
                                         defaultValue={email}
                                         third_height={responsiveWidth(4)}
                                         third_width={responsiveWidth(4)}
                                         first_inpt_Img={globalImages.envelope_filled}
-                                        third_inpt_Img={globalImages.disabled_icon}
                                         left={responsiveWidth(-10)}
                                         tintColor={COLOURS.grey}
                                         value={email}
@@ -239,10 +289,8 @@ const Edit_Profile = ({ navigation }) => {
                                         third_height={responsiveWidth(4)}
                                         third_width={responsiveWidth(4)}
                                         maxLength={40}
-                                        editable={false}
                                         defaultValue={phone}
                                         first_inpt_Img={globalImages.phone_filled}
-                                        third_inpt_Img={globalImages.disabled_icon}
                                         left={responsiveWidth(-10)}
                                         tintColor={COLOURS.grey}
                                         value={phone}
@@ -250,7 +298,7 @@ const Edit_Profile = ({ navigation }) => {
                                     />
 
                                 </FadeIn>
-                                <View marginTop={responsiveWidth(3)}/>
+                                <View marginTop={responsiveWidth(3)} />
                                 <FadeIn delay={350}>
                                     <Input_Field backgroundColor={COLOURS.light_primary} borderColor={COLOURS.transparent}
                                         borderWidth={1}
@@ -302,6 +350,16 @@ const Edit_Profile = ({ navigation }) => {
                         </View>
                     </ScrollView>
                 </View>
+
+                <Modal_OTP
+                    modalVisible={otpModalVisible}
+                    setModalVisible={setOtpModalVisible}
+                    email={otpType === 'email' ? email : phone}
+                    handleOtpSubmit={handleOtpSubmit}
+                    loading={otpLoading}
+                    type={otpType}
+                />
+
             </SafeAreaView>
         </>
 

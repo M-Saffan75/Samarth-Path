@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import RazorpayCheckout from 'react-native-razorpay';
 import Button from '../../../components/Button';
 import App_Logo from '../../../components/App_Logo';
@@ -28,6 +28,10 @@ const PayWall = ({ navigation }) => {
 
     const { theme: COLOURS, isDark } = useTheme();
     const { userData, updateUser } = useUser();
+    const [subsID, setSubsID] = useState('')
+    const name = userData?.name;
+    const email = userData?.email;
+    const phone = userData?.phone;
     const { setLoading } = useLoader();
 
     const isTrialExpired = userData?.subscription?.status === 'expired';
@@ -39,10 +43,36 @@ const PayWall = ({ navigation }) => {
         try {
             setLoading(true);
             const { token, orderData } = await createSubscriptionOrder();
-            const options = buildRazorpayOptions(orderData);
+            const razorpaySubscriptionId = orderData?.data?.razorpaySubscriptionId;
+            setSubsID(razorpaySubscriptionId);
+            console.log('orderData', orderData);
+
+            const options = buildRazorpayOptions(orderData, name, email, phone);
+            console.log('options', options);
             options.description = '3-Day Trial — ₹5';
+            options.prefill.contact = userData?.phone?.replace('+91', '') || '9999999999';
+            options.prefill.name = userData?.name || 'User';
+
             const paymentData = await RazorpayCheckout.open(options);
-            await verifySubscriptionPayment({ token, paymentData });
+            console.log('RAW paymentData >>>', JSON.stringify(paymentData));
+
+            const {
+                razorpay_payment_id,
+                razorpay_subscription_id,
+                razorpay_signature,
+            } = paymentData;
+
+            console.log('razorpay_payment_id', razorpay_payment_id);
+            console.log('razorpay_subscription_id', razorpay_subscription_id);
+            console.log('razorpay_signature', razorpay_signature);
+            console.log('subsID (from create response)', razorpaySubscriptionId);
+
+            await verifySubscriptionPayment({
+                token,
+                paymentData,
+                subsID: razorpaySubscriptionId,
+            });
+
             const freshToken = await AsyncStorage.getItem('token');
             const freshUser = await getUserMe(freshToken);
             updateUser(freshUser);

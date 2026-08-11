@@ -62,6 +62,8 @@ const User_Subscription = ({ navigation }) => {
       const { token, orderData } = await createSubscriptionOrder();
       console.log('token, orderData<><><><>><<><<', token, orderData)
       const options = buildRazorpayOptions(orderData);
+      options.prefill.contact = userData?.phone?.replace('+91', '') || '9999999999';
+      options.prefill.name = userData?.name || 'User';
       const paymentData = await RazorpayCheckout.open(options);
       await verifySubscriptionPayment({ token, paymentData });
       navigation.replace(UserRoutes.Bottom_Navigation, {
