@@ -1,5 +1,5 @@
-export const IMG_URL = 'https://tribicx.globaleselect.it'
-export const BASE_URL = 'https://tribicx.globaleselect.it/api'
+export const IMG_URL = 'https://api.samarthpath.com'
+export const BASE_URL = 'https://api.samarthpath.com/api'
 
 
 // export const IMG_URL = 'http://192.168.1.9:5000'

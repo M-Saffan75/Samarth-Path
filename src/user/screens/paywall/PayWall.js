@@ -8,7 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../../assets/themecontext/ThemeContext';
 import Subscription_Card from '../../../components/Subscription_Card';
 import Subscription_Offer from '../../../components/Subscription_Offer';
-import { StatusBar, StyleSheet, View } from 'react-native';
+import { StatusBar, StyleSheet, View, Text, TouchableOpacity, Linking } from 'react-native';
 import { globalImages } from '../../../assets/images/images_file/All_Images';
 import { responsiveFontSize, responsiveWidth } from 'react-native-responsive-dimensions';
 import { createSubscriptionOrder, verifySubscriptionPayment, buildRazorpayOptions } from '../subscription/subscription_backend/Subs_Backend';
@@ -171,14 +171,14 @@ const PayWall = ({ navigation }) => {
                     </FadeIn>
 
                     <Bounce>
-                        <Title_Here title={'by continuing, you agree to our terms of services.'}
-                            color={COLOURS.light_black}
-                            textAlign={'center'}
-                            fontFamily={'Poppins-Regular'}
-                            marginTop={responsiveWidth(5)}
-                            marginBottom={responsiveWidth(2)}
-                            fontSize={responsiveFontSize(1.4)}
-                        />
+                        <TouchableOpacity activeOpacity={0.7} onPress={() => Linking.openURL('https://samarthpath.com/privacy-policy.html')} style={{ marginTop: responsiveWidth(5), marginBottom: responsiveWidth(2), paddingHorizontal: responsiveWidth(4) }}>
+                            <Text style={{ color: COLOURS.light_black, textAlign: 'center', fontFamily: 'Poppins-Regular', fontSize: responsiveFontSize(1.4) }}>
+                                {'by continuing, you agree to our '}
+                                <Text style={{ color: COLOURS.primary, textDecorationLine: 'underline' }}>
+                                    {'privacy policy & terms of service'}
+                                </Text>
+                            </Text>
+                        </TouchableOpacity>
                     </Bounce>
 
                 </View>
