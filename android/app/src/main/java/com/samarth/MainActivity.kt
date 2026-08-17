@@ -1,4 +1,4 @@
-package com.samarth
+package com.samarthpath
 
 import android.os.Bundle
 import android.view.WindowManager

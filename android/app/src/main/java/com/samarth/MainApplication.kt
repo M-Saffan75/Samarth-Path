@@ -1,4 +1,4 @@
-package com.samarth
+package com.samarthpath
 
 import android.app.Application
 import com.facebook.react.PackageList
