@@ -33,7 +33,8 @@ const Splash = () => {
         if (user.isSubscribed) {
           navigation.reset({ index: 0, routes: [{ name: UserRoutes.Bottom_Navigation }] });
         } else {
-          navigation.reset({ index: 0, routes: [{ name: UserRoutes.PayWall }] });
+          // navigation.reset({ index: 0, routes: [{ name: UserRoutes.PayWall }] });
+          navigation.reset({ index: 0, routes: [{ name: UserRoutes.Bottom_Navigation }] });
         }
       } else {
         navigation.reset({
